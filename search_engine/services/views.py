@@ -52,3 +52,16 @@ def document(request):
         'document': document
     }
     return JsonResponse(data)
+
+
+@require_http_methods(["GET"])
+def query_suggestion(request):
+    query = request.GET['query']
+    suggestions = []
+    for i in range(5):
+        suggestions.append(lorem.sentence())
+    
+    data = {
+        'suggestions': suggestions
+    }
+    return JsonResponse(data)

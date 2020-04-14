@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="{% static 'aduna/bootstrap/css/bootstrap.min.css' %}" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'aduna/jquery-ui/jquery-ui.min.css' %}">
     <link rel="stylesheet" href="{% static 'aduna/style.css' %}">
 
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -23,9 +24,8 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
-                    {% comment %} <form class="form-inline mt-2 mt-md-0"> {% endcomment %}
-                    <form action="{% url 'aduna:search' %}" method="GET" class="form form-inline mt-2 mt-md-0">
-                    <input class="form-control mr-sm-2" type="text" placeholder="Sua consulta aqui..." aria-label="Consulta" value="{{ query }}" name="query" id="query">
+                    <form action="{% url 'aduna:search' %}" method="GET" class="form-inline mt-2 mt-md-0">
+                    <input id="query" name="query" class="form-control mr-sm-2" type="text" placeholder="Sua consulta aqui..." aria-label="Consulta" value="{{ query }}">
                     <button class="btn btn-primary my-2 my-sm-0" type="submit">Pesquisar</button>
                     </form>
                 </div>
@@ -61,10 +61,13 @@
         </div>
     </main>
 
-    <!-- Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="{% static 'aduna/jquery-3.4.1.slim.min.js' %}" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="{% static 'aduna/popper.min.js' %}" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="{% static 'aduna/bootstrap/js/bootstrap.min.js' %}" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <script>
+        SERVICES_URL = 'http://127.0.0.1:8000/services/'
+    </script>
+    <script src="{% static 'aduna/jquery-3.4.1.min.js' %}" ></script>
+    <script src="{% static 'aduna/popper.min.js' %}"></script>
+    <script src="{% static 'aduna/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'aduna/jquery-ui/jquery-ui.min.js' %}"></script>
+    <script src="{% static 'aduna/script.js' %}"></script>
   </body>
 </html>
