@@ -3,6 +3,7 @@ from django.http import HttpResponse
 
 import requests
 
+
 SERVICES_URL = 'http://127.0.0.1:8000/services/'
 
 def index(request):
@@ -14,8 +15,9 @@ def index(request):
 def search(request):
     query = request.GET['query']
     page = request.GET.get('page', 1)
+    # es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
     service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
-    
+
     context = {
         'query': query, 
         'page': page,

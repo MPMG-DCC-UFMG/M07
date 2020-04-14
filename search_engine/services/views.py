@@ -3,7 +3,9 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
-import lorem
+import elasticsearch
+import elasticsearch_dsl
+# import lorem
 
 
 # @csrf_exempt
@@ -11,18 +13,20 @@ import lorem
 def search(request):
     query = request.GET['query']
     page = request.GET.get('page', 1)
-
+    es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
+    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)
+    response = request.execute()
     documents = []
-    for i in range(10):
+    for i, hit in enumerate(response):
         documents.append({
-            'id': i,
-            'title': lorem.sentence(), 
-            'description': lorem.paragraph(),
+            'id': hit.meta.id,
+            'title': 'placeholder title', 
+            'description': hit.conteudo[:500],
             'type': 'diario'
         })
     data = {
         'query': query,
-        'total_docs': i+1,
+        'total_docs': response.hits.total.value,
         'total_pages': 10,
         'documents': documents
     }
@@ -34,12 +38,13 @@ def search(request):
 def document(request):
     doc_type = request.GET['doc_type']
     doc_id = request.GET['doc_id']
-
+    es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
+    retrieve_doc = elasticsearch_dsl.Document.get(doc_id, using=es, index='diarios')
     document = {
         'id': doc_id,
-        'title': lorem.sentence(), 
-        'description': lorem.paragraph(),
-        'text': lorem.text(),
+        'title': 'placeholder title', 
+        'description': 'placeholder description',
+        'text': retrieve_doc.conteudo,
         'type': 'diario',
     }
 
