@@ -42,6 +42,9 @@
                     <div class="result-description">
                         {{ doc.description }}
                     </div>
+                    <div class="source-description">
+                        Fonte: {{ doc.source }}
+                    </div>
                 </div>
             {% endfor %}
 
@@ -51,7 +54,7 @@
                     <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
                   </li>
                   {% for _ in total_pages %}
-                    <li class="page-item"><a class="page-link" href="#">{{ forloop.counter }}</a></li>
+                    <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
                   {% endfor %}
                   <li class="page-item">
                     <a class="page-link" href="#">Next</a>

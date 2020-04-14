@@ -19,7 +19,7 @@ def search(request):
     service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
 
     context = {
-        'query': query, 
+        'query': query,     
         'page': page,
         'total_docs': service_response['total_docs'],
         'total_pages': range(service_response['total_pages']),

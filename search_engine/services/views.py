@@ -11,10 +11,13 @@ import elasticsearch_dsl
 # @csrf_exempt
 @require_http_methods(["GET"])
 def search(request):
+    results_per_page = 10
     query = request.GET['query']
-    page = request.GET.get('page', 1)
+    page = int(request.GET.get('page', 1)) - 1 # Indexing page starts at 1
     es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
-    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)
+    from_index = results_per_page*page
+    to_index = results_per_page*(page + 1)
+    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)[from_index:to_index]
     response = request.execute()
     documents = []
     for i, hit in enumerate(response):
@@ -22,12 +25,13 @@ def search(request):
             'id': hit.meta.id,
             'title': 'placeholder title', 
             'description': hit.conteudo[:500],
+            'source': hit.fonte,
             'type': 'diario'
         })
     data = {
         'query': query,
         'total_docs': response.hits.total.value,
-        'total_pages': 10,
+        'total_pages': results_per_page,
         'documents': documents
     }
     return JsonResponse(data)
@@ -45,6 +49,7 @@ def document(request):
         'title': 'placeholder title', 
         'description': 'placeholder description',
         'text': retrieve_doc.conteudo,
+        'source': retrieve_doc.fonte,
         'type': 'diario',
     }
 
