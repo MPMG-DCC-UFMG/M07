@@ -29,8 +29,12 @@ def search(request):
 
 
 def document(request, doc_type, doc_id):
+    import re
     service_response = requests.get(SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}).json()
     document = service_response['document']
     
+    document['text'] = document['text'].replace('\n', '<br>')
+    document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
+
     context = {'document': document}
     return render(request, 'aduna/document.html', context)
