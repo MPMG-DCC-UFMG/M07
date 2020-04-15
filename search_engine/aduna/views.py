@@ -3,6 +3,7 @@ from django.http import HttpResponse
 
 import requests
 
+
 SERVICES_URL = 'http://127.0.0.1:8000/services/'
 
 def index(request):
@@ -14,10 +15,11 @@ def index(request):
 def search(request):
     query = request.GET['query']
     page = request.GET.get('page', 1)
+    # es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
     service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
-    
+
     context = {
-        'query': query, 
+        'query': query,     
         'page': page,
         'total_docs': service_response['total_docs'],
         'total_pages': range(service_response['total_pages']),
@@ -27,8 +29,12 @@ def search(request):
 
 
 def document(request, doc_type, doc_id):
+    import re
     service_response = requests.get(SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}).json()
     document = service_response['document']
     
+    document['text'] = document['text'].replace('\n', '<br>')
+    document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
+
     context = {'document': document}
     return render(request, 'aduna/document.html', context)
