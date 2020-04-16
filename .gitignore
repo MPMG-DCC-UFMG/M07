@@ -1,3 +1,15 @@
+# Don't track content of these folders
+indexer/original/
+indexer/zips/
+indexer/csvs/
+indexer/teste/
+indexer/.ipynb_checkpoints/
+
+# Don't track content of these files
+#indexer/playground.ipynb
+indexer/Indexing.ipynb
+#indexer/treating.ipynb
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

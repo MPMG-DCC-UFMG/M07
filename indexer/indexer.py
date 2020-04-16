@@ -88,8 +88,8 @@ responses = {}
 for csv_file in files_to_index:
     print("Indexing: " + csv_file)
     responses[csv_file] =  helpers.bulk(es, generate_formated_csv_lines(csv_file, args['index'], args["doctype"]) ) 
-    print("Response: " + str(responses[csv_file]))
+    print(" Response: " + str(responses[csv_file]))
 
     if len(responses[csv_file][1]) > 0 :
-        print("Detected error while indexing " + csv_file)
+        print("Detected error while indexing: " + csv_file)
 
