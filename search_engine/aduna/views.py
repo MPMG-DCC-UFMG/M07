@@ -14,7 +14,7 @@ def index(request):
 
 def search(request):
     query = request.GET['query']
-    page = request.GET.get('page', 1)
+    page = int(request.GET.get('page', 1))
     # es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
     service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
 
@@ -22,7 +22,7 @@ def search(request):
         'query': query,     
         'page': page,
         'total_docs': service_response['total_docs'],
-        'total_pages': range(service_response['total_pages']),
+        'results_per_page': range(service_response['results_per_page']),
         'documents': service_response['documents']
     }
     return render(request, 'aduna/search.html', context)

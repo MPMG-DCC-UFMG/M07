@@ -31,8 +31,9 @@ def search(request):
     data = {
         'query': query,
         'total_docs': response.hits.total.value,
-        'total_pages': results_per_page,
-        'documents': documents
+        'results_per_page': results_per_page,
+        'documents': documents,
+        'current_page': page,
     }
     return JsonResponse(data)
 
