@@ -7,6 +7,9 @@ import requests
 SERVICES_URL = 'http://127.0.0.1:8000/services/'
 
 def index(request):
+    # if not request.session.session_key:
+    #     request.session.create()
+    # print(request.session.session_key)
     context = {}
     return render(request, 'aduna/index.html', context)
     # return HttpResponse("Hello, world. You're at the polls index.")
@@ -19,7 +22,7 @@ def search(request):
     service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
 
     context = {
-        'query': query,     
+        'query': query,
         'page': page,
         'total_docs': service_response['total_docs'],
         'results_per_page': range(service_response['results_per_page']),
