@@ -13,26 +13,28 @@ import elasticsearch_dsl
 def search(request):
     results_per_page = 10
     query = request.GET['query']
-    page = int(request.GET.get('page', 1)) - 1 # Indexing page starts at 1
+    page = int(request.GET.get('page', 1))
     es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
-    from_index = results_per_page*page
-    to_index = results_per_page*(page + 1)
-    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)[from_index:to_index]
+    from_index = results_per_page*(page - 1)
+    to_index = results_per_page*page
+    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)[from_index:to_index].highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>')
     response = request.execute()
     documents = []
     for i, hit in enumerate(response):
         documents.append({
             'id': hit.meta.id,
             'title': 'placeholder title', 
-            'description': hit.conteudo[:500],
+            'description': hit.meta.highlight.conteudo[0],
+            'rank_number': results_per_page * (page-1) + (i+1),
             'source': hit.fonte,
             'type': 'diario'
         })
     data = {
         'query': query,
         'total_docs': response.hits.total.value,
-        'total_pages': results_per_page,
-        'documents': documents
+        'results_per_page': results_per_page,
+        'documents': documents,
+        'current_page': page,
     }
     return JsonResponse(data)
 
@@ -64,9 +66,34 @@ def query_suggestion(request):
     query = request.GET['query']
     suggestions = []
     for i in range(5):
-        suggestions.append(lorem.sentence())
+        suggestions.append({'label': 'sugestão de consulta '+str(i+1), 'value': 'sugestão de consulta '+str(i+1), 'rank_number': i+1, 'suggestion_id': i+1})
     
     data = {
         'suggestions': suggestions
     }
+    return JsonResponse(data)
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def log_search_result_click(request):
+    session_id = request.POST['session_id']
+    user_id = request.POST['user_id']
+    item_id = request.POST['item_id']
+    item_type = request.POST['item_type']
+    rank_number = request.POST['rank_number']
+    query = request.POST['query']
+    print('[LOG RESULT CLICK] query: {:s}, session_id: {:s}, user_id: {:s}, item_id: {:s}, item_type: {:s}, rank_number: {:s}'.format(query, session_id, user_id, item_id, item_type, rank_number))
+    data = {}
+    return JsonResponse(data)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def log_query_suggestion_click(request):
+    session_id = request.POST['session_id']
+    user_id = request.POST['user_id']
+    rank_number = request.POST['rank_number']
+    suggestion_id = request.POST['suggestion_id']
+    print('[LOG SUGGESTION CLICK] session_id: {:s}, user_id: {:s}, suggestion_id: {:s}, rank_number: {:s}'.format(session_id, user_id, suggestion_id, rank_number))
+    data = {}
     return JsonResponse(data)
