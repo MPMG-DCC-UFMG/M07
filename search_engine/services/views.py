@@ -17,14 +17,14 @@ def search(request):
     es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
     from_index = results_per_page*(page - 1)
     to_index = results_per_page*page
-    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)[from_index:to_index]
+    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)[from_index:to_index].highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>')
     response = request.execute()
     documents = []
     for i, hit in enumerate(response):
         documents.append({
             'id': hit.meta.id,
             'title': 'placeholder title', 
-            'description': hit.conteudo[:500],
+            'description': hit.meta.highlight.conteudo[0],
             'rank_number': results_per_page * (page-1) + (i+1),
             'source': hit.fonte,
             'type': 'diario'
