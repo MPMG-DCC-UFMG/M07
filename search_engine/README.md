@@ -1,9 +1,25 @@
 # Instruções
 
+## Clone o projeto:
+
+```
+git clone https://github.com/MPMG-DCC-UFMG/M07
+cd M07/search_engine
+```
+
+## Setup
+
+```
+python3 -m venv env
+source env_m07/bin/activate
+pip install -r requirements.txt
+```
 
 ## Rode o servidor:
 
+```
 python manage.py runserver
+````
 
 ## Em seguida acesse:
 
