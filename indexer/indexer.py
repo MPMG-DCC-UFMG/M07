@@ -74,9 +74,10 @@ if args['f'] != None:
         if isfile(f):
             files_to_index.append(f)
 
-for folder in args['d']:
-    for f in list_files(folder):
-        files_to_index.append(f)
+if args['d'] != None:
+    for folder in args['d']:
+        for f in list_files(folder):
+            files_to_index.append(f)
 
 
 # Creating ES conection
