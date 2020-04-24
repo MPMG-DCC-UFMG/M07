@@ -18,7 +18,7 @@ def index(request):
 def search(request):
     query = request.GET['query']
     page = int(request.GET.get('page', 1))
-    # es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
+    
     service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
 
     context = {
