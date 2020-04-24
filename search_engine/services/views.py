@@ -8,6 +8,7 @@ import elasticsearch_dsl
 # import lorem
 
 
+
 # @csrf_exempt
 @require_http_methods(["GET"])
 def search(request):
@@ -15,11 +16,15 @@ def search(request):
     query = request.GET['query']
     page = int(request.GET.get('page', 1))
     es = elasticsearch.Elasticsearch(['http://localhost:9200/'])
-    from_index = results_per_page*(page - 1)
-    to_index = results_per_page*page
-    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match', conteudo=query)[from_index:to_index].highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>')
+    start = results_per_page * (page - 1)
+    end = start + results_per_page
+    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match',
+             conteudo=query)[start:end].highlight('conteudo', fragment_size=500,
+             pre_tags='<strong>', post_tags='</strong>')
     response = request.execute()
+    total_pages = (response.hits.total.value // results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
     documents = []
+
     for i, hit in enumerate(response):
         documents.append({
             'id': hit.meta.id,
@@ -27,7 +32,7 @@ def search(request):
             'description': hit.meta.highlight.conteudo[0],
             'rank_number': results_per_page * (page-1) + (i+1),
             'source': hit.fonte,
-            'type': 'diario'
+            'type': 'diario',
         })
     data = {
         'query': query,
@@ -35,6 +40,7 @@ def search(request):
         'results_per_page': results_per_page,
         'documents': documents,
         'current_page': page,
+        'total_pages': total_pages,
     }
     return JsonResponse(data)
 

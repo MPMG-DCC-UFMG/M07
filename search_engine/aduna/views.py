@@ -26,8 +26,11 @@ def search(request):
         'page': page,
         'total_docs': service_response['total_docs'],
         'results_per_page': range(service_response['results_per_page']),
-        'documents': service_response['documents']
+        'documents': service_response['documents'],
+        'total_pages': service_response['total_pages'],
+        'results_pagination_bar': range(min(9, service_response['total_pages'])), # Typically show 9 pages. Odd number used so we can center the current one and show 4 in each side. Show less if not enough pages
     }
+    
     return render(request, 'aduna/search.html', context)
 
 
