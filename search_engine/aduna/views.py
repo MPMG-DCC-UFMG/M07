@@ -7,23 +7,28 @@ import requests
 SERVICES_URL = 'http://127.0.0.1:8000/services/'
 
 def index(request):
-    # if not request.session.session_key:
-    #     request.session.create()
-    # print(request.session.session_key)
-    context = {}
+    if not request.session.session_key:
+        request.session.create()
+    print(request.session.session_key)
+    context = {'sid': request.session.session_key,}
     return render(request, 'aduna/index.html', context)
     # return HttpResponse("Hello, world. You're at the polls index.")
 
 
 def search(request):
     query = request.GET['query']
+    sid = request.GET['sid']
+    qid = request.GET.get('qid', '')
     page = int(request.GET.get('page', 1))
     
-    service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page}).json()
+
+    service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}).json()
 
     context = {
         'query': query,
         'page': page,
+        'sid': sid,
+        'qid': service_response['qid'],
         'total_docs': service_response['total_docs'],
         'results_per_page': range(service_response['results_per_page']),
         'documents': service_response['documents'],

@@ -21,8 +21,9 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <form action="{% url 'aduna:search' %}" method="GET" class="form-inline mt-2 mt-md-0">
-                        <input id="query" name="query" class="form-control mr-sm-2" type="text" placeholder="Sua consulta aqui..." aria-label="Consulta" value="{{ query }}">
-                        <button class="btn btn-primary my-2 my-sm-0" type="submit">Pesquisar</button>
+                            <input id="query" name="query" class="form-control mr-sm-2" type="text" placeholder="Sua consulta aqui..." aria-label="Consulta" value="{{ query }}">
+                            <button class="btn btn-primary my-2 my-sm-0" type="submit">Pesquisar</button>
+                            <input type="hidden" name="sid" id="sid" value="{{ sid }}">
                         </form>
                     </div>
                 </div>
@@ -53,26 +54,26 @@
                     {% else %}
                         <li class="page-item">
                     {% endif %}
-                        <a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ page|add:'-1' }}" tabindex="-1" aria-disabled="true">Previous</a>
+                        <a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ page|add:'-1' }}&sid={{ sid }}&qid={{ qid }}" tabindex="-1" aria-disabled="true">Previous</a>
                     </li>
                     {% for _ in results_pagination_bar %}
                         {% if page < 6  %}
                             {% if forloop.counter == page %}
                             <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">{{ forloop.counter }}</a></li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ forloop.counter }}">{{ forloop.counter }}</a></li>
+                            <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ forloop.counter }}&sid={{ sid }}&qid={{ qid }}">{{ forloop.counter }}</a></li>
                             {% endif %}
                         {% elif page > total_pages|add:'-5'%}
                             {% if total_pages|add:forloop.counter|subtract:results_pagination_bar == page %}
                             <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">{{ page }}</a></li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ total_pages|add:forloop.counter|subtract:results_pagination_bar }}">{{ total_pages|add:forloop.counter|subtract:results_pagination_bar }}</a></li>
+                            <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ total_pages|add:forloop.counter|subtract:results_pagination_bar }}&sid={{ sid }}&qid={{ qid }}">{{ total_pages|add:forloop.counter|subtract:results_pagination_bar }}</a></li>
                             {% endif %}
                         {% else %} 
                             {% if forloop.counter == 5 %}
                             <li class="page-item disabled"><a class="page-link" href="#" aria-disabled="true">{{ page }}</a></li>
                             {% else %}
-                            <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ page|add:forloop.counter|add:'-5' }}">{{ page|add:forloop.counter|add:'-5' }}</a></li>
+                            <li class="page-item"><a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ page|add:forloop.counter|add:'-5' }}&sid={{ sid }}&qid={{ qid }}">{{ page|add:forloop.counter|add:'-5' }}</a></li>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
@@ -81,7 +82,7 @@
                     {% else %}
                         <li class="page-item">
                     {% endif %}
-                        <a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ page|add:'1' }}">Next</a>
+                        <a class="page-link" href="{% url 'aduna:search' %}?query={{ query }}&page={{ page|add:'1' }}&sid={{ sid }}&qid={{ qid }}">Next</a>
                     </li>
                     </ul>
                 </nav>

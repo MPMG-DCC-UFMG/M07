@@ -8,26 +8,34 @@ import elasticsearch_dsl
 # import lorem
 
 from elasticsearch import helpers
-from datetime import datetime
+import time
 import json
+import hashlib
 
 
 
 # @csrf_exempt
 @require_http_methods(["GET"])
 def search(request):
-    data_hora = datetime.now().strftime("%d-%m-%Y %H:%M:%S:%f")
-    id_usuario = str(31415) #numero magico
-
+    data_hora = str(time.time())
     results_per_page = 10 #numero magico
+    id_usuario = str(31415) #numero magico
     query = request.GET['query']
     page = int(request.GET.get('page', 1))
+    sid = request.GET['sid']
+    qid = request.GET.get('qid', '')    
+    if not qid: # Gera um novo id de consulta
+        pre_qid = hashlib.sha1()
+        pre_qid.update(bytes(data_hora + id_usuario + query + sid, encoding='utf-8'))
+        qid = pre_qid.hexdigest()
+
     es = elasticsearch.Elasticsearch(['http://localhost:9200/']) # deve ser uma variavel global
     start = results_per_page * (page - 1)
     end = start + results_per_page
     request = elasticsearch_dsl.Search(using=es, index='diarios').query('match',
              conteudo=query)[start:end].highlight('conteudo', fragment_size=500,
              pre_tags='<strong>', post_tags='</strong>')
+
     response = request.execute()
     total_pages = (response.hits.total.value // results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
     documents = []
@@ -49,9 +57,11 @@ def search(request):
         'documents': documents,
         'current_page': page,
         'total_pages': total_pages,
+        'qid': qid,
     }
 
     # Chama funcao para fazer o log da consulta
+    # TODO: Passar qid (query id) aqui
     log_search_result(es, data, id_usuario , data_hora, response.took )
     
     return JsonResponse(data)
