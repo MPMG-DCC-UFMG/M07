@@ -6,6 +6,7 @@ import ctypes
 import os
 import argparse
 import time
+import json
 
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
@@ -19,6 +20,8 @@ Configs
 """
 csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
+config = json.load(open('../config.json'))
+ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
 
 """
 Functions
@@ -122,6 +125,7 @@ def main(args):
 
 
     # Creating ES conection
+    print(ELASTIC_ADDRESS)
     es = Elasticsearch(timeout=30, max_retries=3, retry_on_timeout=True)
 
 
