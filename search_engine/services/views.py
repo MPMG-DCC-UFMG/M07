@@ -12,7 +12,8 @@ import time
 import json
 import hashlib
 
-
+config = json.load(open('../config.json'))
+ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
 
 # @csrf_exempt
 @require_http_methods(["GET"])
@@ -29,7 +30,7 @@ def search(request):
         pre_qid.update(bytes(data_hora + id_usuario + query + sid, encoding='utf-8'))
         qid = pre_qid.hexdigest()
 
-    es = elasticsearch.Elasticsearch(['http://localhost:9200/']) # deve ser uma variavel global
+    es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS]) # deve ser uma variavel global
     start = results_per_page * (page - 1)
     end = start + results_per_page
     request = elasticsearch_dsl.Search(using=es, index='diarios').query('match',
@@ -103,7 +104,7 @@ def log_search_result(es, data , id_usuario, data_hora, tempo_resposta):
 def document(request):
     doc_type = request.GET['doc_type']
     doc_id = request.GET['doc_id']
-    es = elasticsearch.Elasticsearch(['http://localhost:9200/']) # deve ser uma variavel global
+    es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS]) # deve ser uma variavel global
     retrieve_doc = elasticsearch_dsl.Document.get(doc_id, using=es, index='diarios')
     document = {
         'id': doc_id,
@@ -167,7 +168,7 @@ def log_search_result_click(request):
     
     # Calls update_by_query API
     response = {}
-    es = elasticsearch.Elasticsearch(['http://localhost:9200/']) # deve ser uma variavel global
+    es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS]) # deve ser uma variavel global
     response = es.update_by_query(index="log_busca_clicks", body=body)
 
     print("[LOG SUGGESTION CLICK] " + str(response))

@@ -124,9 +124,8 @@ def main(args):
             thread_count = int(args['t'])
 
 
-    # Creating ES conection
-    print(ELASTIC_ADDRESS)
-    es = Elasticsearch(timeout=30, max_retries=3, retry_on_timeout=True)
+    # Creating ES conections
+    es = Elasticsearch([ELASTIC_ADDRESS], timeout=30, max_retries=3, retry_on_timeout=True)
 
 
     # Index all the csv files in the list and measures the time
