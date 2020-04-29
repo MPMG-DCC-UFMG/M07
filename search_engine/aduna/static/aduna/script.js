@@ -1,17 +1,19 @@
 function log_search_result_click(link){
-    var query = $('#results-container').data('executed-query');
+    // var query = $('#results-container').data('executed-query');
     $.ajax({
         async: false,
         url: SERVICES_URL+'log_search_result_click',
         type: 'post',
         dataType: 'json',
         data:{
-            session_id: 123,
-            user_id: 0,
+            // session_id: 123,
+            // user_id: 0,
+            // query: query,
             rank_number: $(link).data('rank-number'),
             item_id: $(link).data('item-id'),
             item_type: $(link).data('item-type'),
-            query: query,
+            qid: QID,
+            page: PAGE,
         }
     });
 }

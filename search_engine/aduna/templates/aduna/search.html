@@ -36,7 +36,7 @@
                 <div id="results-container" data-executed-query="{{ query }}">
                 {% for doc in documents %}
                     <div class="result-item">
-                        <h3><a class="result-link" href="{% url 'aduna:document' doc.type doc.id %}" data-rank-number="{{ doc.rank_number }}" data-item-id="{{ doc.id }}" data-item-type="{{ doc.type }}">{{ doc.title }}</a></h3>
+                        <h3><a class="result-link" href="{% url 'aduna:document' doc.type doc.id %}" data-rank-number="{{ doc.rank_number }}" data-item-id="{{ doc.id }}" data-item-type="{{ doc.type }}" >{{ doc.title }}</a></h3>
                         <div class="result-description">
                             {{ doc.description|safe }}
                         </div>
@@ -90,7 +90,9 @@
         </main>
 
         <script>
-            SERVICES_URL = 'http://127.0.0.1:8000/services/'
+            SERVICES_URL = 'http://127.0.0.1:8000/services/';
+            QID = '{{ qid }}';
+            PAGE = '{{ page }}';
         </script>
         <script src="{% static 'aduna/jquery-3.4.1.min.js' %}" ></script>
         <script src="{% static 'aduna/popper.min.js' %}"></script>
