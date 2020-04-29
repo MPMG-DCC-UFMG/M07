@@ -13,6 +13,7 @@ cd M07/search_engine
 python3 -m venv env
 source env/bin/activate
 pip install -r requirements.txt
+python manage.py migrate
 ```
 
 ## Rode o servidor:
