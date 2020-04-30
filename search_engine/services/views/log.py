@@ -2,19 +2,11 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
-import elasticsearch
-import elasticsearch_dsl
-# import lorem
-
-from elasticsearch import helpers
 import time
-import json
-import hashlib
 
-config = json.load(open('../config.json'))
-ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
+from ..elastic import Elastic
 
-def log_search_result(es, id_sessao, id_consulta, id_usuario, text_consulta, algoritmo, data_hora,
+def log_search_result(elastic, id_sessao, id_consulta, id_usuario, text_consulta, algoritmo, data_hora,
                       tempo_resposta, documentos, pagina, resultados_por_pagina):
     """
     Stores the query log in the given elasticsearch instace`s index with a give document type.
@@ -36,7 +28,7 @@ def log_search_result(es, id_sessao, id_consulta, id_usuario, text_consulta, alg
         
     }
 
-    resp = helpers.bulk(es, [{
+    resp = elastic.helpers.bulk(elastic.es, [{
         "_index": indice,
         "_type": doc_type,
         "_source": doc
@@ -67,7 +59,7 @@ def log_search_result_click(request):
     indice = "log_clicks"
     doc_type = "log_click"
 
-    es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS]) # deve ser uma variavel global
+    elastic = Elastic()
 
     doc = {
         "id_documento": id_documento,
@@ -79,7 +71,7 @@ def log_search_result_click(request):
 
     }
 
-    response = helpers.bulk(es, [{
+    response = elastic.helpers.bulk(elastic.es, [{
         "_index": indice,
         "_type": doc_type,
         "_source": doc

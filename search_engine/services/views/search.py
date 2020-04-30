@@ -2,18 +2,11 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
-import elasticsearch
-import elasticsearch_dsl
-
-from elasticsearch import helpers
 import time
-import json
 import hashlib
 
 from .log import log_search_result
-
-config = json.load(open('../config.json'))
-ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
+from ..elastic import Elastic
 
 @require_http_methods(["GET"])
 def search(request):
@@ -30,10 +23,11 @@ def search(request):
         pre_qid.update(bytes(data_hora + id_usuario + query + sid, encoding='utf-8'))
         qid = pre_qid.hexdigest()
 
-    es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS]) # deve ser uma variavel global
+    elastic = Elastic()
+
     start = results_per_page * (page - 1)
     end = start + results_per_page
-    request = elasticsearch_dsl.Search(using=es, index='diarios').query('match',
+    request = elastic.dsl.Search(using=elastic.es, index='diarios').query('match',
              conteudo=query)[start:end].highlight('conteudo', fragment_size=500,
              pre_tags='<strong>', post_tags='</strong>')
 
@@ -62,7 +56,7 @@ def search(request):
     }
 
     # Chama funcao para fazer o log da consulta
-    log_search_result(es,
+    log_search_result(elastic,
                       id_sessao = sid, 
                       id_consulta = qid,
                       id_usuario = id_usuario,
