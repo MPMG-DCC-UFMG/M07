@@ -8,7 +8,7 @@ class Elastic:
         super().__init__()
         config = json.load(open('../config.json'))
         ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
-        self.es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS])
+        self.es = elasticsearch.Elasticsearch([ELASTIC_ADDRESS], timeout=60)
         self.dsl = elasticsearch_dsl
         self.helpers = helpers
     
