@@ -1,15 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
+from django.conf import settings
 import requests
 
-
-SERVICES_URL = 'http://127.0.0.1:8000/services/'
 
 def index(request):
     if not request.session.session_key:
         request.session.create()
-    print(request.session.session_key)
+    
     context = {'sid': request.session.session_key,}
     return render(request, 'aduna/index.html', context)
     # return HttpResponse("Hello, world. You're at the polls index.")
@@ -22,7 +20,7 @@ def search(request):
     page = int(request.GET.get('page', 1))
     
 
-    service_response = requests.get(SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}).json()
+    service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}).json()
 
     context = {
         'query': query,
@@ -41,7 +39,7 @@ def search(request):
 
 def document(request, doc_type, doc_id):
     import re
-    service_response = requests.get(SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}).json()
+    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}).json()
     document = service_response['document']
     
     document['text'] = document['text'].replace('\n', '<br>')
