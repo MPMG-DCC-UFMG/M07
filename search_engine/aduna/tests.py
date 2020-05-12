@@ -28,10 +28,21 @@ class SearchResultsTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
         # Check that the rendered context contains 0 results.
-        self.assertEqual(len(response.context['documents']), 1)
+        self.assertEqual(len(response.context['documents']), 0)
 
     
+class DocumentTests(TestCase):
+    def setUp(self):
+        # Every test needs a client.
+        self.client = Client()
 
+    def test_get_document(self):
+       # Issue a GET request.
+       response = self.client.get(reverse('aduna:document', kwargs={'doc_type': 'diario', 'doc_id': 'ZQejVnEBmEbG-Rbp6MAz'}))
 
+       # Check that the response is 200 OK.
+       self.assertEqual(response.status_code, 200)
+
+    
 
 
