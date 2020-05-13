@@ -39,4 +39,4 @@ def clicks_per_document(request):
 #     print(json.dumps(response, indent = "  "))
 
 
-    return JsonResponse({"response": response})
+    # return JsonResponse({"response": response})
