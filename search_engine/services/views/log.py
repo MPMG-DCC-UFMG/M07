@@ -6,11 +6,10 @@ import time
 
 from ..elastic import Elastic
 
-def log_search_result(elastic, id_sessao, id_consulta, id_usuario, text_consulta, algoritmo, data_hora,
-                      tempo_resposta, documentos, pagina, resultados_por_pagina):
-    """
-    Stores the query log in the given elasticsearch instace`s index with a give document type.
-    """
+def log_search_result(elastic, id_sessao, id_consulta, id_usuario, 
+    text_consulta, algoritmo, data_hora, tempo_resposta, documentos, pagina,
+    resultados_por_pagina):
+
     indice = "log_buscas"
     doc_type = "log_busca"
 
@@ -25,7 +24,6 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario, text_consulta
         'pagina': pagina,
         'resultados_por_pagina': resultados_por_pagina,
         'documentos': documentos
-        
     }
 
     resp = elastic.helpers.bulk(elastic.es, [{
@@ -34,8 +32,7 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario, text_consulta
         "_source": doc
     }])
 
-    # Test if some error was found during indexing
-    if len(resp[1]) == 0:
+    if len(resp[1]) == 0: # Test if some error was found during indexing
         print("[services/log_search_result] Search log indexed successfully.")
     else:
         print("[services/log_search_result] ERROR: Error while indexing log: " + str(resp))
@@ -44,11 +41,6 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario, text_consulta
 @csrf_exempt
 @require_http_methods(["POST"])
 def log_search_result_click(request):
-    """
-    Log the clicks by updating the clicked documents in the log_busca_clicks index via elastic`s update_by_query API.
-    Exemple requisition: requests.post("http://localhost:8000/services/log_search_result_click", {'user_id': '31415', 'document_id': '', 'query': '' })
-    """
-    
     timestamp = str(time.time())
     id_documento = request.POST['item_id']
     posicao = request.POST['rank_number']
@@ -68,7 +60,6 @@ def log_search_result_click(request):
         "timestamp": timestamp,
         "tipo_documento": tipo_documento,
         "pagina": pagina,
-
     }
 
     response = elastic.helpers.bulk(elastic.es, [{
@@ -79,13 +70,13 @@ def log_search_result_click(request):
 
     print("[services/log_search_result_click] Response from bulk API: " + str(response))
 
-    # Test if some error was found during indexing
-    if len(response[1])  == 0:
+    if len(response[1])  == 0: # Test if some error was found during indexing
         print("[services/log_search_result_click] Click log indexed successfully.")
         return JsonResponse({"click_logged": True})
     else:
         print("[services/log_search_result_click] ERROR: Error while indexing click log: " + str(response))
         return JsonResponse({"click_logged": False})
+
 
 @require_http_methods(["GET"])
 def query_suggestion(request):
