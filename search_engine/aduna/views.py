@@ -8,7 +8,10 @@ def index(request):
     if not request.session.session_key:
         request.session.create()
     
-    context = {'sid': request.session.session_key,}
+    context = {
+        'sid': request.session.session_key,
+        'services_url': settings.SERVICES_URL,
+    }
     return render(request, 'aduna/index.html', context)
     # return HttpResponse("Hello, world. You're at the polls index.")
 
@@ -23,6 +26,7 @@ def search(request):
     service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}).json()
 
     context = {
+        'services_url': settings.SERVICES_URL,
         'query': query,
         'page': page,
         'sid': sid,
