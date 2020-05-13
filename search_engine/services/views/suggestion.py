@@ -42,9 +42,9 @@ def query_suggestion(request):
     
     suggestions = []
     for i, hit in enumerate(hits):
-        suggestions.append({'label': 'sugestão de consulta '+str(i+1), 'value': hit, 'rank_number': i+1, 'suggestion_id': i+1})
+        suggestions.append({'label': hit, 'value': hit, 'rank_number': i+1, 'suggestion_id': i+1})
     
-    print("[services/query_suggestion] Suggestions: " + str(suggestions))
+    # print("[services/query_suggestion] Suggestions: " + str(suggestions))
     
     data = {
         'suggestions': suggestions
