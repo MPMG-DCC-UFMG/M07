@@ -32,17 +32,19 @@ def query_suggestion(request):
     }
 
     response = Elastic().es.search(body = request_body, index = "log_buscas_teste")
-    suggestions = [ suggestion['_source']['text_consulta'] for suggestion in response['hits']['hits']]
+    hits = [ hit['_source']['text_consulta'] for hit in response['hits']['hits']]
     
+    get_position = lambda element: element.lower().find(query.lower()) #TODO: Tratar a query para outros casos alem de lower
+    hits.sort(key = get_position)
     # Ordena a lista de sugestoes pela ordem em que a string procurada aparece na query
     # TODO: Melhorar forma de se ordenar essa lista: pode-se ordenar pelo numero de queries que aquele termo apareceu ou
     # pela posicao da palavra em que se encontra o termo buscado. Interresante seria combinar a essa ultima com a primeira
-    get_position = lambda element: element.lower().find(query.lower()) #TODO: Tratar a query para outros casos alem de lower
-    suggestions.sort(key = get_position)
-    print("[services/query_suggestion]" + str(suggestions))
-
-    # for i in range(5):
-    #     suggestions.append({'label': 'sugestão de consulta '+str(i+1), 'value': 'sugestão de consulta '+str(i+1), 'rank_number': i+1, 'suggestion_id': i+1})
+    
+    suggestions = []
+    for i, hit in enumerate(hits):
+        suggestions.append({'label': 'sugestão de consulta '+str(i+1), 'value': hit, 'rank_number': i+1, 'suggestion_id': i+1})
+    
+    print("[services/query_suggestion] Suggestions: " + str(suggestions))
     
     data = {
         'suggestions': suggestions
