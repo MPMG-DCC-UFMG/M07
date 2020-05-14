@@ -54,7 +54,7 @@ class DocumentTests(TestCase):
 
     def test_request(self):
        # Issue a GET request.
-       response = self.client.get(reverse('aduna:document', kwargs={'doc_type': 'diario', 'doc_id': 'ZQejVnEBmEbG-Rbp6MAz'}))
+       response = self.client.get(reverse('aduna:document', kwargs={'doc_type': 'diario', 'doc_id': 'Vw6WiHEBmEbG-RbpxnIs'}))
 
        # Check that the response is 200 OK.
        self.assertEqual(response.status_code, 200)
