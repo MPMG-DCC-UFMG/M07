@@ -31,7 +31,7 @@ def query_suggestion(request):
         }
     }
 
-    response = Elastic().es.search(body = request_body, index = "log_buscas_teste")
+    response = Elastic().es.search(body = request_body, index = "log_buscas")
     hits = [ hit['_source']['text_consulta'] for hit in response['hits']['hits']]
     
     get_position = lambda element: element.lower().find(query.lower()) #TODO: Tratar a query para outros casos alem de lower
