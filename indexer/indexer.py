@@ -1,6 +1,3 @@
-"""
-Imports
-"""
 import csv
 import ctypes
 import os
@@ -15,14 +12,6 @@ from os import listdir
 from os.path import isfile, join
 
 
-""" 
-Configs
-"""
-csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
-
-config = json.load(open('../config.json'))
-ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
-
 """
 Functions
 """
@@ -36,7 +25,7 @@ def list_files(mypath):
     return [mypath+f for f in listdir(mypath) if isfile(join(mypath, f))]
 
 
-def generate_formated_csv_lines(file_path, index_name, doc_type, encoding="utf8"):
+def generate_formated_csv_lines(file_path, index_name, encoding="utf8"):
     """
     Generates formated entries to indexed by the bulk API
     """
@@ -54,69 +43,99 @@ def generate_formated_csv_lines(file_path, index_name, doc_type, encoding="utf8"
     
         yield {
             "_index": index_name,
-            "_type": doc_type,
             "_source": doc
         }
 
 
-def simple_indexer(es, files_to_index, args):
-    """
-    Index the csvs files using helpers.bulk
-    """
-    responses = {}
-    for csv_file in files_to_index:
-        print("Indexing: " + csv_file)
-        responses[csv_file] =  helpers.bulk(es, generate_formated_csv_lines(csv_file, args['index'], args["doctype"]) ) 
-        print("  Response: " + str(responses[csv_file]))
 
-        if len(responses[csv_file][1]) > 0 :
-            print("Detected error while indexing: " + csv_file)
+"""
 
+"""
 
-def parallel_indexer(es, files_to_index, agrs, thread_count ):
-    """
-    Index the csvs files using helpers.parallel_bulk
-    Note that the queue_size is the same as thread_count
-    """
-    error = False
-    for csv_file in files_to_index:
-        print("Indexing: " + csv_file + "...")
-        for success, info in helpers.parallel_bulk(es, generate_formated_csv_lines(csv_file, args['index'], args["doctype"]), thread_count = thread_count, queue_size = thread_count): 
-            if not success:
+class Indexer:
+    def __init__(self):
+        config = json.load(open('../config.json'))
+        self.ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
+
+    def simple_indexer(self, files_to_index, index):
+        """
+        Index the csvs files using helpers.bulk
+        """
+        start = time.time()
+       
+        csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
+        es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=30, max_retries=3, retry_on_timeout=True)
+
+        responses = {}
+        for csv_file in files_to_index:
+            print("Indexing: " + csv_file)
+            responses[csv_file] =  helpers.bulk(es, generate_formated_csv_lines(csv_file, index) )
+            print("  Response: " + str(responses[csv_file]))
+
+            if len(responses[csv_file][1]) > 0 :
                 print("Detected error while indexing: " + csv_file)
-                error = True
-                print(info)
-    if not error:
-        print("All files indexed with no error.")
-    else:
-        print("Error while indexing.")
+            else:
+                end = time.time()
+                print("Indexing time: {:.4f} seconds.".format(end-start))
 
+
+    def parallel_indexer(self, files_to_index, index, thread_count):
+        """
+        Index the csvs files using helpers.parallel_bulk
+        Note that the queue_size is the same as thread_count
+        """
+        start = time.time()
+
+        csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
+        es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=30, max_retries=3, retry_on_timeout=True)
+
+        error = False
+        for csv_file in files_to_index:
+            print("Indexing: " + csv_file + "...")
+            for success, info in helpers.parallel_bulk(es, generate_formated_csv_lines(csv_file, index), thread_count = thread_count, queue_size = thread_count): 
+                if not success:
+                    print("Detected error while indexing: " + csv_file)
+                    error = True
+                    print(info)
+        if not error:
+            print("All files indexed with no error.")
+            end = time.time()
+            print("Indexing time: {:.4f} seconds.".format(end-start))
+        else:
+            print("Error while indexing.")
+
+
+"""
+Main
+"""
+
+if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description='Indexa arquivos csv no ES dado.')
+
+    parser.add_argument("-strategy", choices=['simple', 'parallel'], help="Strategy for indexing the data: [simple] or [parallel]", required=True)
+    parser.add_argument("-index", help="Index", required=True)
+    parser.add_argument("-f", nargs='+', help="List of csv files to index")
+    parser.add_argument("-d", nargs='+', help="List of directories which all files will be indexed")
+    parser.add_argument("-t", help="Threadpool size to use for the bulk requests")
     
+    # Get all args
+    args = vars(parser.parse_args())
 
-
-"""
-Script
-"""
-
-def main(args):
-
-    # Generates the list with all files to index
+    index = args["index"]
+    
     files_to_index = []
-
     if args['f'] != None:
         for f in args['f']:
             if isfile(f):
                 files_to_index.append(f)
-
     if args['d'] != None:
         for folder in args['d']:
             for f in list_files(folder):
                 files_to_index.append(f)
     
-    # Setting thread_count
     if args["strategy"] == "simple" and args['t'] != None:
         print("WARNING: Argument -t (Threadpool size) is not applicable.")
-    
     thread_count = None
     if args["strategy"] == "parallel":
         thread_count = 4
@@ -124,37 +143,9 @@ def main(args):
             thread_count = int(args['t'])
 
 
-    # Creating ES conections
-    es = Elasticsearch([ELASTIC_ADDRESS], timeout=30, max_retries=3, retry_on_timeout=True)
-
-
-    # Index all the csv files in the list and measures the time
-    start = time.time()
+    # Index all the csv files in the list
+    i = Indexer()
     if args['strategy'] == 'simple':
-        simple_indexer(es, files_to_index, args)
+        i.simple_indexer( files_to_index, index)
     elif args['strategy'] == 'parallel':
-        parallel_indexer(es, files_to_index, args, thread_count )
-    end = time.time()
-
-    print("Indexing time: {:.4f} seconds.".format(end-start))
-
-
-"""
-main
-"""
-if __name__ == "__main__":
-
-    # Define the args that thae program will accept
-    parser = argparse.ArgumentParser(description='Indexa arquivos csv no ES dado.')
-
-    parser.add_argument("-strategy", choices=['simple', 'parallel'], help="Strategy for indexing the data: [simple] or [parallel]", required=True)
-    parser.add_argument("-index", help="Index", required=True)
-    parser.add_argument("-doctype", help="Type of the indexing documets", required=True)
-    parser.add_argument("-f", nargs='+', help="List of csv files to index")
-    parser.add_argument("-d", nargs='+', help="List of directories which all files will be indexed")
-    parser.add_argument("-t", help="Threadpool size to use for the bulk requests")
-    
-    # Get all args
-    args = vars(parser.parse_args())
-    
-    main(args)
+        i.parallel_indexer(files_to_index, index, thread_count )
