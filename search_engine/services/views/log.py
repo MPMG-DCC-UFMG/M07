@@ -11,7 +11,6 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario,
     resultados_por_pagina):
 
     indice = "log_buscas"
-    doc_type = "log_busca"
 
     doc = {
         'id_sessao': id_sessao,
@@ -28,7 +27,6 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario,
 
     resp = elastic.helpers.bulk(elastic.es, [{
         "_index": indice,
-        "_type": doc_type,
         "_source": doc
     }])
 
@@ -49,7 +47,6 @@ def log_search_result_click(request):
     pagina = request.POST['page']
     
     indice = "log_clicks"
-    doc_type = "log_click"
 
     elastic = Elastic()
 
@@ -64,7 +61,6 @@ def log_search_result_click(request):
 
     response = elastic.helpers.bulk(elastic.es, [{
         "_index": indice,
-        "_type": doc_type,
         "_source": doc
     }])
 

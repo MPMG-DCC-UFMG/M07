@@ -1,6 +1,5 @@
 import json
-import os.path
-from os import listdir
+import os
 
 import indexer
 
@@ -15,17 +14,19 @@ local_mappings = es.indices.get_mapping(local_indices)
 csv_indexer = indexer.Indexer()
 for index in updated_mappings.keys():
     
+    if not os.path.isdir(index):
+            os.mkdir(os.getcwd()+index)
+            print("Created new directory: " + index)
+
     if index in local_indices and local_mappings[index] != updated_mappings[index]: # se o indice ja existe e o mapping eh diferente
         es.indices.delete(index)
         print("Existing index deleted: " + index)
         local_indices.remove(index)
     
     if index not in local_indices: # caso o indice ainda nao exista
-        if os.path.isdir(index):
-            es.indices.create(index, body = updated_mappings[index] ) # cria indice
-            print("New index created: " + index)
-            files_to_index = indexer.list_files(index)
-            print("Indexing " + str(len(files_to_index)) + " files in " + index)
-            csv_indexer.parallel_indexer(files_to_index, index, thread_count=4) # insere documentos
-        else: 
-            raise Exception(index + " directory does not exist.")
+        es.indices.create(index, body = updated_mappings[index] ) # cria indice
+        print("New index created: " + index)
+        files_to_index = indexer.list_files(index)
+        print("Indexing " + str(len(files_to_index)) + " files in " + index)
+        csv_indexer.parallel_indexer(files_to_index, index, thread_count=4) # insere documentos
+        
