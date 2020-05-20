@@ -29,7 +29,7 @@ def search(request):
     end = start + results_per_page
     request = elastic.dsl.Search(using=elastic.es, index='diarios') \
               .source(['fonte']) \
-              .query('match', conteudo=query)[start:end] \
+              .query('query_string', query=query)[start:end] \
               .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>')
 
     response = request.execute()
