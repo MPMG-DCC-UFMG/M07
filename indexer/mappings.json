@@ -71,33 +71,6 @@
                         }
                     }
                 },
-                "pagina": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "posicao": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "timestamp": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
                 "tipo_documento": {
                     "type": "text",
                     "fields": {
@@ -106,6 +79,15 @@
                             "ignore_above": 256
                         }
                     }
+                },
+                "pagina": {
+                    "type": "long"
+                },
+                "posicao": {
+                    "type": "long"
+                },
+                "timestamp": {
+                    "type": "long"
                 }
             }
         }

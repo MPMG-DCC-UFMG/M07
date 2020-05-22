@@ -53,10 +53,10 @@ def log_search_result_click(request):
     doc = {
         "id_documento": id_documento,
         "id_consulta": id_consulta,
-        "posicao": posicao,
-        "timestamp": timestamp,
+        "posicao": int(posicao),
+        "timestamp": float(timestamp),
         "tipo_documento": tipo_documento,
-        "pagina": pagina,
+        "pagina": int(pagina),
     }
 
     response = elastic.helpers.bulk(elastic.es, [{

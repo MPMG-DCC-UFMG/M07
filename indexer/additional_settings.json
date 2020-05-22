@@ -1,0 +1,11 @@
+{
+    "diarios": {
+        "settings": {
+            "index": {
+                "highlight": {
+                    "max_analyzed_offset" : 9000000
+                }
+            }
+        }
+    }
+}
