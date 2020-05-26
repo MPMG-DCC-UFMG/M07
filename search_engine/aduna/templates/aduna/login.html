@@ -22,7 +22,7 @@
                         Login necessário.
                     </div>
                 {% endif %}
-                <form action="{% url 'aduna:efetua_login' %}" method="post">
+                <form action="{% url 'aduna:login' %}" method="post">
                     {% csrf_token %}
                     <div class="row justify-content-md-center">
                         <div class="col-sm-4">

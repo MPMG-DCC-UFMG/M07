@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
@@ -9,8 +9,10 @@ import re
 
 
 def index(request):
-    if not request.session.session_key:
-        request.session.create()
+    if not request.session.get('auth_token'):
+        return redirect('/aduna/login')
+    # if not request.session.session_key:
+    #     request.session.create()
     
     context = {
         'sid': request.session.session_key,
@@ -20,14 +22,20 @@ def index(request):
 
 
 def search(request):
+    if not request.session.get('auth_token'):
+        return redirect('/aduna/login')
+    
+    cookies = {'sessionid': request.session.get('auth_token')}
+
     query = request.GET['query']
     sid = request.GET['sid']
     qid = request.GET.get('qid', '')
     page = int(request.GET.get('page', 1))
-    
-    service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}).json()
 
-    if service_response['auth']:
+    
+    service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}, cookies=cookies).json()
+
+    if service_response['is_authenticated']:
         context = {
             'services_url': settings.SERVICES_URL,
             'query': query,
@@ -43,40 +51,52 @@ def search(request):
         
         return render(request, 'aduna/search.html', context)
     else:
-        context = {'auth': 'invalid',}
-        return render(request, 'aduna/login.html', context)
+        return redirect('/aduna/login')
     
 
 def document(request, doc_type, doc_id):
-    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}).json()
+    if not request.session.get('auth_token'):
+        return redirect('/aduna/login')
+    
+    cookies = {'sessionid': request.session.get('auth_token')}
+
+    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}, cookies=cookies).json()
     document = service_response['document']
-    if service_response['document']['auth']:
-        document['text'] = document['text'].replace('\n', '<br>')
-        document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
-        context = {'document': document}
-        return render(request, 'aduna/document.html', context)
-    else:
-        context = {'auth': False,}
-        return render(request, 'aduna/login.html', context)
+    document['text'] = document['text'].replace('\n', '<br>')
+    document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
+    context = {'document': document}
+    return render(request, 'aduna/document.html', context)
 
 
-def login_view(request):
-    auth = request.GET.get('auth', True)
-    context = {'auth': auth,}
-    return render(request, 'aduna/login.html', context)
+def login(request):
+    if request.method == 'GET':
 
-@csrf_exempt
-def efetua_login(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    login_response = requests.post(settings.SERVICES_URL+'login', {'username': username, 'password': password}).json()
-    if login_response['auth']:
-        context = {
-            'auth': True,
-        }
-        return render(request, 'aduna/index.html', context)
-    else:
-        context = {'auth': False,}
-        return render(request, 'aduna/login.html', context)
+        if request.session.get('auth_token'):
+            return redirect('/aduna/search')
+        return render(request, 'aduna/login.html')
+
+    elif request.method == 'POST':
+
+        username = request.POST['username']
+        password = request.POST['password']
+        login_response = requests.post(settings.SERVICES_URL+'login', {'username': username, 'password': password}).json()
+        if login_response['success']:
+            request.session['auth_token'] = login_response['auth_token']
+            return redirect('/aduna/')
+        else:
+            return redirect('/aduna/login/')
+
+
+def logout(request):
+    if not request.session.get('auth_token'):
+        return redirect('/aduna/login')
+    
+    cookies = {'sessionid': request.session.get('auth_token')}
+    
+    logout_response = requests.post(settings.SERVICES_URL+'logout', {}, cookies=cookies).json()
+
+    if logout_response['success']:
+        request.session['auth_token'] = None
+        return redirect('/aduna/login')
 
     
