@@ -39,14 +39,16 @@ def query_suggestion(request):
     # Ordena a lista de sugestoes pela ordem em que a string procurada aparece na query
     # TODO: Melhorar forma de se ordenar essa lista: pode-se ordenar pelo numero de queries que aquele termo apareceu ou
     # pela posicao da palavra em que se encontra o termo buscado. Interresante seria combinar a essa ultima com a primeira
-    
+    # TODO: Remover elementos repetidos
+
     suggestions = []
     for i, hit in enumerate(hits):
-        suggestions.append({'label': hit, 'value': hit, 'rank_number': i+1, 'suggestion_id': i+1})
+        suggestions.append({'label': hit, 'value': 'sugestao '+str(i+1), 'rank_number': i+1, 'suggestion_id': i+1})
     
     # print("[services/query_suggestion] Suggestions: " + str(suggestions))
     
     data = {
         'suggestions': suggestions
     }
+    print(data)
     return JsonResponse(data)

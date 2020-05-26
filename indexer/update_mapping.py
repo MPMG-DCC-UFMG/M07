@@ -58,6 +58,7 @@ def main(args):
 
         print()
 
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Verifica se o indice sofreu alguma alteracao e, nesse caso,\

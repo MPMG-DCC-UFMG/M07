@@ -2,6 +2,15 @@
     "diarios": {
         "mappings": {
             "properties": {
+                "titulo": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
                 "conteudo": {
                     "type": "text",
                     "fields": {
@@ -30,15 +39,6 @@
                     }
                 },
                 "fonte": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "fonte_csv": {
                     "type": "text",
                     "fields": {
                         "keyword": {

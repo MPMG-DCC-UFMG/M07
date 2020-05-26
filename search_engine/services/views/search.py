@@ -28,7 +28,7 @@ def search(request):
     start = results_per_page * (page - 1)
     end = start + results_per_page
     request = elastic.dsl.Search(using=elastic.es, index='diarios') \
-              .source(['fonte']) \
+              .source(['fonte','titulo']) \
               .query('query_string', query=query)[start:end] \
               .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>')
 
@@ -36,10 +36,11 @@ def search(request):
     total_pages = (response.hits.total.value // results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
     documents = []
 
+    print(response)
     for i, hit in enumerate(response):
         documents.append({
             'id': hit.meta.id,
-            'title': 'placeholder title', 
+            'title': hit.titulo, 
             'description': hit.meta.highlight.conteudo[0],
             'rank_number': results_per_page * (page-1) + (i+1),
             'source': hit.fonte,
