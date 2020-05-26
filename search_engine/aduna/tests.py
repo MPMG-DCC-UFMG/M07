@@ -61,4 +61,14 @@ class DocumentTests(TestCase):
 
     
 
+class LoginTests(TestCase):
+    def setUp(self):
+        # Every test needs a client.
+        self.client = Client()
 
+    def test_request(self):
+       # Issue a GET request.
+       response = self.client.get(reverse('aduna:login'))
+
+       # Check that the response is 200 OK.
+       self.assertEqual(response.status_code, 200)
