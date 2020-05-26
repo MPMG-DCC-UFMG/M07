@@ -17,9 +17,15 @@
         <div class="vertical-center">
             <div class="container">
                 <h1 class="aduna-title">Áduna</h1>
-                {% if not success %}
-                    <div class="alert alert-info col-sm-4 fade show mb-2" style="margin: auto" role="alert">
-                        Login necessário.
+                {% if messages %}
+                    <div class="row justify-content-md-center">
+                    <div class="col-sm-4">
+                        {% for message in messages %}
+                        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} fade show mb-2" style="margin: auto" role="alert">
+                        {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
                     </div>
                 {% endif %}
                 <form action="{% url 'aduna:login' %}" method="post">
@@ -28,13 +34,11 @@
                         <div class="col-sm-4">
                             <div class="input-group">
                                 <input type="text" class="form-control shadow bg-white rounded" name="username" id="username" placeholder="Username" autocomplete="off">
-                            </div>
+                            </div><br>
                             <div class="input-group">
                                 <input type="password" class="form-control shadow bg-white rounded" name="password" id="password" placeholder="Senha" autocomplete="off">
-                            </div>
-                                <div class="input-group-btn col text-center">
-                                    <button type="submit" class="btn btn-primary shadow mb-5 rounded">Login</button>
-                                </div>
+                            </div><br>
+                                <button type="submit" class="col btn btn-primary shadow mb-5 rounded">Login</button>
                                 <input type="hidden" name="sid" id="sid" value="{{ sid }}">
                             </div>
                         </div>
@@ -42,4 +46,26 @@
                 </form>
             </div>
         </div>
+
+        <!--
+        <h1 class="aduna-title">Áduna</h1>
+        <form action="{% url 'aduna:login' %}" class="form-signin" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="sid" id="sid" value="{{ sid }}">
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} col-sm-4 fade show mb-2" style="margin: auto" role="alert">
+                {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            <div class="form-label-group">
+                <input type="text" class="form-control shadow bg-white rounded" name="username" id="username" placeholder="Username" autocomplete="off">
+            </div>
+            <div class="form-label-group">
+                <input type="password" class="form-control shadow bg-white rounded" name="password" id="password" placeholder="Senha" autocomplete="off">
+            </div>
+            <button type="submit" class="btn btn-primary shadow mb-5 rounded">Login</button>
+        </form>
+        //-->
     </body>

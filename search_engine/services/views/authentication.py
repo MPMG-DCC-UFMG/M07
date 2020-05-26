@@ -9,15 +9,15 @@ def do_login(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        data = {'success': True, 'auth_token': request.session.session_key}
+        user_info = {'first_name': request.user.first_name, 'last_name': request.user.last_name, 'email': request.user.email}
+        data = {'success': True, 'auth_token': request.session.session_key, 'message': '', 'user_info': user_info}
         return JsonResponse(data)
-
     else:
-        data = {'success': False, 'auth_token': None}
+        data = {'success': False, 'auth_token': None, 'message': 'Usuário ou senha inválidos.', 'user_info': None}
         return JsonResponse(data)
 
 
 @csrf_exempt
 def do_logout(request):
     logout(request)
-    return JsonResponse({'success': True})
+    return JsonResponse({'success': True, 'message': 'Você saiu.'})
