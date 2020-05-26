@@ -4,6 +4,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
 import requests
 import re
 
@@ -15,6 +16,7 @@ def index(request):
     #     request.session.create()
     
     context = {
+        'user_name': request.session.get('user_info')['first_name'],
         'sid': request.session.session_key,
         'services_url': settings.SERVICES_URL,
     }
@@ -37,6 +39,7 @@ def search(request):
 
     if service_response['is_authenticated']:
         context = {
+            'user_name': request.session.get('user_info')['first_name'],
             'services_url': settings.SERVICES_URL,
             'query': query,
             'page': page,
@@ -51,6 +54,7 @@ def search(request):
         
         return render(request, 'aduna/search.html', context)
     else:
+        request.session['auth_token'] = None
         return redirect('/aduna/login')
     
 
@@ -61,30 +65,37 @@ def document(request, doc_type, doc_id):
     cookies = {'sessionid': request.session.get('auth_token')}
 
     service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}, cookies=cookies).json()
-    document = service_response['document']
-    document['text'] = document['text'].replace('\n', '<br>')
-    document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
-    context = {'document': document}
-    return render(request, 'aduna/document.html', context)
+    
+    if service_response['is_authenticated']:
+        document = service_response['document']
+        document['text'] = document['text'].replace('\n', '<br>')
+        document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
+        context = {'document': document}
+        return render(request, 'aduna/document.html', context)
+    else:
+        request.session['auth_token'] = None
+        return redirect('/aduna/login')
 
 
 def login(request):
     if request.method == 'GET':
 
         if request.session.get('auth_token'):
-            return redirect('/aduna/search')
+            return redirect('/aduna/')
         return render(request, 'aduna/login.html')
 
     elif request.method == 'POST':
 
         username = request.POST['username']
         password = request.POST['password']
-        login_response = requests.post(settings.SERVICES_URL+'login', {'username': username, 'password': password}).json()
-        if login_response['success']:
-            request.session['auth_token'] = login_response['auth_token']
+        service_response = requests.post(settings.SERVICES_URL+'login', {'username': username, 'password': password}).json()
+        if service_response['success']:
+            request.session['user_info'] = service_response['user_info']
+            request.session['auth_token'] = service_response['auth_token']
             return redirect('/aduna/')
         else:
-            return redirect('/aduna/login/')
+            messages.add_message(request, messages.ERROR, service_response['message'], extra_tags='danger')
+            return redirect('/aduna/login')
 
 
 def logout(request):
@@ -93,9 +104,12 @@ def logout(request):
     
     cookies = {'sessionid': request.session.get('auth_token')}
     
-    logout_response = requests.post(settings.SERVICES_URL+'logout', {}, cookies=cookies).json()
+    service_response = requests.post(settings.SERVICES_URL+'logout', {}, cookies=cookies).json()
 
-    if logout_response['success']:
+    if service_response['success']:
+        print(service_response['message'])
+        messages.add_message(request, messages.INFO, service_response['message'], extra_tags='info')
+        request.session['user_info'] = None
         request.session['auth_token'] = None
         return redirect('/aduna/login')
 
