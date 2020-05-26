@@ -4,6 +4,8 @@ from . import views
 
 app_name = 'services'
 urlpatterns = [
+    path('login', views.do_login, name='login'),
+    path('logout', views.do_logout, name='logout'),
     path('search', views.search, name='search'),
     path('document', views.document, name='document'),
     path('query_suggestion', views.query_suggestion, name='query_suggestion'),

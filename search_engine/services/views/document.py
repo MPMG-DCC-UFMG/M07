@@ -7,6 +7,10 @@ from ..elastic import Elastic
 
 @require_http_methods(["GET"])
 def document(request):
+    if not request.user.is_authenticated:
+        data = {'is_authenticated': False}
+        return JsonResponse(data)
+        
     doc_type = request.GET['doc_type']
     doc_id = request.GET['doc_id']
     elastic = Elastic()
@@ -21,6 +25,7 @@ def document(request):
     }
 
     data = {
+        'is_authenticated': True,
         'document': document
     }
     return JsonResponse(data)

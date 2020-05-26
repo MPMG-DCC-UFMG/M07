@@ -10,6 +10,10 @@ from ..elastic import Elastic
 
 @require_http_methods(["GET"])
 def search(request):
+    if not request.user.is_authenticated:
+        data = {'is_authenticated': False}
+        return JsonResponse(data)
+
     data_hora = str(time.time())
     algoritmo = 'BM25'
     results_per_page = 10 #numero magico
@@ -27,12 +31,12 @@ def search(request):
 
     start = results_per_page * (page - 1)
     end = start + results_per_page
-    request = elastic.dsl.Search(using=elastic.es, index='diarios') \
-              .source(['fonte','titulo']) \
-              .query('query_string', query=query)[start:end] \
-              .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>')
+    elastic_request = elastic.dsl.Search(using=elastic.es, index='diarios') \
+            .source(['fonte', 'titulo']) \
+            .query('query_string', query=query, phrase_slop='2')[start:end] \
+            .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False)
 
-    response = request.execute()
+    response = elastic_request.execute()
     total_pages = (response.hits.total.value // results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
     documents = []
 
@@ -48,6 +52,7 @@ def search(request):
         })
     
     data = {
+        'is_authenticated': True,
         'query': query,
         'total_docs': response.hits.total.value,
         'results_per_page': results_per_page,
@@ -58,16 +63,16 @@ def search(request):
     }
 
     # Chama funcao para fazer o log da consulta
-    log_search_result(elastic,
-                      id_sessao = sid, 
-                      id_consulta = qid,
-                      id_usuario = id_usuario,
-                      text_consulta = query,
-                      algoritmo = algoritmo,
-                      data_hora = data_hora,
-                      tempo_resposta = response.took,
-                      documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
-                      pagina = page,
-                      resultados_por_pagina = results_per_page )
-                      
+    # log_search_result(elastic,
+    #                     id_sessao = sid, 
+    #                     id_consulta = qid,
+    #                     id_usuario = id_usuario,
+    #                     text_consulta = query,
+    #                     algoritmo = algoritmo,
+    #                     data_hora = data_hora,
+    #                     tempo_resposta = response.took,
+    #                     documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
+    #                     pagina = page,
+    #                     resultados_por_pagina = results_per_page )
+                    
     return JsonResponse(data)

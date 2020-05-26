@@ -8,4 +8,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('search', views.search, name='search'),
     path('document/<str:doc_type>/<str:doc_id>', views.document, name='document'),
+    path('login', views.login, name='login'),
+    path('logout', views.logout, name='logout'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

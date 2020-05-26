@@ -5,6 +5,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="stylesheet" href="{% static 'aduna/fontawesome/css/all.min.css' %}">
         <link rel="stylesheet" href="{% static 'aduna/bootstrap/css/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'aduna/jquery-ui/jquery-ui.min.css' %}">
         <link rel="stylesheet" href="{% static 'aduna/style.css' %}">
@@ -26,6 +27,20 @@
                             <input type="hidden" name="sid" id="sid" value="{{ sid }}">
                         </form>
                     </div>
+
+                    <ul class="navbar-nav mr-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                                {{ user_name }}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="dropdown07">
+                                <a class="dropdown-item" href="/aduna/logout"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                            </div>
+                        </li>
+                    </ul>
+
+
                 </div>
             </nav>
         </header>
