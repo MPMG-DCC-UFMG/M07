@@ -37,10 +37,10 @@ def main(args):
             es.indices.delete(index)
             print("Existing index deleted: " + index)
             local_indices.remove(index)
+            update_settings.append(index)
         
         if index not in local_indices: # caso o indice ainda nao exista ou foi excluido
             es.indices.create(index, body = updated_mappings[index] ) # cria indice
-            es.indices.put_settings(index = index, body = settings[index]["settings"]) # atualiza settings
             print("New index created: " + index)
             files_to_index = indexer.list_files(index)
             if len(files_to_index) == 0:
