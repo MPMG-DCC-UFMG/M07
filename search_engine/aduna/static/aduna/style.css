@@ -43,3 +43,17 @@
     color: #bfbfbf;
     padding-top: 5px;
 }
+
+
+.view-as-page{
+    background-color: #333;
+}
+
+.view-as-page .page{
+    margin-top: 100px;
+    background-color: white;
+    padding: 100px 50px;
+    -webkit-box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
+}
