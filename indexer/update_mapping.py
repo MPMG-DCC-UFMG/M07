@@ -18,6 +18,10 @@ def main(args):
         if i in force_reindexation:
             update_settings.remove(i)
 
+    if not os.path.isdir("indices"):
+            os.mkdir("indices")
+            print("Created new directory: indices")
+
     es = Elasticsearch()
     settings = json.load(open('additional_settings.json'))
     updated_mappings = json.load(open('mappings.json'))
@@ -27,13 +31,14 @@ def main(args):
     csv_indexer = indexer.Indexer()
     for index in updated_mappings.keys():
         print("Checking " + index + "...")
-
-        if not os.path.isdir(index):
-                os.mkdir(index)
-                print("Created new directory: " + index)
+        
+        index_folder = "indices/"+index
+        if not os.path.isdir(index_folder):
+            os.mkdir(index_folder)
+            print("Created new directory: " + index_folder)
         
         # se o indice ja existe e o mapping eh diferente ou se esta na lista de force_reindexation
-        if (index in local_indices and local_mappings[index] != updated_mappings[index]) or (index in force_reindexation and index in local_indices): 
+        if (index in local_indices) and (local_mappings[index] != updated_mappings[index] or index in force_reindexation): 
             es.indices.delete(index)
             print("Existing index deleted: " + index)
             local_indices.remove(index)
@@ -42,9 +47,9 @@ def main(args):
         if index not in local_indices: # caso o indice ainda nao exista ou foi excluido
             es.indices.create(index, body = updated_mappings[index] ) # cria indice
             print("New index created: " + index)
-            files_to_index = indexer.list_files(index)
+            files_to_index = indexer.list_files(index_folder)
             if len(files_to_index) == 0:
-                print("No files to index in " + index)
+                print("No files to index in " + index_folder)
             else:
                 print("Indexing " + str(len(files_to_index)) + " files in " + index)
                 csv_indexer.parallel_indexer(files_to_index, index, thread_count=4) # insere documentos
@@ -56,7 +61,6 @@ def main(args):
             else:
                 print("There is no settings to update in " + index)
 
-        print()
 
 
 if __name__ == "__main__":

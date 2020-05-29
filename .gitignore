@@ -2,10 +2,8 @@
 indexer/original/
 indexer/zips/
 indexer/csvs/
-indexer/diarios/*
-indexer/log_buscas/*
-indexer/log_clicks/*
 indexer/.ipynb_checkpoints/
+indexer/indices/*
 
 # indexation tests
 indexer/playground.ipynb
