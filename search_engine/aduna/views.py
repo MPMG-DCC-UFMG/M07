@@ -70,7 +70,10 @@ def document(request, doc_type, doc_id):
         document = service_response['document']
         document['text'] = document['text'].replace('\n', '<br>')
         document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
-        context = {'document': document}
+        context = {
+            'user_name': request.session.get('user_info')['first_name'],
+            'document': document
+        }
         return render(request, 'aduna/document.html', context)
     else:
         request.session['auth_token'] = None

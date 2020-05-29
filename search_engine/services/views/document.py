@@ -17,7 +17,7 @@ def document(request):
     retrieve_doc = elastic.dsl.Document.get(doc_id, using=elastic.es, index='diarios')
     document = {
         'id': doc_id,
-        'title': 'placeholder title', 
+        'title': retrieve_doc.titulo, 
         'description': 'placeholder description',
         'text': retrieve_doc.conteudo,
         'source': retrieve_doc.fonte,
