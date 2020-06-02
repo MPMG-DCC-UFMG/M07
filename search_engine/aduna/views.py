@@ -24,7 +24,7 @@ def index(request):
 
 
 def search(request):
-    if not request.session.get('auth_token'):
+    if request.GET.get('invalid_query', False) or not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
     cookies = {'sessionid': request.session.get('auth_token')}

@@ -14,11 +14,18 @@ def search(request):
         data = {'is_authenticated': False}
         return JsonResponse(data)
 
+    
+
     data_hora = str(time.time())
     algoritmo = 'BM25'
     results_per_page = 10 #numero magico
     id_usuario = str(31415) #numero magico
     query = request.GET['query']
+    query_len = len(''.join(query.split()))
+    if query_len < 2:
+        data = {'invalid_query': True}
+        return JsonResponse(data)
+
     page = int(request.GET.get('page', 1))
     sid = request.GET['sid']
     qid = request.GET.get('qid', '')    
@@ -62,16 +69,16 @@ def search(request):
     }
 
     # Chama funcao para fazer o log da consulta
-    # log_search_result(elastic,
-    #                     id_sessao = sid, 
-    #                     id_consulta = qid,
-    #                     id_usuario = id_usuario,
-    #                     text_consulta = query,
-    #                     algoritmo = algoritmo,
-    #                     data_hora = data_hora,
-    #                     tempo_resposta = response.took,
-    #                     documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
-    #                     pagina = page,
-    #                     resultados_por_pagina = results_per_page )
+    log_search_result(elastic,
+                        id_sessao = sid, 
+                        id_consulta = qid,
+                        id_usuario = id_usuario,
+                        text_consulta = query,
+                        algoritmo = algoritmo,
+                        data_hora = data_hora,
+                        tempo_resposta = response.took,
+                        documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
+                        pagina = page,
+                        resultados_por_pagina = results_per_page )
                     
     return JsonResponse(data)

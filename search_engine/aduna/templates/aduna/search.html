@@ -22,7 +22,7 @@
                     </button>
                     <div class="collapse navbar-collapse" id="navbarCollapse">
                         <form action="{% url 'aduna:search' %}" method="GET" class="form-inline mt-2 mt-md-0">
-                            <input id="query" name="query" class="form-control mr-sm-2" type="text" placeholder="Sua consulta aqui..." aria-label="Consulta" value="{{ query }}" oninvalid="setCustomValidity('Insira uma consulta válida.')" oninput="setCustomValidity('')"  required>
+                            <input id="query" name="query" class="form-control mr-sm-2" type="text" placeholder="Sua consulta aqui..." aria-label="Consulta" value="{{ query }}" oninvalid="setCustomValidity('A consulta requer pelo menos 2 caracteres não vazios.')" oninput="setCustomValidity('')" required pattern="\s*(\S\s*){2,}" autofocus>
                             <button class="btn btn-primary my-2 my-sm-0" type="submit">Pesquisar</button>
                             <input type="hidden" name="sid" id="sid" value="{{ sid }}">
                         </form>
