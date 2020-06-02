@@ -45,7 +45,7 @@ class SearchTests(TestCase):
         # Checa pela resposta de autenticado.
         self.assertTrue(response['is_authenticated'])
 
-    def test_query_no_results(self):
+    def test_invalid_query(self):
         # GET request enquanto logged in.
         user_login(self.client)
         response = self.client.get(reverse('services:search'), {'query': '', 'page': 1, 'sid': 'sid', 'qid': ''})
@@ -57,7 +57,7 @@ class SearchTests(TestCase):
         response = response.json()
 
         # Checa que o resultado contém 0 resultados.
-        self.assertEqual(len(response['documents']), 0)
+        self.assertTrue(response['invalid_query'])
 
     
 class DocumentTests(TestCase):
