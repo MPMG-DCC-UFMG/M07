@@ -3,7 +3,7 @@
         "settings": {
             "index": {
                 "highlight": {
-                    "max_analyzed_offset" : 9000000
+                    "max_analyzed_offset" : 15000000
                 }
             }
         }

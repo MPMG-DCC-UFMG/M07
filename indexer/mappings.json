@@ -147,7 +147,7 @@
                     "type": "long"
                 },
                 "timestamp": {
-                    "type": "long"
+                    "type": "date"
                 }
             }
         }
@@ -165,13 +165,7 @@
                     }
                 },
                 "data_hora": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
+                    "type": "date"
                 },
                 "documentos": {
                     "type": "text",

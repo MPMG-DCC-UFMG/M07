@@ -4,20 +4,17 @@ from django.http import JsonResponse
 
 from ..elastic import Elastic
 
-# from elasticsearch import helpers
-# import time
 import json
-# import hashlib
+import pandas as pd
 
 config = json.load(open('../config.json'))
 ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
 
 
-@require_http_methods(["GET"])
-def query_suggestion(request):
-    query = request.GET['query']
+def elastic_sugester(query):
     request_body = {
-        "_source": "text_consulta", 
+        "_source": "text_consulta",
+        "size": int(Elastic().es.cat.count("log_buscas").split(" ")[2]),
         "query": {
             "multi_match": {
                 "query": query,
@@ -31,24 +28,46 @@ def query_suggestion(request):
         }
     }
 
-    response = Elastic().es.search(body = request_body, index = "log_buscas")
-    hits = [ hit['_source']['text_consulta'] for hit in response['hits']['hits']]
+    elastic_response = Elastic().es.search(body = request_body, index = "log_buscas")
+    hits = [ hit['_source']['text_consulta'] for hit in elastic_response['hits']['hits']]
     
-    get_position = lambda element: element.lower().find(query.lower()) #TODO: Tratar a query para outros casos alem de lower
-    hits.sort(key = get_position)
-    # Ordena a lista de sugestoes pela ordem em que a string procurada aparece na query
-    # TODO: Melhorar forma de se ordenar essa lista: pode-se ordenar pelo numero de queries que aquele termo apareceu ou
-    # pela posicao da palavra em que se encontra o termo buscado. Interresante seria combinar a essa ultima com a primeira
-    # TODO: Remover elementos repetidos
+    search_result = {
+        "hits": hits,
+        "total": elastic_response["hits"]["total"]["value"]
+    }
 
-    suggestions = []
-    for i, hit in enumerate(hits):
-        suggestions.append({'label': hit, 'value': 'sugestao '+str(i+1), 'rank_number': i+1, 'suggestion_id': i+1})
-    
-    # print("[services/query_suggestion] Suggestions: " + str(suggestions))
+    return search_result
+
+def get_word_postion(element, query):
+    for i,word in enumerate(element.split(" ")):
+        if word.find(query)>=0:
+            return i
+    return -1
+
+@require_http_methods(["GET"])
+def query_suggestion(request):
+    query = request.GET['query']
+
+    search_response = elastic_sugester(query)
+    processed_suggestions = []
+    if search_response["total"]>0:
+        suggestions = pd.Series(search_response["hits"], name = "text_consulta").str.replace("\"", "").to_list() 
+        df = pd.DataFrame( {"text_consulta": suggestions})
+        df = pd.Series(df.groupby(['text_consulta'])['text_consulta'].agg('count'))
+
+        counts = df.to_list()
+        suggestions = list(df.index)
+        positions = [ get_word_postion(element, query) for element in suggestions]
+        df = pd.DataFrame({"suggestions": suggestions, "count": counts, "position": positions})
+
+        df = df.sort_values(['position', 'count'], ascending=[True, False])
+        
+        processed_suggestions = df.suggestions.to_list()
     
     data = {
-        'suggestions': suggestions
+        'suggestions': []
     }
-    print(data)
+    for i, hit in enumerate(processed_suggestions):
+        data["suggestions"].append({'label': hit, 'value': hit, 'rank_number': i+1, 'suggestion_id': i+1})
+    
     return JsonResponse(data)

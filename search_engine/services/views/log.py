@@ -11,17 +11,16 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario,
     resultados_por_pagina):
 
     indice = "log_buscas"
-
     doc = {
         'id_sessao': id_sessao,
         'id_consulta': id_consulta,
         'id_usuario': id_usuario,
         'text_consulta': text_consulta,
         'algoritmo': algoritmo,
-        'data_hora': data_hora,
-        'tempo_resposta': tempo_resposta,
-        'pagina': pagina,
-        'resultados_por_pagina': resultados_por_pagina,
+        'data_hora': round(float(data_hora), 6),
+        'tempo_resposta': int(tempo_resposta),
+        'pagina': int(pagina),
+        'resultados_por_pagina': int(resultados_por_pagina),
         'documentos': documentos
     }
 
@@ -39,7 +38,7 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario,
 @csrf_exempt
 @require_http_methods(["POST"])
 def log_search_result_click(request):
-    timestamp = str(time.time())
+    timestamp = time.time()
     id_documento = request.POST['item_id']
     posicao = request.POST['rank_number']
     tipo_documento = request.POST['item_type']
@@ -54,7 +53,7 @@ def log_search_result_click(request):
         "id_documento": id_documento,
         "id_consulta": id_consulta,
         "posicao": int(posicao),
-        "timestamp": float(timestamp),
+        "timestamp": round(float(timestamp), 6),
         "tipo_documento": tipo_documento,
         "pagina": int(pagina),
     }
@@ -64,7 +63,7 @@ def log_search_result_click(request):
         "_source": doc
     }])
 
-    print("[services/log_search_result_click] Response from bulk API: " + str(response))
+    # print("[services/log_search_result_click] Response from bulk API: " + str(response))
 
     if len(response[1])  == 0: # Test if some error was found during indexing
         print("[services/log_search_result_click] Click log indexed successfully.")
