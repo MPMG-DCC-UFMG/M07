@@ -14,11 +14,19 @@ def search(request):
         data = {'is_authenticated': False}
         return JsonResponse(data)
 
+    
+
     data_hora = str(time.time())
     algoritmo = 'BM25'
     results_per_page = 10 #numero magico
     id_usuario = str(31415) #numero magico
-    query = request.GET['query']
+    raw_query = request.GET['query']
+    query = ' '.join([w for w in raw_query.split() if len(w) > 1])
+    query_len = len(''.join(query.split()))
+    if query_len < 2:
+        data = {'invalid_query': True}
+        return JsonResponse(data)
+
     page = int(request.GET.get('page', 1))
     sid = request.GET['sid']
     qid = request.GET.get('qid', '')    
