@@ -10,4 +10,5 @@ urlpatterns = [
     path('document/<str:doc_type>/<str:doc_id>', views.document, name='document'),
     path('login', views.login, name='login'),
     path('logout', views.logout, name='logout'),
+    path('erro', views.erro, name='erro'),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

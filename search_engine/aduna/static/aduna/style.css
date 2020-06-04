@@ -57,3 +57,12 @@
     -moz-box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
     box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
 }
+
+
+.error-box{
+    margin-top: 40px;
+    font-family: 'Monaco', monospace;
+    font-size: 14px;
+    padding: 10px;
+    background-color: #ddd;
+}
