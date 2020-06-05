@@ -3,8 +3,19 @@ from django.test import Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+from .elastic import Elastic
 
 # Create your tests here.
+
+def get_any_id():
+    elastic_response = Elastic().es.search(index = "diarios", _source = False,\
+            body = {
+                "size": 1, 
+                "query": {
+                    "match_all": {}
+                }
+            })
+    return elastic_response["hits"]["hits"][0]["_id"]
 
 def user_login(client):
     """Faz login no 'client' especificado."""
@@ -67,7 +78,8 @@ class DocumentTests(TestCase):
 
     def test_document_request_logout(self):
         # GET request enquanto logged out.
-        response = self.client.get(reverse('services:document'), {'doc_type': 'diario', 'doc_id': '7OhmUnIBh9Xgt3ZVq2bI'})
+        document_id = get_any_id()
+        response = self.client.get(reverse('services:document'), {'doc_type': 'diario', 'doc_id': document_id})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -81,7 +93,9 @@ class DocumentTests(TestCase):
     def test_document_request_login(self):
         # GET request enquanto logged in.
         user_login(self.client)
-        response = self.client.get(reverse('services:document'), {'doc_type': 'diario', 'doc_id': '7OhmUnIBh9Xgt3ZVq2bI'})
+        
+        document_id = get_any_id()
+        response = self.client.get(reverse('services:document'), {'doc_type': 'diario', 'doc_id': document_id})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -144,3 +158,56 @@ class LoginTests(TestCase):
 
         # Checa por success == True
         self.assertTrue(response['success'])
+
+
+class ElasticTests(TestCase):
+    def test_elastic_connection(self):
+        #testar conexao com elastic
+        ping_result = Elastic().es.ping()
+        self.assertTrue(ping_result)
+
+    def test_existence_elastic_indices(self):
+        #testar se os indices existem
+        indices_list = ["diarios", "processos", "log_buscas", "log_clicks"]
+        indices_exist = Elastic().es.indices.exists(index=indices_list)
+        self.assertTrue(indices_exist)
+
+
+from .views import log_search_result
+class LogTests(TestCase):
+    def setUp(self):
+        # Every test needs a client.
+        self.client = Client()
+
+    def test_log_search_result(self):
+        log_response = log_search_result(
+                        id_sessao = "sid", 
+                        id_consulta = "test_query",
+                        id_usuario = "",
+                        text_consulta = "maria",
+                        algoritmo = "",
+                        data_hora = 123,
+                        tempo_resposta = 10,
+                        documentos = ["a","b","c"],
+                        pagina = 1,
+                        resultados_por_pagina = 10 )
+
+        self.assertTrue(log_response["search_result_logged"])
+
+    def test_log_search_result_click(self):
+        log = {
+
+            'item_id': 'test_item_id', 
+            'rank_number': 1, 
+            'item_type': 'test_type', 
+            'qid': 'test_query',
+            'page': 1
+        }
+        response = self.client.post(reverse('services:log_search_result_click'), log)
+        
+        response = response.json()
+
+        self.assertTrue(response["click_logged"])
+        
+        
+

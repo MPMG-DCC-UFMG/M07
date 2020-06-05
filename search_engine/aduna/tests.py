@@ -2,7 +2,19 @@ from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
 
+from elasticsearch import Elasticsearch
+
 # Create your tests here.
+
+def get_any_id():
+    elastic_response = Elasticsearch().search(index = "diarios", _source = False,\
+            body = {
+                "size": 1, 
+                "query": {
+                    "match_all": {}
+                }
+            })
+    return elastic_response["hits"]["hits"][0]["_id"]
 
 class IndexTests(TestCase):
     def setUp(self):
@@ -54,10 +66,12 @@ class DocumentTests(TestCase):
 
     def test_request(self):
        # Issue a GET request.
-       response = self.client.get(reverse('aduna:document', kwargs={'doc_type': 'diario', 'doc_id': 'EiqrM3IBLNZWNi1asnBU'}))
 
-       # Check that the response is 200 OK.
-       self.assertEqual(response.status_code, 200)
+        document_id = get_any_id()
+        response = self.client.get(reverse('aduna:document', kwargs={'doc_type': 'diario', 'doc_id': document_id}))
+
+        # Check that the response is 200 OK.
+        self.assertEqual(response.status_code, 200)
 
     
 

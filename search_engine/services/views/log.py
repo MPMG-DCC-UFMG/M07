@@ -6,7 +6,7 @@ import time
 
 from ..elastic import Elastic
 
-def log_search_result(elastic, id_sessao, id_consulta, id_usuario, 
+def log_search_result( id_sessao, id_consulta, id_usuario, 
     text_consulta, algoritmo, data_hora, tempo_resposta, documentos, pagina,
     resultados_por_pagina):
 
@@ -24,15 +24,15 @@ def log_search_result(elastic, id_sessao, id_consulta, id_usuario,
         'documentos': documentos
     }
 
-    resp = elastic.helpers.bulk(elastic.es, [{
+    resp = Elastic().helpers.bulk(Elastic().es, [{
         "_index": indice,
         "_source": doc
     }])
 
     if len(resp[1]) == 0: # Test if some error was found during indexing
-        print("[services/log_search_result] Search log indexed successfully.")
-    else:
-        print("[services/log_search_result] ERROR: Error while indexing log: " + str(resp))
+        return {"search_result_logged": True}
+    else :
+        return {"search_result_logged": False}
 
 
 @csrf_exempt
@@ -63,10 +63,8 @@ def log_search_result_click(request):
         "_source": doc
     }])
 
-    # print("[services/log_search_result_click] Response from bulk API: " + str(response))
-
     if len(response[1])  == 0: # Test if some error was found during indexing
-        print("[services/log_search_result_click] Click log indexed successfully.")
+        # print("[services/log_search_result_click] Click log indexed successfully.")
         return JsonResponse({"click_logged": True})
     else:
         print("[services/log_search_result_click] ERROR: Error while indexing click log: " + str(response))
