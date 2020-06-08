@@ -9,7 +9,7 @@ def do_login(request):
     user = authenticate(request, username=username, password=password)
     if user is not None:
         login(request, user)
-        user_info = {'first_name': request.user.first_name, 'last_name': request.user.last_name, 'email': request.user.email}
+        user_info = {'user_id': request.user.id, 'first_name': request.user.first_name, 'last_name': request.user.last_name, 'email': request.user.email}
         data = {'success': True, 'auth_token': request.session.session_key, 'message': '', 'user_info': user_info}
         return JsonResponse(data)
     else:

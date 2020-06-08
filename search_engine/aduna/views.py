@@ -37,7 +37,11 @@ def search(request):
     
     service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}, cookies=cookies).json()
 
-    if service_response['is_authenticated']:
+    if service_response['error']:
+        messages.add_message(request, messages.ERROR, service_response['error_message'], extra_tags='danger')
+        return redirect('/aduna/erro')
+
+    elif service_response['is_authenticated']:
         context = {
             'user_name': request.session.get('user_info')['first_name'],
             'services_url': settings.SERVICES_URL,
@@ -116,4 +120,5 @@ def logout(request):
         request.session['auth_token'] = None
         return redirect('/aduna/login')
 
-    
+def erro(request):
+    return render(request, 'aduna/erro.html')    
