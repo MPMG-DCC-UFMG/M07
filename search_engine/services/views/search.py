@@ -35,17 +35,17 @@ class Search(View):
 
             
             # Grava o log da consulta
-            log_search_result(self.elastic,
-                                id_sessao = self.sid, 
-                                id_consulta = self.qid,
-                                id_usuario = self.id_usuario,
-                                text_consulta = self.query,
-                                algoritmo = self.algoritmo,
-                                data_hora = self.data_hora,
-                                tempo_resposta = response_time,
-                                documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
-                                pagina = self.page,
-                                resultados_por_pagina = self.results_per_page )
+            # log_search_result(self.elastic,
+            #                     id_sessao = self.sid, 
+            #                     id_consulta = self.qid,
+            #                     id_usuario = self.id_usuario,
+            #                     text_consulta = self.query,
+            #                     algoritmo = self.algoritmo,
+            #                     data_hora = self.data_hora,
+            #                     tempo_resposta = response_time,
+            #                     documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
+            #                     pagina = self.page,
+            #                     resultados_por_pagina = self.results_per_page )
             data = {
                 'is_authenticated': True,
                 'error': False,
@@ -85,7 +85,7 @@ class Search(View):
         self.algoritmo = 'BM25'
         self.results_per_page = 10
         self.id_usuario = request.user.id
-
+        self.index = request.GET.getlist('index', ['diarios', 'processos'])
 
         self.query = ' '.join([w for w in self.raw_query.split() if len(w) > 1])
         self._generate_query_id()
@@ -101,7 +101,7 @@ class Search(View):
     def _search_documents(self):
         start = self.results_per_page * (self.page - 1)
         end = start + self.results_per_page
-        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index='diarios') \
+        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=self.index) \
                 .source(['fonte', 'titulo']) \
                 .query('query_string', query=self.query, phrase_slop='2', default_field='conteudo')[start:end] \
                 .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False)
@@ -118,7 +118,7 @@ class Search(View):
                 'description': hit.meta.highlight.conteudo[0],
                 'rank_number': self.results_per_page * (self.page-1) + (i+1),
                 'source': hit.fonte,
-                'type': 'diario',
+                'type': hit.meta.index,
             })
         
         return total_docs, total_pages, documents, response.took

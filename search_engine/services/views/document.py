@@ -14,14 +14,14 @@ def document(request):
     doc_type = request.GET['doc_type']
     doc_id = request.GET['doc_id']
     elastic = Elastic()
-    retrieve_doc = elastic.dsl.Document.get(doc_id, using=elastic.es, index='diarios')
+    retrieve_doc = elastic.dsl.Document.get(doc_id, using=elastic.es, index=doc_type)
     document = {
         'id': doc_id,
         'title': retrieve_doc.titulo, 
         'description': 'placeholder description',
         'text': retrieve_doc.conteudo,
         'source': retrieve_doc.fonte,
-        'type': 'diario',
+        'type': doc_type,
     }
 
     data = {
