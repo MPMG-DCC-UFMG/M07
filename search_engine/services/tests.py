@@ -79,7 +79,7 @@ class DocumentTests(TestCase):
     def test_document_request_logout(self):
         # GET request enquanto logged out.
         document_id = get_any_id()
-        response = self.client.get(reverse('services:document'), {'doc_type': 'diario', 'doc_id': document_id})
+        response = self.client.get(reverse('services:document'), {'doc_type': 'diarios', 'doc_id': document_id})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -95,7 +95,7 @@ class DocumentTests(TestCase):
         user_login(self.client)
         
         document_id = get_any_id()
-        response = self.client.get(reverse('services:document'), {'doc_type': 'diario', 'doc_id': document_id})
+        response = self.client.get(reverse('services:document'), {'doc_type': 'diarios', 'doc_id': document_id})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)

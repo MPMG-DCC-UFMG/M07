@@ -30,6 +30,9 @@
                     }
                 },
                 "data": {
+                    "type": "date"
+                },
+                "fonte": {
                     "type": "text",
                     "fields": {
                         "keyword": {
@@ -38,7 +41,19 @@
                         }
                     }
                 },
-                "fonte": {
+                "metadata_ultima_modificacao":{
+                    "type": "date"
+                },
+                "metadata_titulo": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "instancia": {
                     "type": "text",
                     "fields": {
                         "keyword": {
@@ -99,6 +114,15 @@
                     }
                 },
                 "fonte": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "instancia": {
                     "type": "text",
                     "fields": {
                         "keyword": {
