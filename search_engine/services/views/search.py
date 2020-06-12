@@ -34,7 +34,6 @@ class Search(View):
             total_docs, total_pages, documents, response_time = self._search_documents()
             
             # Grava o log da consulta
-<<<<<<< HEAD
             log_search_result(id_sessao = self.sid, 
                 id_consulta = self.qid,
                 id_usuario = self.id_usuario,
@@ -46,19 +45,6 @@ class Search(View):
                 pagina = self.page,
                 resultados_por_pagina = self.results_per_page )
 
-=======
-            # log_search_result(self.elastic,
-            #                     id_sessao = self.sid, 
-            #                     id_consulta = self.qid,
-            #                     id_usuario = self.id_usuario,
-            #                     text_consulta = self.query,
-            #                     algoritmo = self.algoritmo,
-            #                     data_hora = self.data_hora,
-            #                     tempo_resposta = response_time,
-            #                     documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
-            #                     pagina = self.page,
-            #                     resultados_por_pagina = self.results_per_page )
->>>>>>> b7cb2ceace2be62046888bc8ffc77fb49a92bc11
             data = {
                 'is_authenticated': True,
                 'error': False,

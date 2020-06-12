@@ -204,9 +204,9 @@ class LogTests(TestCase):
             'page': 1
         }
         response = self.client.post(reverse('services:log_search_result_click'), log)
+        self.assertEqual(response.status_code, 200)
         
         response = response.json()
-
         self.assertTrue(response["click_logged"])
         
         
