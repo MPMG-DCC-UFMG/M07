@@ -9,6 +9,8 @@ import hashlib
 
 from .log import log_search_result
 from ..elastic import Elastic
+from ..features_extractor import FeaturesExtractor
+from ..ranking.tf_idf import TF_IDF
 
 
 class Search(View):
@@ -119,6 +121,37 @@ class Search(View):
                 'rank_number': self.results_per_page * (self.page-1) + (i+1),
                 'source': hit.fonte,
                 'type': hit.meta.index,
+            })
+        
+        return total_docs, total_pages, documents, response.took
+
+    def _search_documents_NEW(self):
+        start = self.results_per_page * (self.page - 1)
+        end = start + self.results_per_page
+        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=['diarios']) \
+                .source(['fonte', 'titulo']) \
+                .query('query_string', query=self.query, phrase_slop='2', default_field='conteudo')[0:100] \
+                .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False) \
+                .extra(explain=True)
+
+        response = elastic_request.execute()
+
+        ranking_features = FeaturesExtractor(['conteudo', 'titulo']).extract(response)
+        tf_idf = TF_IDF(response, ranking_features)
+        new_ranking = tf_idf.reranking()[start:end]
+
+        total_docs = 100
+        total_pages = (total_docs // self.results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
+        documents = []
+
+        for i, item in enumerate(new_ranking):
+            documents.append({
+                'id': item['hit'].meta.id,
+                'title': item['hit'].titulo, 
+                'description': item['hit'].meta.highlight.conteudo[0],
+                'rank_number': self.results_per_page * (self.page-1) + (i+1),
+                'source': item['hit'].fonte,
+                'type': item['hit'].meta.index,
             })
         
         return total_docs, total_pages, documents, response.took
