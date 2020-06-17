@@ -53,6 +53,7 @@ class Search(View):
                 'error': False,
                 'query': self.query,
                 'total_docs': total_docs,
+                'time': response_time,
                 'results_per_page': self.results_per_page,
                 'documents': documents,
                 'current_page': self.page,
@@ -104,7 +105,7 @@ class Search(View):
         start = self.results_per_page * (self.page - 1)
         end = start + self.results_per_page
         elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=self.index) \
-                .source(['fonte', 'titulo']) \
+                .source(['fonte', 'titulo', 'conteudo']) \
                 .query('query_string', query=self.query, phrase_slop='2', default_field='conteudo')[start:end] \
                 .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False)
 
@@ -112,7 +113,6 @@ class Search(View):
         total_docs = response.hits.total.value
         total_pages = (total_docs // self.results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
         documents = []
-
         for i, hit in enumerate(response):
             documents.append({
                 'id': hit.meta.id,
@@ -123,7 +123,7 @@ class Search(View):
                 'type': hit.meta.index,
             })
         
-        return total_docs, total_pages, documents, response.took
+        return total_docs, total_pages, documents, response.took 
 
     def _search_documents_NEW(self):
         start = self.results_per_page * (self.page - 1)
