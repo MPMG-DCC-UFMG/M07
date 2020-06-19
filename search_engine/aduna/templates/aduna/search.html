@@ -47,7 +47,7 @@
 
         <main role="main">
             <div class="container">
-                <div class="total-docs">A pesquisa retornou {{ total_docs }} documentos.</div>
+                <div class="total-docs">A pesquisa retornou {{ total_docs }} documentos ({{ time|floatformat:2 }} segundos).</div>
                 <div id="results-container" data-executed-query="{{ query }}">
                 {% for doc in documents %}
                     <div class="result-item">
