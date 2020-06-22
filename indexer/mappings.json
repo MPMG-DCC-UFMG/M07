@@ -30,7 +30,13 @@
                     }
                 },
                 "data": {
-                    "type": "date"
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
                 },
                 "fonte": {
                     "type": "text",
@@ -42,7 +48,13 @@
                     }
                 },
                 "metadata_ultima_modificacao":{
-                    "type": "date"
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
                 },
                 "metadata_titulo": {
                     "type": "text",
