@@ -42,7 +42,8 @@ class Indexer:
             line = dict(line)
             doc = {}
             for field in columns:
-                doc[field] = line[field]
+                if line[field]!= '':
+                    doc[field] = line[field]
             
             yield {
                 "_index": index,
