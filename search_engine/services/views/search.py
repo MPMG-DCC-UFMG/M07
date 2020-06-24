@@ -6,12 +6,14 @@ from django.http import JsonResponse
 
 import time
 import hashlib
+import json
 
 from .log import log_search_result
 from ..elastic import Elastic
 from ..features_extractor import FeaturesExtractor
 from ..ranking.tf_idf import TF_IDF
 
+from ..features_extractor import TermVectorsFeaturesExtractor
 
 class Search(View):
 
@@ -152,5 +154,41 @@ class Search(View):
                 'source': item['hit'].fonte,
                 'type': item['hit'].meta.index,
             })
+        
+        return total_docs, total_pages, documents, response.took
+
+    
+    #Para testar testar essa funçao, troque a funçao de busca usada na função get por essa e certifique-se de estar usando indices com os term_vectors indexados
+    def _search_documents_BY_TERM_VECTORS(self):
+        indices = ["diarios_teste"] #Usar indice com term_vectors indexados
+        total_docs = 100
+
+        start = self.results_per_page * (self.page - 1)
+        end = start + self.results_per_page
+        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=indices) \
+                .source(['fonte', 'titulo']) \
+                .query('query_string', query=self.query, phrase_slop='2', default_field='conteudo')[0:total_docs] \
+                .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False)
+
+        response = elastic_request.execute()
+
+        ranking_features = TermVectorsFeaturesExtractor(['conteudo', 'titulo'], self.query.split(" "), indices = indices).extract(response) #TODO: parser correto da query
+
+        tf_idf = TF_IDF(response, ranking_features)
+        new_ranking = tf_idf.reranking()[start:end]
+
+        total_pages = (total_docs // self.results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
+        documents = []
+
+        for i, item in enumerate(new_ranking):
+            documents.append({
+                'id': item['hit'].meta.id,
+                'title': item['hit'].titulo, 
+                'description': item['hit'].meta.highlight.conteudo[0],
+                'rank_number': self.results_per_page * (self.page-1) + (i+1),
+                'source': item['hit'].fonte,
+                'type': item['hit'].meta.index,
+            })
+        # print(json.dumps(documents,indent="  "))
         
         return total_docs, total_pages, documents, response.took

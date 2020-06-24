@@ -10,6 +10,8 @@ def main(args):
     
     force_reindexation = []
     update_settings = []
+
+    mappings_path = args["mappings_path"]
     if args["force_reindexation"] != None:
         force_reindexation = args["force_reindexation"]
     if args["update_settings"] != None:
@@ -20,11 +22,11 @@ def main(args):
 
     if not os.path.isdir("indices"):
             os.mkdir("indices")
-            print("Created new directory: indices")
+            print("Created new directory: indexer/indices")
 
     es = Elasticsearch()
     settings = json.load(open('additional_settings.json'))
-    updated_mappings = json.load(open('mappings.json'))
+    updated_mappings = json.load(open(mappings_path))
     local_indices = [index for index in updated_mappings.keys() if es.indices.exists(index)]
     local_mappings = es.indices.get_mapping(local_indices)
     
@@ -70,6 +72,7 @@ if __name__ == "__main__":
     
     parser.add_argument("-force_reindexation", nargs='+', help="List of indices to force reindexation")
     parser.add_argument("-update_settings", nargs='+', help="List of indices to force settings update")
+    parser.add_argument("-mappings_path",default="mappings.json", help="Path of the mappings json file that will be used")#TODO: Add this arg in the docs
 
     # Get all args
     args = vars(parser.parse_args())
