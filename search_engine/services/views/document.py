@@ -10,7 +10,7 @@ def document(request):
     if not request.user.is_authenticated:
         data = {'is_authenticated': False}
         return JsonResponse(data)
-        
+    sid = request.GET['sid']
     doc_type = request.GET['doc_type']
     doc_id = request.GET['doc_id']
     elastic = Elastic()
@@ -22,6 +22,7 @@ def document(request):
         'text': retrieve_doc.conteudo,
         'source': retrieve_doc.fonte,
         'type': doc_type,
+        'sid': sid
     }
 
     data = {

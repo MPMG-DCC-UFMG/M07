@@ -33,10 +33,9 @@ def search(request):
     sid = request.GET['sid']
     qid = request.GET.get('qid', '')
     page = int(request.GET.get('page', 1))
-
     
     service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}, cookies=cookies).json()
-    
+
     if service_response['error']:
         messages.add_message(request, messages.ERROR, service_response['error_message'], extra_tags='danger')
         return redirect('/aduna/erro')
@@ -64,13 +63,12 @@ def search(request):
         return redirect('/aduna/login')
     
 
-def document(request, doc_type, doc_id):
+def document(request, doc_type, doc_id, sid):
     if not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
     cookies = {'sessionid': request.session.get('auth_token')}
-
-    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id':doc_id}, cookies=cookies).json()
+    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id': doc_id, 'sid': sid}, cookies=cookies).json()
     
     if service_response['is_authenticated']:
         document = service_response['document']
@@ -78,7 +76,8 @@ def document(request, doc_type, doc_id):
         document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
         context = {
             'user_name': request.session.get('user_info')['first_name'],
-            'document': document
+            'document': document,
+            'sid': sid
         }
         return render(request, 'aduna/document.html', context)
     else:
