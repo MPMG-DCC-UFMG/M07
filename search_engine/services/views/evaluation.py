@@ -8,7 +8,7 @@ from ..metrics import Metrics
 def get_metrics(request):
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
-    metrics = request.GET.getlist('metrics')
+    metrics = request.GET.getlist('metrics', [])
 
     if start_date == None and end_date == None:
         raise Exception('At leat one date parameter must be given.')
@@ -21,11 +21,14 @@ def get_metrics(request):
             callable_funcs.append(func.__name__)
     callable_funcs.remove("__init__")
     callable_funcs.remove("_get_logs")
+
+    if metrics == []:
+        metrics = callable_funcs
     
     response = {}
     for metric in metrics:
         if metric in callable_funcs:
-            response[metric] = getattr(m, 'avg_response_time')()
+            response[metric] = getattr(m, metric)()
     
     return JsonResponse(response)
 
