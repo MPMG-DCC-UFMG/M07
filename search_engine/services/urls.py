@@ -13,4 +13,6 @@ urlpatterns = [
     path('log_search_result_click', views.log_search_result_click, name='log_search_result_click'),
     path('log_query_suggestion_click', views.log_query_suggestion_click, name='log_query_suggestion_click'),
     path('get_log_buscas', views.get_log_buscas, name='get_log_buscas'),
+    path('get_log_clicks', views.get_log_clicks, name='get_log_clicks'),
+    path('get_metrics', views.get_metrics, name='get_metrics'),
 ]

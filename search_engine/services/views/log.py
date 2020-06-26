@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
 import time
+import pandas
 
 from ..elastic import Elastic
 
@@ -94,3 +95,117 @@ def log_query_suggestion_click(request):
     print('[LOG SUGGESTION CLICK] session_id: {:s}, user_id: {:s}, suggestion_id: {:s}, rank_number: {:s}'.format(session_id, user_id, suggestion_id, rank_number))
     data = {}
     return JsonResponse(data)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_log_buscas(request):
+    user_id = request.POST.get('user_id',  None)
+    start_date = request.POST.get('start_date', None)
+    end_date = request.POST.get('end_date', None)
+
+    if user_id == None and start_date == None and end_date == None:
+        response = "Error: At least one parameter must be given."
+        return JsonResponse({"response": response})
+
+    body = {
+        "size": int(Elastic().es.cat.count("log_buscas").split(" ")[2]), # numero de documentos no indice
+        "query": {
+            "bool" : {
+                "must": []
+            }
+        }
+    }
+    
+    if user_id != None:
+        body["query"]["bool"]["must"].append({
+            "term": {
+                "id_usuario": user_id
+            
+            }
+        })
+    
+    if start_date != None:
+        start_date = int(float(start_date))
+        body["query"]["bool"]["must"].append({
+            "range": {
+                "data_hora": {
+                    "gte": start_date
+                }
+            }
+        })
+
+    if end_date != None:
+        end_date = float(end_date)
+        if end_date - int(end_date) > 0:
+            end_date = int(end_date) + 1
+        else:
+            end_date = int(end_date)
+        body["query"]["bool"]["must"].append({
+            "range": {
+                "data_hora": {
+                    "lte": end_date
+                }
+            }
+        })
+
+    elastic_response = Elastic().es.search(index = "log_buscas", body = body)
+
+    data = []
+    for hit in elastic_response["hits"]["hits"]:
+        d = hit["_source"]
+        d["log_buscas_index_id"] = hit["_id"]
+        data.append(d)
+
+    metadata = {
+        "took" : elastic_response["took"],
+        "timed_out": elastic_response["timed_out"],
+        "_shards" : elastic_response["_shards"],
+        "total": elastic_response["hits"]["total"]
+    }
+    if user_id != None: metadata["user_id"] = user_id 
+    if start_date != None: metadata["start_date"] = start_date 
+    if end_date != None: metadata["end_date"] = end_date
+    
+    response = {
+        "data": data,
+        "metadata": metadata
+    }
+    
+    return JsonResponse(response)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def get_log_clicks(request):
+    consultas = request.POST.getlist('consultas', None) #list of id_consulta
+
+    body = {
+        "size": int(Elastic().es.cat.count("log_clicks").split(" ")[2]), # numero de documentos no indice
+        "query": {
+            "terms": {
+            "id_consulta.keyword": consultas
+            }
+        }
+    }
+    elastic_response = Elastic().es.search(body = body, index = "log_clicks")
+
+    data = []
+    for hit in elastic_response['hits']['hits']:
+        d = hit["_source"]
+        d["log_buscas_index_id"] = hit["_id"]
+        data.append(d)
+    
+    metadata = {
+        "took" : elastic_response["took"],
+        "timed_out": elastic_response["timed_out"],
+        "_shards" : elastic_response["_shards"],
+        "total": elastic_response["hits"]["total"]
+    }
+
+    response = {
+        "data": data,
+        "metadata": metadata
+    }
+
+    return JsonResponse(response)
