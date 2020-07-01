@@ -34,7 +34,7 @@ class Metrics:
             if q['id_consulta'] not in self.click_log['id_consulta'].to_list():
                 unclicked_queries.append(q.to_dict())
         response = {
-            "total": len(unclicked_queries),
+            "no_clicks_query": len(unclicked_queries),
             "detailed": unclicked_queries
         }
         return response
@@ -45,8 +45,8 @@ class Metrics:
         no_ressults = self.query_log.loc[ (self.query_log['pagina'] == 1) & (self.query_log['documentos'].str.len() == 0) ]
         no_ressults = no_ressults.reset_index(drop=True)
         response = {
-            "total":len(no_ressults),
-            "data": no_ressults.to_dict(orient='records')
+            "no_results_query":len(no_ressults),
+            "detailed": no_ressults.to_dict(orient='records')
         }
         return response
 
@@ -71,7 +71,11 @@ class Metrics:
             }
             d["n_clicks"] = len(self.click_log[self.click_log['id_documento'] == doc])
             data.append(d)
-        return data
+            
+        response = {
+            "clicks_per_document": data
+        }
+        return response
 
     def clicks_per_position(self):
         #clicks por posição
@@ -87,10 +91,34 @@ class Metrics:
         df['numero_termos'] = df['text_consulta'].apply(lambda x: len(x.replace('"', "").split(" ")))
         avg_times = df.groupby(by = ["algoritmo", "numero_termos", ], as_index =False)["tempo_resposta"].mean()
         response = {
-            "total_avg_time": df["tempo_resposta"].mean(),
+            "avg_response_time": df["tempo_resposta"].mean(),
             "detailed": avg_times.to_dict(orient='records')
         }
         return response
+
+    def avg_time_to_first_click(self):
+        #Calcula o tempo medio ate o primeiro click
+        queries = self.query_log['id_consulta'].drop_duplicates().to_list() #calcular todas as queries
+        times = []
+        for q in queries:
+            target_queries = self.query_log[self.query_log['id_consulta'] == q]
+            target_queries = target_queries.sort_values(by='data_hora').reset_index(drop=True)
+            first_query = target_queries['data_hora'][0]
+
+            if q in self.click_log["id_consulta"].to_list():
+                clicks = self.click_log[self.click_log['id_consulta'] == q]
+                clicks = clicks.sort_values(by='timestamp', ).reset_index(drop=True)
+                first_click = clicks['timestamp'][0]
+
+                time_to_click = first_click - first_query
+                times.append(time_to_click)
+
+        response = {
+            "avg_time_to_first_click": pd.Series(times).mean()
+        }
+        return response
+
+
 
     # def hist_clicks_per_position():
         #     #histograma de clicks por posição
