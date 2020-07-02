@@ -26,7 +26,7 @@ class Indexer:
 
         config = json.load(open('../config.json'))
         self.ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
-        self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=30, max_retries=3, retry_on_timeout=True)
+        self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=60, max_retries=3, retry_on_timeout=True)
 
         csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
