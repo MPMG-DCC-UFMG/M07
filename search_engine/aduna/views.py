@@ -41,14 +41,13 @@ def search(request):
         return redirect('/aduna/erro')
 
     elif service_response['is_authenticated']:
-        time_seconds = service_response['time'] / 1000
         context = {
             'user_name': request.session.get('user_info')['first_name'],
             'services_url': settings.SERVICES_URL,
             'query': query,
             'page': page,
             'sid': sid,
-            'time': time_seconds,
+            'time': service_response['time'],
             'qid': service_response['qid'],
             'total_docs': service_response['total_docs'],
             'results_per_page': range(service_response['results_per_page']),

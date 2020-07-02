@@ -21,6 +21,7 @@ from ..features_extractor import TermVectorsFeaturesExtractor
 class Search(View):
 
     def get(self, request):
+        start = time.time() # Medindo wall-clock time da requisição completa
         if not request.user.is_authenticated:
             data = {'is_authenticated': False, 'error': False}
             return JsonResponse(data)
@@ -55,13 +56,16 @@ class Search(View):
             resultados_por_pagina = self.results_per_page
         ))
 
-
+        end = time.time()
+        wall_time = end - start
+        
         data = {
             'is_authenticated': True,
             'error': False,
             'query': self.query,
             'total_docs': total_docs,
-            'time': response_time,
+            'time': wall_time,
+            'time_elastic': response_time,
             'results_per_page': self.results_per_page,
             'documents': documents,
             'current_page': self.page,
