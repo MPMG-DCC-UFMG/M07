@@ -1,6 +1,7 @@
 from services.elastic import Elastic
 from services.models.processo import Processo
 from services.models.diario import Diario
+from django.conf import settings
 
 class Document:
     '''
@@ -15,18 +16,15 @@ class Document:
     retornar os resultados como uma lista de múltiplas classes.
     '''
 
-    def __init__(self, searchable_indexes=None):
+    def __init__(self, searchable_indices=None):
         self.elastic = Elastic()
         self.results_per_page = 10
         
-        if searchable_indexes == None:
-            searchable_indexes = {
-                'diarios': Diario,
-                'processos': Processo
-            }
+        if searchable_indices == None:
+            searchable_indices = settings.SEARCHABLE_INDICES
 
-        self.searchable_indexes = searchable_indexes
-        self.index_names = list(self.searchable_indexes.keys())
+        self.searchable_indices = searchable_indices
+        self.index_names = list(self.searchable_indices.keys())
 
     
 
@@ -51,7 +49,7 @@ class Document:
             dict_data['rank_number'] = self.results_per_page * (page_number-1) + (i+1)
             dict_data['type'] = item.meta.index
 
-            result_class = self.searchable_indexes[item.meta.index]
+            result_class = self.searchable_indices[item.meta.index]
             documents.append(result_class(**dict_data))
         
         return total_docs, total_pages, documents, response.took

@@ -3,6 +3,7 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from django.conf import settings
 
 import time
 import hashlib
@@ -95,8 +96,7 @@ class Search(View):
         self.algoritmo = 'BM25'
         self.results_per_page = 10
         self.id_usuario = request.user.id
-        self.index = request.GET.getlist('index', ['diarios', 'processos'])
-
+        self.index = request.GET.getlist('index', settings.SEARCHABLE_INDICES.keys())
         self.query = ' '.join([w for w in self.raw_query.split() if len(w) > 1])
         self._generate_query_id()
     
@@ -135,7 +135,7 @@ class Search(View):
     def _search_documents_NEW(self):
         start = self.results_per_page * (self.page - 1)
         end = start + self.results_per_page
-        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=['diarios']) \
+        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=self.index) \
                 .source(['fonte', 'titulo']) \
                 .query('query_string', query=self.query, phrase_slop='2', default_field='conteudo')[0:100] \
                 .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False) \

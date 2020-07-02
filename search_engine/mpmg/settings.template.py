@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from services.models.processo import Processo
+from services.models.diario import Diario
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -137,3 +139,10 @@ ELASTICSEARCH_DSL = {
 }
 
 SERVICES_URL = 'http://127.0.0.1:8000/services/'
+
+# Indices to search
+#   - Requires class import (e.g. from services.models.processo import Processo)
+SEARCHABLE_INDICES = {
+                'diarios': Diario,
+                'processos': Processo
+            }
