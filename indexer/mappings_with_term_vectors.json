@@ -260,7 +260,7 @@
             "properties": {
                 "titulo": {
                     "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
+                    "term_vector" : "with_positions_offsets",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -270,7 +270,7 @@
                 },
                 "conteudo": {
                     "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
+                    "term_vector" : "with_positions_offsets",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -340,7 +340,7 @@
             "properties": {
                 "titulo": {
                     "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
+                    "term_vector" : "with_positions_offsets",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -350,7 +350,7 @@
                 },
                 "conteudo": {
                     "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
+                    "term_vector" : "with_positions_offsets",
                     "fields": {
                         "keyword": {
                             "type": "keyword",

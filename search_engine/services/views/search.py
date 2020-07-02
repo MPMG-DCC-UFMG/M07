@@ -114,7 +114,7 @@ class Search(View):
         elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=self.index) \
                 .source(['fonte', 'titulo', 'conteudo']) \
                 .query('query_string', query=self.query, phrase_slop='2', default_field='conteudo')[start:end] \
-                .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False)
+                .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False, type="unified")
 
         response = elastic_request.execute()
         total_docs = response.hits.total.value
