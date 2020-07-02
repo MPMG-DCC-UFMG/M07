@@ -4,6 +4,7 @@
             "properties": {
                 "titulo": {
                     "type": "text",
+                    "term_vector" : "with_positions_offsets_payloads",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -13,6 +14,7 @@
                 },
                 "conteudo": {
                     "type": "text",
+                    "term_vector" : "with_positions_offsets_payloads",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -82,6 +84,7 @@
             "properties": {
                 "titulo": {
                     "type": "text",
+                    "term_vector" : "with_positions_offsets_payloads",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -91,6 +94,7 @@
                 },
                 "conteudo": {
                     "type": "text",
+                    "term_vector" : "with_positions_offsets_payloads",
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -251,157 +255,6 @@
                 "text_consulta": {
                     "type": "search_as_you_type",
                     "max_shingle_size": 3
-                }
-            }
-        }
-    },
-    "diarios_tv": {
-        "mappings": {
-            "properties": {
-                "titulo": {
-                    "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "conteudo": {
-                    "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "tipo_documento": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "data": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "fonte": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "metadata_ultima_modificacao":{
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "metadata_titulo": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "instancia": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "processos_tv": {
-        "mappings": {
-            "properties": {
-                "titulo": {
-                    "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "conteudo": {
-                    "type": "text",
-                    "term_vector" : "with_positions_offsets_payloads",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "tipo_documento": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "numero_processo": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "tipo_arquivo": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "fonte": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "instancia": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
                 }
             }
         }
