@@ -1,0 +1,41 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th>ID Sessão</th>
+                                <th>ID Consulta</th>
+                                <th>ID Usuário</th>
+                                <th>Consulta</th>
+                                <th>Algoritmo</th>
+                                <th>Data</th>
+                                <th>Tempo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in result_list %}
+                            <tr>
+                                <td>{{ item.id_sessao }}</td>
+                                <td>{{ item.id_consulta }}</td>
+                                <td>{{ item.id_usuario }}</td>
+                                <td>{{ item.text_consulta }}</td>
+                                <td>{{ item.algoritmo }}</td>
+                                <td>{{ item.data_hora|to_date|date:"d/m/Y G:i:s" }}</td>
+                                <td>{{ item.tempo_resposta }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock%}

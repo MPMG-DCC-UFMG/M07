@@ -6,70 +6,58 @@ import time
 import pandas
 
 from ..elastic import Elastic
+from services.models.log_busca import LogBusca
+from services.models.log_search_click import LogSearchClick
 
-def log_search_result( id_sessao, id_consulta, id_usuario, 
-    text_consulta, algoritmo, data_hora, tempo_resposta, documentos, pagina,
-    resultados_por_pagina):
 
-    indice = "log_buscas"
-    doc = {
-        'id_sessao': id_sessao,
-        'id_consulta': id_consulta,
-        'id_usuario': id_usuario,
-        'text_consulta': text_consulta,
-        'algoritmo': algoritmo,
-        'data_hora': round(float(data_hora), 6),
-        'tempo_resposta': int(tempo_resposta),
-        'pagina': int(pagina),
-        'resultados_por_pagina': int(resultados_por_pagina),
-        'documentos': documentos
-    }
+@csrf_exempt
+@require_http_methods(["POST"])
+def log_search_result(request):
+    '''
+    Grava o log de uma consulta. Atualmente o log da consulta já está sendo
+    gravado junto do método search da API. Mas ele está exposto aqui para o
+    caso dessa dinâmica mudar e ser necessário chamar o método explicitamente.
+    '''
 
-    resp = Elastic().helpers.bulk(Elastic().es, [{
-        "_index": indice,
-        "_source": doc
-    }])
+    response = LogBusca().save(dict(
+        id_sessao             = request.POST['id_sessao'],
+        id_consulta           = request.POST['id_consulta'],
+        id_usuario            = request.POST['id_usuario'],
+        text_consulta         = request.POST['text_consulta'],
+        algoritmo             = request.POST['algoritmo'],
+        data_hora             = request.POST['data_hora'],
+        tempo_resposta        = request.POST['tempo_resposta'],
+        pagina                = request.POST['pagina'],
+        resultados_por_pagina = request.POST['resultados_por_pagina'],
+        documentos            = request.POST['documentos']
+    ))
 
-    if len(resp[1]) == 0: # Test if some error was found during indexing
-        return {"search_result_logged": True}
-    else :
-        return {"search_result_logged": False}
+    if len(response[1]) == 0:
+        return JsonResponse({"success": True})
+    else:
+        return JsonResponse({"success": False})
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def log_search_result_click(request):
-    timestamp = time.time()
-    id_documento = request.POST['item_id']
-    posicao = request.POST['rank_number']
-    tipo_documento = request.POST['item_type']
-    id_consulta = request.POST['qid']
-    pagina = request.POST['page']
-    
-    indice = "log_clicks"
+    '''
+    Grava no log o item do ranking clicado pelo usuário.
+    '''
 
-    elastic = Elastic()
+    response = LogSearchClick().save(dict(
+        id_documento   = request.POST['item_id'],
+        id_consulta    = request.POST['qid'],
+        posicao        = request.POST['rank_number'],
+        tipo_documento = request.POST['item_type'],
+        pagina         = request.POST['page'],
+        timestamp      = int(time.time() * 1000),
+    ))
 
-    doc = {
-        "id_documento": id_documento,
-        "id_consulta": id_consulta,
-        "posicao": int(posicao),
-        "timestamp": round(float(timestamp), 6),
-        "tipo_documento": tipo_documento,
-        "pagina": int(pagina),
-    }
-
-    response = elastic.helpers.bulk(elastic.es, [{
-        "_index": indice,
-        "_source": doc
-    }])
-
-    if len(response[1])  == 0: # Test if some error was found during indexing
-        # print("[services/log_search_result_click] Click log indexed successfully.")
-        return JsonResponse({"click_logged": True})
+    if len(response[1])  == 0:
+        return JsonResponse({"success": True})
     else:
-        print("[services/log_search_result_click] ERROR: Error while indexing click log: " + str(response))
-        return JsonResponse({"click_logged": False})
+        return JsonResponse({"success": False})
 
 
 @require_http_methods(["GET"])

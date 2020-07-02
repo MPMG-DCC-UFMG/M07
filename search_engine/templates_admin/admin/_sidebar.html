@@ -1,0 +1,53 @@
+{% load static %}
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+    <ul class="nav">
+        <li class="nav-item nav-category">Menu Principal</li>
+        <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin:index' %}">
+                    <i class="menu-icon typcn typcn-document-text"></i>
+                    <span class="menu-title">Dashboard</span>
+                </a>
+        </li>
+        {% for app in available_apps %}
+            {% for model in app.models %}
+                {% if model.admin_url %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ model.admin_url }}">
+                            <i class="menu-icon typcn typcn-document-text"></i>
+                            <span class="menu-title">{{ model.name }}</span>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+            <i class="menu-icon typcn typcn-coffee"></i>
+            <span class="menu-title">Logs</span>
+            <i class="menu-arrow"></i>
+            </a>
+            <div class="collapse" id="ui-basic">
+            <ul class="nav flex-column sub-menu">
+                <li class="nav-item">
+                <a class="nav-link" href="/admin/log_buscas">Consultas</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="#">Cliques</a>
+                </li>
+            </ul>
+            </div>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="pages/forms/basic_elements.html">
+            <i class="menu-icon typcn typcn-shopping-bag"></i>
+            <span class="menu-title">Rankings</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="pages/charts/chartjs.html">
+            <i class="menu-icon typcn typcn-th-large-outline"></i>
+            <span class="menu-title">Métricas</span>
+            </a>
+        </li>
+    </ul>
+</nav>
