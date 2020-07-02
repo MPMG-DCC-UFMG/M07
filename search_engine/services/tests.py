@@ -174,13 +174,16 @@ class ElasticTests(TestCase):
 
 
 from .views import log_search_result
+from services.models.log_busca import LogBusca
+from services.models.log_search_click import LogSearchClick
+
 class LogTests(TestCase):
     def setUp(self):
         # Every test needs a client.
         self.client = Client()
 
     def test_log_search_result(self):
-        log_response = log_search_result(
+        log_response = LogBusca().save(dict(
                         id_sessao = "sid", 
                         id_consulta = "test_query",
                         id_usuario = "",
@@ -190,24 +193,21 @@ class LogTests(TestCase):
                         tempo_resposta = 10,
                         documentos = ["a","b","c"],
                         pagina = 1,
-                        resultados_por_pagina = 10 )
+                        resultados_por_pagina = 10 ))
 
-        self.assertTrue(log_response["search_result_logged"])
+        self.assertTrue(len(log_response[1]) == 0)
 
     def test_log_search_result_click(self):
         log = {
-
             'item_id': 'test_item_id', 
             'rank_number': 1, 
             'item_type': 'test_type', 
             'qid': 'test_query',
             'page': 1
         }
-        response = self.client.post(reverse('services:log_search_result_click'), log)
-        self.assertEqual(response.status_code, 200)
+        response = LogSearchClick().save(log)
         
-        response = response.json()
-        self.assertTrue(response["click_logged"])
+        self.assertTrue(len(response[1]) == 0)
         
         
 
