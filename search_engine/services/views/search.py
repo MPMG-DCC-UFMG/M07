@@ -53,7 +53,8 @@ class Search(View):
             tempo_resposta = response_time,
             documentos = [ i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
             pagina = self.page,
-            resultados_por_pagina = self.results_per_page
+            resultados_por_pagina = self.results_per_page,
+            tempo_resposta_total = time.time() - start
         ))
 
         end = time.time()
