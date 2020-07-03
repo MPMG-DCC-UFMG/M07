@@ -17,7 +17,8 @@ class LogBusca(ElasticModel):
             'tempo_resposta',
             'pagina',
             'resultados_por_pagina',
-            'documentos'
+            'documentos',
+            'tempo_resposta_total'
         ]
         
         super().__init__(index_name, meta_fields, index_fields, **kwargs)
