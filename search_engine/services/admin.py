@@ -23,11 +23,30 @@ class CustomAdminSite(admin.AdminSite):
     
 
     def view_log_buscas(self, request):
-        log_buscas_list = LogBusca.get_list(sort={'data_hora':{'order':'desc'}})
+        id_sessao = request.GET.get('id_sessao', None)
+        id_consulta = request.GET.get('id_consulta', None)
+        id_usuario = request.GET.get('id_usuario', None)
+        text_consulta = request.GET.get('text_consulta', None)
+        page = request.GET.get('page', 1)
+
+        total_records, log_buscas_list = LogBusca.get_list_filtered(
+            id_sessao=id_sessao,
+            id_consulta=id_consulta,
+            id_usuario=id_usuario,
+            text_consulta=text_consulta,
+            page=page, 
+            sort={'data_hora':{'order':'desc'}}
+        )
 
         context = dict(
-           self.each_context(request), # Include common variables for rendering the admin template.
-           result_list=log_buscas_list,
+            self.each_context(request), # Include common variables for rendering the admin template.
+            id_sessao=id_sessao,
+            id_consulta=id_consulta,
+            id_usuario=id_usuario,
+            text_consulta=text_consulta,
+            page=page,
+            total_records=total_records,
+            result_list=log_buscas_list,
         )
         
         return render(request, 'admin/log_buscas.html', context)

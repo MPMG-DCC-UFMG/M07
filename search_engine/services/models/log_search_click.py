@@ -17,3 +17,17 @@ class LogSearchClick(ElasticModel):
         ]
     
         super().__init__(index_name, meta_fields, index_fields, **kwargs)
+    
+    
+    @staticmethod
+    def get_list_filtered(id_consultas=None, page='all'):
+        if id_consultas != None:
+            query_param = {
+                "terms": {
+                    "id_consulta.keyword": id_consultas
+                }
+            }
+        else:
+            query_param = None
+        
+        return LogSearchClick.get_list(query=query_param)

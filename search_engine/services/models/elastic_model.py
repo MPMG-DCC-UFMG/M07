@@ -26,6 +26,8 @@ class ElasticModel(dict):
     # atributos estáticos necessários para os métodos estáticos abaixo
     elastic = Elastic()
     index_name = None
+    results_per_page = 10
+
     
     def __init__(self, index_name, meta_fields, index_fields, **kwargs):
         self.elastic = ElasticModel.elastic
@@ -40,8 +42,11 @@ class ElasticModel(dict):
         for field in self.index_fields:
             setattr(self, field, kwargs.get(field, None))
         
-        serializable_attributes = self.__dict__
-        del serializable_attributes['elastic']
+        # passa pro dict apenas os allowed_attributes
+        serializable_attributes = {}
+        for k, v in self.__dict__.items():
+            if k in self.allowed_attributes:
+                serializable_attributes[k] = v
         super().__init__(serializable_attributes)
     
 
@@ -83,34 +88,59 @@ class ElasticModel(dict):
         '''
 
         retrieved_doc = cls.elastic.dsl.Document.get(doc_id, using=cls.elastic.es, index=cls.index_name)
-        document = dict({'_id': retrieved_doc.meta.id}, **retrieved_doc.to_dict())
+        document = dict({'id': retrieved_doc.meta.id}, **retrieved_doc.to_dict())
         return cls(**document)
     
 
     @classmethod
-    def get_list(cls, sort=None, query=None):
+    def get_total(cls):
+        '''
+        Retorna o total de registros salvos no índice.
+        '''
+        total = cls.elastic.dsl.Search(using=cls.elastic.es, index=cls.index_name).count()
+        return total
+    
+
+    @classmethod
+    def get_list(cls, query=None, page=1, sort=None):
         '''
         Busca uma lista de documentos do índice. Cada item da lista é uma instância da classe
         em questão. É possível passar parâmetros de ordenação em sort, e também parâmetros de 
-        consulta em query.
-        Exemplo de sort e de query:
+        consulta em query. 
+        O tamanho da lista será de acordo com o atributo results_per_page da classe e os dados
+        retornados serão de acordo com a página definida pelo parâmetro page.
+        Caso queira retornar todos os registros, sem fazer paginação, passe page='all'
+        Exemplo:
 
-        sort_param = {'data_hora':{'order':'desc'}}
         query_param = {"bool":{"must":{"term":{"text_consulta":"glater"}}}}
-        LogBusca.getList(sort=sort_param, query=query_param)
+        sort_param = {'data_hora':{'order':'desc'}}
+        LogBusca.results_per_page = 20
+        LogBusca.getList(query=query_param, page=3, sort=sort_param)
         '''
 
         search_obj = cls.elastic.dsl.Search(using=cls.elastic.es, index=cls.index_name)
         
-        if sort != None:
-            search_obj = search_obj.sort(sort)
-        
         if query != None:
             search_obj = search_obj.query(cls.elastic.dsl.Q(query))
         
+        if page == 'all':
+            total = cls.get_total()
+            search_obj = search_obj[0:total]
+        else:
+            start = cls.results_per_page * (page - 1)
+            end = start + cls.results_per_page
+            search_obj = search_obj[start:end]
+        
+        if sort != None:
+            search_obj = search_obj.sort(sort)
+        
         elastic_result = search_obj.execute()
+
+        total_records = elastic_result.hits.total.value
         
         result_list = []
         for item in elastic_result:
-            result_list.append(cls(**dict({'_id': item.meta.id}, **item.to_dict())))
-        return result_list
+            result_list.append(cls(**dict({'id': item.meta.id}, **item.to_dict())))
+        
+        
+        return total_records, result_list
