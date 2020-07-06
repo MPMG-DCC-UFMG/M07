@@ -5,7 +5,8 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Star Admin Premium Bootstrap Admin Dashboard Template</title>
+    <title>Aduna - Administração</title>
+    <link rel="stylesheet" href="{% static 'admin/fontawesome/css/all.min.css' %}">
     <!-- plugins:css -->
     <link rel="stylesheet" href="{% static 'admin/vendors/iconfonts/mdi/css/materialdesignicons.min.css' %}">
     <link rel="stylesheet" href="{% static 'admin/vendors/iconfonts/ionicons/css/ionicons.css' %}">
@@ -21,8 +22,9 @@
     <!-- endinject -->
     <!-- Layout styles -->
     <link rel="stylesheet" href="{% static 'admin/css/demo_1/style.css' %}">
+    <link rel="stylesheet" href="{% static 'admin/css/custom.css' %}">
     <!-- End Layout styles -->
-    <link rel="shortcut icon" href="{% static 'admin/images/favicon.png' %}" />
+    <!-- <link rel="shortcut icon" href="{% static 'admin/images/favicon.png' %}" /> -->
   </head>
   <body>
     <div class="container-scroller">
@@ -51,6 +53,10 @@
     <!-- endinject -->
     <!-- Custom js for this page-->
     <script src="{% static 'admin/js/demo_1/dashboard.js' %}"></script>
+    
+    <script src="{% static 'admin/js/jquery-3.4.1.min.js' %}"></script>
+    <script src="{% static 'admin/js/dashboard.js' %}"></script>
+    {% block additional_script %}{% endblock %}
     <!-- End custom js for this page-->
   </body>
 </html>

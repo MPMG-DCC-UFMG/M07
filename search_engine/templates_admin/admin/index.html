@@ -1,5 +1,10 @@
 {% extends "./base.html" %}
 {% load static %}
+{% block additional_script %}
+<script>
+var indices_amounts = {{ indices_amounts|safe }};
+</script>
+{% endblock %}
 {% block content %}
 <div class="content-wrapper">
   <!-- Page Title Header Starts-->
@@ -112,6 +117,47 @@
       </div>
     </div>
   </div>
+
+  <div class="row">
+      <div class="col-md-6 grid-margin stretch-card">
+          <div class="card">
+              <div class="card-body">
+                  <h4 class="card-title">Informações sobre os Índices</h4>
+                  <table id="indices-status" class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th>Nome</th>
+                          <th>Saúde</th>
+                          <th>Status</th>
+                          <th>Registros</th>
+                          <th>Tamanho</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          {% for item in indices_info %}
+                          <tr>
+                            <td>{{ item.index_name }}</td>
+                            <td><span class="health-circle {{ item.health }}" alt="{{ item.health }}"></span></td>
+                            <td>{{ item.status }}</td>
+                            <td>{{ item.num_documents }}</td>
+                            <td>{{ item.total_store_size }}</td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Proporção dos Dados</h4>
+                <canvas id="grafico-pizza-qtdes-indices"></canvas>
+            </div>
+        </div>
+      </div>
+  </div>
+
   <div class="row">
     <div class="col-md-8 grid-margin stretch-card">
       <div class="card">

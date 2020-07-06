@@ -144,3 +144,29 @@ class ElasticModel(dict):
         
         
         return total_records, result_list
+    
+
+    @staticmethod
+    def get_indices_info():
+        info = []
+        response = ElasticModel.elastic.es.cat.indices()
+        parts = response.strip().split('\n')
+
+        for part in parts:
+            subpart = part.strip().split()
+            if subpart[2][0] == '.':
+                continue
+            info.append({
+                'health': subpart[0],
+                'status': subpart[1],
+                'index_name': subpart[2],
+                'uuid': subpart[3],
+                'num_primary_shards': subpart[4],
+                'num_replica_shards': subpart[5],
+                'num_documents': subpart[6],
+                'num_deleted_docs': subpart[7],
+                'total_store_size': subpart[8],
+                'primary_store_size': subpart[9]
+            })
+        info = sorted(info, key=lambda item: item['index_name'])
+        return info
