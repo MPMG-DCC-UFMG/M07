@@ -255,6 +255,9 @@
                 "text_consulta": {
                     "type": "search_as_you_type",
                     "max_shingle_size": 3
+                },
+                "tempo_resposta_total": {
+                    "type": "long"
                 }
             }
         }

@@ -2,31 +2,29 @@ import pandas as pd
 import time
 import requests
 
+from services.models.log_busca import LogBusca
+from services.models.log_search_click import LogSearchClick
 
-#TODO: Usar caminhos das requests para o get_log_busca e get_log_clicks pegando os endereços de uma arquivo de config
+
 class Metrics:
     def __init__(self, start_date=None, end_date=None):
         self.start_date = start_date 
         self.end_date = end_date
         self.query_log, self.click_log = self._get_logs()
         
+
     def _get_logs(self):
-        params = {}
-        if self.start_date == None and self.end_date == None:
-            raise Exception('At leat one parameter must be given.')
-        if self.start_date != None:
-            params['start_date'] = self.start_date
-        if self.end_date != None:
-            params['end_date'] = self.end_date
+        _, query_log = LogBusca.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
+        query_log = pd.DataFrame.from_dict(query_log)
         
-        query_response = requests.post(url = "http://localhost:8000/services/get_log_buscas", data = params).json()
-        query_log = pd.DataFrame.from_dict(query_response['data'])
-        
-        consultas = query_log['id_consulta'].to_list()
-        click_response = requests.post("http://localhost:8000/services/get_log_clicks", data = {"consultas": consultas }).json()
-        click_log = pd.DataFrame.from_dict(click_response['data'])
+        id_consultas = query_log['id_consulta'].to_list()
+
+        _, click_log = LogSearchClick.get_list_filtered(id_consultas=id_consultas)
+        click_log = pd.DataFrame.from_dict(click_log)
+
         return query_log, click_log
     
+
     def no_clicks_query(self):
         #consultas sem nenhum click
         unclicked_queries = []

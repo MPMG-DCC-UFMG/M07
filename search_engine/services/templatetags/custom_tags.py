@@ -5,4 +5,7 @@ register = template.Library()
 
 @register.filter(name='to_date')
 def to_date(value):
-    return datetime.fromtimestamp(value/1000) 
+    if value:
+        return datetime.fromtimestamp(value/1000)
+    else:
+        return value

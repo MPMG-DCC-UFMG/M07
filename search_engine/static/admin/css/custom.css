@@ -1,0 +1,32 @@
+.fa-circle.yellow{
+    color: yellow;
+}
+
+.fa-circle.green{
+    color: green;
+}
+
+.fa-circle.red{
+    color: red;
+}
+
+.health-circle{
+    height: 14px;
+    width: 14px;
+    background-color: #999;
+    border-radius: 14px;
+    display: inline-block;
+    border: 1px solid #333;
+}
+
+.health-circle.yellow{
+    background-color: yellow;
+}
+
+.health-circle.green{
+    background-color: green;
+}
+
+.health-circle.red{
+    background-color: red;
+}

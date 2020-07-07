@@ -71,8 +71,8 @@ def document(request, doc_type, doc_id, sid):
     
     if service_response['is_authenticated']:
         document = service_response['document']
-        document['text'] = document['text'].replace('\n', '<br>')
-        document['text'] = re.sub('(<br>){3,}', '<br>', document['text'])
+        document['conteudo'] = document['conteudo'].replace('\n', '<br>')
+        document['conteudo'] = re.sub('(<br>){3,}', '<br>', document['conteudo'])
         context = {
             'user_name': request.session.get('user_info')['first_name'],
             'document': document,
