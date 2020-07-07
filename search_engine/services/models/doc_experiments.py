@@ -5,6 +5,7 @@ from django.conf import settings
 import time
 import statistics
 import subprocess
+import requests
 
 class Document:
     '''
@@ -60,7 +61,8 @@ class Document:
         return total_docs, total_pages, documents, response.took, wall_time
 
     def experiment(self):
-        cities = read_cities('/home/filipe/CC/MPMG/M07/search_engine/services/models/municipios.txt')
+        url = 'https://raw.githubusercontent.com/MPMG-DCC-UFMG/M07/master/search_engine/services/models/municipios.txt'
+        cities = read_cities(url)
         measures = []
         for i, city in enumerate(cities):
             _, _, _, _, wall_time = self.search(city, 1)
@@ -70,15 +72,11 @@ class Document:
         return statistics.mean(measures), statistics.median(measures), statistics.stdev(measures)
 
 
-def read_cities(path):
-    city_list = []
-    with open(path, 'r') as f:
-        for city in f.readlines():
-            city_list.append(city.strip())
-    return city_list
+def read_cities(url):    
+    return requests.get(url).text.split('\n')
 
 def clear_cache(doc):
-    print('Clearing cache')
+    # print('Clearing cache')
     # print('Elasticsearch...')
     doc.elastic.es.indices.clear_cache(index=doc.index_names)
     # print('OS...')
