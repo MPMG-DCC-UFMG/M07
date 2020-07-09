@@ -59,7 +59,7 @@ ROOT_URLCONF = 'mpmg.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates_admin')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
