@@ -30,3 +30,15 @@
 .health-circle.red{
     background-color: red;
 }
+
+.last-queries-container{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 300px;
+}
+
+.last-queries-container table thead th{
+    position: sticky;
+    top: 0;
+    background-color: #fff;
+}

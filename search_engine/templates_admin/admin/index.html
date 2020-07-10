@@ -1,8 +1,10 @@
 {% extends "./base.html" %}
 {% load static %}
+{% load custom_tags %}
 {% block additional_script %}
 <script>
 var indices_amounts = {{ indices_amounts|safe }};
+var total_searches_per_day = {{ total_searches_per_day|safe }};
 </script>
 {% endblock %}
 {% block content %}
@@ -157,6 +159,48 @@ var indices_amounts = {{ indices_amounts|safe }};
         </div>
       </div>
   </div>
+
+  <div class="row">
+      <div class="col-md-6 grid-margin stretch-card">
+          <div class="card">
+              <div class="card-body">
+                    <h4 class="card-title">Número de buscas nos últimos dias</h4>
+                    <canvas id="grafico-linha-num_buscas-dia"></canvas>
+              </div>
+          </div>
+      </div>
+      <div class="col-md-6 grid-margin stretch-card">
+          <div class="card">
+              <div class="card-body">
+                  <h4 class="card-title">Últimas consultas</h4>
+                  <div class='last-queries-container'>
+                  <table id="las-queries" class="table table-striped">
+                      <thead>
+                          <tr>
+                              <th>Consulta</th>
+                              <th>Usuário</th>
+                              <th>Data</th>
+                              <th>Tempo<i class="far fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tempo de resposta em segundos"></i></th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          {% for item in last_queries %}
+                          <tr>
+                              <td>{{ item.text_consulta }}</td>
+                              <td>{{ item.id_usuario }}</td>
+                              <td>{{ item.data_hora|to_date|date:"d/m/Y G:i:s" }}</td>
+                              <td>{{ item.tempo_resposta_total|floatformat:2 }}</td>
+                          </tr>
+                          {% endfor %}
+                      </tbody>
+                  </table>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
 
   <div class="row">
     <div class="col-md-8 grid-margin stretch-card">

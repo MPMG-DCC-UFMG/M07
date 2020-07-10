@@ -66,4 +66,4 @@ class LogBusca(ElasticModel):
                 }
             })
 
-        return LogBusca.get_list(query=query_param, page=page)
+        return LogBusca.get_list(query=query_param, page=page, sort=sort)

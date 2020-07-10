@@ -8,6 +8,7 @@ from django.conf import settings
 from services.models import LogBusca
 from services.models import ElasticModel
 from datetime import datetime, timedelta
+from django.contrib.auth.models import User
 import pandas as pd
 
 
@@ -27,6 +28,8 @@ class CustomAdminSite(admin.AdminSite):
     def index(self, request):
         # informação sobre os índices
         indices_info = ElasticModel.get_indices_info()
+
+        # users = User.objects.all()
         
         # dados para o gráfico de pizza com a qtde de documentos por índice
         searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
@@ -45,13 +48,15 @@ class CustomAdminSite(admin.AdminSite):
         end_date = int(datetime(year=end_date.year, month=end_date.month, day=end_date.day).timestamp() * 1000)
         _, last_queries = LogBusca.get_list_filtered(start_date=start_date, end_date=end_date, sort={'data_hora':{'order':'desc'}})
         last_queries = pd.DataFrame.from_dict(last_queries)
-        last_queries['dia'] = last_queries['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date())
-        totals_by_day = last_queries.groupby(by='dia', as_index=True)['id']
-        
+        last_queries['dia'] = last_queries['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
+        total_searches_per_day = last_queries.groupby(by='dia', as_index=False).count()[['dia', 'id']]
+        total_searches_per_day.columns = ['dia', 'total']
         
         context = {
             'indices_info': indices_info,
             'indices_amounts': indices_amounts,
+            'total_searches_per_day': {'labels': total_searches_per_day['dia'].to_list(), 'data': total_searches_per_day['total'].to_list()},
+            'last_queries': last_queries.head(10).fillna('-').to_dict('records'),
         }
         return render(request, 'admin/index.html', context)
     
