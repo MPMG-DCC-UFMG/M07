@@ -1,5 +1,4 @@
 $(function(){
-    $('[data-toggle="tooltip"]').tooltip({boundary:"viewport"});
 
     var qtdes_ctx = $("#grafico-pizza-qtdes-indices").get(0).getContext("2d");
     var qtdes_config = {
