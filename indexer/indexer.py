@@ -26,7 +26,7 @@ class Indexer:
 
         config = json.load(open('../config.json'))
         self.ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
-        self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=60, max_retries=3, retry_on_timeout=True)
+        self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=120, max_retries=3, retry_on_timeout=True)
 
         csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
@@ -77,12 +77,16 @@ class Indexer:
         
         error = False
         for csv_file in files_to_index:
-            print("Indexing: " + csv_file + "...")
-            for success, info in helpers.parallel_bulk(self.es, self.generate_formated_csv_lines(csv_file, index), thread_count = thread_count, queue_size = thread_count): 
-                if not success:
-                    print("Detected error while indexing: " + csv_file)
-                    error = True
-                    print(info)
+            try:
+                print("Indexing: " + csv_file + "...")
+                for success, info in helpers.parallel_bulk(self.es, self.generate_formated_csv_lines(csv_file, index), thread_count = thread_count, queue_size = thread_count): 
+                    if not success:
+                        print("Detected error while indexing: " + csv_file)
+                        error = True
+                        print(info)
+            except:
+                error = True
+                print("Detected error while indexing: " + csv_file)
         
         if not error:
             print("All files indexed with no error.")
