@@ -32,13 +32,8 @@
                     }
                 },
                 "data": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
+                    "type": "date"
+                
                 },
                 "fonte": {
                     "type": "text",
@@ -50,13 +45,7 @@
                     }
                 },
                 "metadata_ultima_modificacao":{
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
+                    "type": "date"
                 },
                 "metadata_titulo": {
                     "type": "text",
