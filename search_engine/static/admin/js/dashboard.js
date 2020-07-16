@@ -25,12 +25,12 @@ $(function(){
         gradientStrokeFill_1.addColorStop(1, 'rgba(255,255,255, 0.0)');
         gradientStrokeFill_1.addColorStop(0, 'rgba(102,78,235, 0.2)');
     var num_buscas_config = {
-        type: 'line',
+        type: 'bar',
         data: {
             datasets: [{
                 data: total_searches_per_day['data'],
-                borderColor: '#36a2eb',
-                backgroundColor: gradientStrokeFill_1
+                // borderColor: '#36a2eb',
+                backgroundColor: '#36a2eb',
 
             }],
             labels: total_searches_per_day['labels']
@@ -40,4 +40,22 @@ $(function(){
         }
     }
     var grafico_num_buscas_dia = new Chart(num_buscas_ctx, num_buscas_config);
+
+
+    var no_clicks_ctx = $("#grafico-consultas-sem-clique").get(0).getContext("2d");
+    var no_clicks_config = {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: no_clicks_per_day['data'],
+                backgroundColor: '#ffcd56',
+
+            }],
+            labels: no_clicks_per_day['labels']
+        },
+        options: {
+            legend: false
+        }
+    }
+    var grafico_sem_cliques_dia = new Chart(no_clicks_ctx, no_clicks_config);
 });

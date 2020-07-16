@@ -10,6 +10,7 @@ from services.models import ElasticModel
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import pandas as pd
+from .metrics import Metrics
 
 
 class CustomAdminSite(admin.AdminSite):
@@ -26,6 +27,17 @@ class CustomAdminSite(admin.AdminSite):
         return my_urls + urls
     
     def index(self, request):
+        # período das métricas e estatísticas
+        end_date = datetime.today().date() + timedelta(days=1)
+        start_date = end_date - timedelta(days=14)
+        start_date_millis = int(datetime(year=start_date.year, month=start_date.month, day=start_date.day).timestamp() * 1000)
+        end_date_millis = int(datetime(year=end_date.year, month=end_date.month, day=end_date.day).timestamp() * 1000)
+        days_labels = [d.strftime('%d/%m') for d in pd.date_range(start_date, end_date)]
+
+
+        # métricas
+        metrics = Metrics(start_date, end_date)
+
         # informação sobre os índices
         indices_info = ElasticModel.get_indices_info()
 
@@ -41,22 +53,30 @@ class CustomAdminSite(admin.AdminSite):
                 indices_amounts['colors'].append(colors.pop())
                 indices_amounts['labels'].append(item['index_name'])
         
-        # Consultas da última semana
-        end_date = datetime.today().date() + timedelta(days=1)
-        start_date = end_date - timedelta(days=7)
-        start_date = int(datetime(year=start_date.year, month=start_date.month, day=start_date.day).timestamp() * 1000)
-        end_date = int(datetime(year=end_date.year, month=end_date.month, day=end_date.day).timestamp() * 1000)
-        _, last_queries = LogBusca.get_list_filtered(start_date=start_date, end_date=end_date, sort={'data_hora':{'order':'desc'}})
-        last_queries = pd.DataFrame.from_dict(last_queries)
-        last_queries['dia'] = last_queries['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
-        total_searches_per_day = last_queries.groupby(by='dia', as_index=False).count()[['dia', 'id']]
-        total_searches_per_day.columns = ['dia', 'total']
+        # Buscas por dia
+        queries_list = metrics.query_log.fillna('-').to_dict('records')
+        total_queries_per_day = dict.fromkeys(days_labels, 0)
+        for item in queries_list:
+            d = item['dia']
+            total_queries_per_day[d] += 1
+
+        # Consultas sem clique por dia
+        no_clicks = metrics.no_clicks_query()
+        no_clicks_per_day = dict.fromkeys(days_labels, 0)
+        for item in no_clicks['detailed']:
+            d = item['dia']
+            no_clicks_per_day[d] += 1
         
+        # Consultas sem resultado
+        no_results = metrics.no_results_query()
+        
+
         context = {
             'indices_info': indices_info,
             'indices_amounts': indices_amounts,
-            'total_searches_per_day': {'labels': total_searches_per_day['dia'].to_list(), 'data': total_searches_per_day['total'].to_list()},
-            'last_queries': last_queries.head(10).fillna('-').to_dict('records'),
+            'total_searches_per_day': {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},
+            'last_queries': queries_list[:10],
+            'no_clicks_per_day': {'labels': list(no_clicks_per_day.keys()), 'data': list(no_clicks_per_day.values())},
         }
         return render(request, 'admin/index.html', context)
     

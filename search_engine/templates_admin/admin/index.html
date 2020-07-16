@@ -5,6 +5,7 @@
 <script>
 var indices_amounts = {{ indices_amounts|safe }};
 var total_searches_per_day = {{ total_searches_per_day|safe }};
+var no_clicks_per_day = {{ no_clicks_per_day|safe }};
 </script>
 {% endblock %}
 {% block content %}
@@ -164,7 +165,7 @@ var total_searches_per_day = {{ total_searches_per_day|safe }};
       <div class="col-md-6 grid-margin stretch-card">
           <div class="card">
               <div class="card-body">
-                    <h4 class="card-title">Número de buscas nos últimos dias</h4>
+                    <h4 class="card-title">Número de Consultas</h4>
                     <canvas id="grafico-linha-num_buscas-dia"></canvas>
               </div>
           </div>
@@ -199,6 +200,25 @@ var total_searches_per_day = {{ total_searches_per_day|safe }};
           </div>
       </div>
   </div>
+
+  <div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                  <h4 class="card-title">Consultas sem clique</h4>
+                  <canvas id="grafico-consultas-sem-clique"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Consultas sem resultados</h4>
+                <canvas id="grafico-consultas-sem-resultado"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 
 
 
