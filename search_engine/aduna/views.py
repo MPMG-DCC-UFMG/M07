@@ -33,8 +33,27 @@ def search(request):
     sid = request.GET['sid']
     qid = request.GET.get('qid', '')
     page = int(request.GET.get('page', 1))
+    instances = request.GET.getlist('instance', [])
+    doc_types = request.GET.getlist('doc_type', [])
+    start_date = request.GET.get('start_date', None)
+    if start_date == "":
+        start_date = None
+    end_date = request.GET.get('end_date', None)
+    if end_date == "":
+        end_date = None
     
-    service_response = requests.get(settings.SERVICES_URL+'search', {'query': query, 'page': page, 'sid': sid, 'qid': qid}, cookies=cookies).json()
+    params = {
+        'query': query, 
+        'page': page, 
+        'sid': sid, 
+        'qid': qid, 
+        'instances': instances, 
+        'doc_types': doc_types,
+        'start_date': start_date,
+        'end_date': end_date
+    }
+    print(params)
+    service_response = requests.get(settings.SERVICES_URL+'search', params, cookies=cookies).json()
 
     if service_response['error']:
         messages.add_message(request, messages.ERROR, service_response['error_message'], extra_tags='danger')
@@ -54,6 +73,9 @@ def search(request):
             'documents': service_response['documents'],
             'total_pages': service_response['total_pages'],
             'results_pagination_bar': range(min(9, service_response['total_pages'])), # Typically show 9 pages. Odd number used so we can center the current one and show 4 in each side. Show less if not enough pages
+            
+            'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2'],
+            'filter_doc_types': ['diarios', 'processos']
         }
         
         return render(request, 'aduna/search.html', context)

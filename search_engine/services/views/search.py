@@ -36,12 +36,12 @@ class Search(View):
         if query_len < 2:
             data = {'invalid_query': True}
             return JsonResponse(data)
-        
-
+            
         # Busca os documentos no elastic
         # total_docs, total_pages, documents, response_time = self._search_documents()
-        total_docs, total_pages, documents, response_time = Document().search(self.query, self.page)
-        
+        total_docs, total_pages, documents, response_time = Document().search_with_filters(self.query, self.page, self.instances, self.doc_types)
+        # print(documents)
+
         # Grava o log da consulta
         LogBusca().save(dict(
             id_sessao = self.sid, 
@@ -51,7 +51,7 @@ class Search(View):
             algoritmo = self.algoritmo,
             data_hora = self.data_hora,
             tempo_resposta = response_time,
-            documentos = [ i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
+            documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
             pagina = self.page,
             resultados_por_pagina = self.results_per_page,
             tempo_resposta_total = time.time() - start
@@ -86,15 +86,20 @@ class Search(View):
         #     return JsonResponse(data)
         
         
-        
-
-
     def _read_parameters(self, request):
         # url parameters
         self.raw_query = request.GET['query']
         self.page = int(request.GET.get('page', 1))
         self.sid = request.GET['sid']
         self.qid = request.GET.get('qid', '')
+        self.instances = request.GET.getlist('instances', [])
+        self.doc_types = request.GET.getlist('doc_types', [])
+        self.start_date = request.GET.get('start_date', None)
+        self.end_date = request.GET.get('end_date', None)
+        if self.start_date == "":
+            self.start_date = None
+        if self.end_date == "":
+            self.end_date = None
 
         # internal parameters
         self.data_hora = int(time.time()*1000)

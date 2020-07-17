@@ -68,3 +68,37 @@ $(function(){
         log_search_result_click(e.target);
     });
 });
+
+$(document).ready(function() {
+    $('#instancia_filter').multiselect({
+        includeSelectAllOption: true,
+        enableFiltering: true,
+    });
+});
+
+$(document).ready(function() {
+    $('#tipo_filter').multiselect({
+        includeSelectAllOption: true,
+        enableFiltering: true,
+    });
+});
+
+$(function() {
+    $("#start_date_filter_display").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        altField: "#start_date_filter",
+        altFormat: "yy-mm-dd"
+    });
+});
+
+$(function() {
+    $("#end_date_filter_display").datepicker({
+        changeMonth: true,
+        changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        altField: "#end_date_filter",
+        altFormat: "yy-mm-dd"
+    });
+});
