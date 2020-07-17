@@ -1,5 +1,6 @@
 import pandas as pd
 import time
+from datetime import datetime
 import requests
 
 from services.models.log_busca import LogBusca
@@ -16,6 +17,8 @@ class Metrics:
     def _get_logs(self):
         _, query_log = LogBusca.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
         query_log = pd.DataFrame.from_dict(query_log)
+        # create columns to help on grouping
+        query_log['dia'] = query_log['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
         
         id_consultas = query_log['id_consulta'].to_list()
 

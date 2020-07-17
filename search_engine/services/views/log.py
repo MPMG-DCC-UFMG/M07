@@ -1,9 +1,10 @@
 import time
+from datetime import datetime, timedelta
+import random
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from services.models.log_busca import LogBusca
-from services.models.log_search_click import LogSearchClick
+from services.models import LogBusca, LogSearchClick, Document
 
 
 @csrf_exempt
@@ -116,3 +117,71 @@ def get_log_clicks(request):
     }
 
     return JsonResponse(response)
+
+
+@require_http_methods(["GET"])
+def generate_log_data(request):
+    MAX_USERS = 10
+    MAX_QUERIES_PER_DAY = 20
+    POSSIBLE_QUERIES = ['Belo Horizonte', 'Uberlândia', 'Contagem', 'Juiz de Fora', 'Betim', 'Montes Claros', 'Ribeirão das Neves', 'Uberaba', 'Governador Valadares', 'Ipatinga', 'Sete Lagoas', 'Divinópolis', 'Santa Luzia', 'Ibirité', 'Poços de Caldas', 'Patos de Minas', 'Pouso Alegre', 'Teófilo Otoni', 'Barbacena', 'Sabará', 'Varginha', 'Conselheiro Lafaiete', 'Vespasiano', 'Itabira', 'Araguari', 'Ubá', 'Passos', 'Coronel Fabriciano', 'Muriaé', 'Araxá', 'Ituiutaba', 'Lavras', 'Nova Serrana', 'Itajubá', 'Nova Lima', 'Pará de Minas', 'Itaúna', 'Paracatu', 'Caratinga', 'Patrocínio', 'Manhuaçu', 'São João del Rei', 'Timóteo', 'Unaí', 'Curvelo', 'Alfenas', 'João Monlevade', 'Três Corações', 'Viçosa', 'Cataguases', 'Ouro Preto', 'Janaúba', 'São Sebastião do Paraíso', 'Esmeraldas', 'Januária', 'Formiga', 'Lagoa Santa', 'Pedro Leopoldo', 'Mariana', 'Ponte Nova', 'Frutal', 'Três Pontas', 'Pirapora', 'São Francisco', 'Congonhas', 'Campo Belo', 'Leopoldina', 'Lagoa da Prata', 'Guaxupé', 'Itabirito', 'Bom Despacho', 'Bocaiúva', 'Monte Carmelo', 'Diamantina', 'João Pinheiro', 'Santos Dumont', 'São Lourenço', 'Caeté', 'Santa Rita do Sapucaí', 'Igarapé', 'Visconde do Rio Branco', 'Machado', 'Almenara', 'Oliveira', 'Salinas', 'Andradas', 'Nanuque', 'Boa Esperança', 'Brumadinho', 'Arcos', 'Ouro Branco', 'Várzea da Palma', 'Iturama', 'Jaíba', 'Porteirinha', 'Matozinhos', 'Capelinha', 'Araçuaí', 'Extrema', 'São Gotardo',]
+    start_date = datetime.strptime(request.GET['start_date'], '%d/%m/%Y')
+    end_date = datetime.strptime(request.GET['end_date'], '%d/%m/%Y')
+    document = Document()
+
+    # num_days = (start_date - end_date).days
+    current_date = start_date
+    while current_date < end_date:
+        current_timestamp = int(datetime(year=current_date.year, month=current_date.month, day=current_date.day).timestamp() * 1000)
+        
+        # queries of the day
+        num_queries = random.randrange(MAX_QUERIES_PER_DAY)
+        day_queries = random.sample(POSSIBLE_QUERIES, num_queries)
+        
+        print(current_date, num_queries)
+
+        # execute queries
+        for q in day_queries:
+            print(q)
+            start = time.time()
+            try:
+                total_docs, total_pages, documents, took = document.search(q, 1)
+            except:
+                print('ERRO:', current_date, q)
+                continue
+
+            LogBusca().save(dict(
+                id_sessao = random.getrandbits(128), 
+                id_consulta = 123,
+                id_usuario = random.randrange(MAX_USERS)+1,
+                text_consulta = q,
+                algoritmo = 'BM25',
+                data_hora = current_timestamp,
+                tempo_resposta = took,
+                documentos = [ i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
+                pagina = 1,
+                resultados_por_pagina = 10,
+                tempo_resposta_total = time.time() - start
+            ))
+
+            # probability of user click
+            clicked = random.choice([True, False])
+            if clicked:
+                clicked_doc = random.sample(documents, 1)
+                if len(clicked_doc) == 0:
+                    continue
+                clicked_doc = clicked_doc[0]
+
+                LogSearchClick().save(dict(
+                    id_documento=clicked_doc.id,
+                    id_consulta=123,
+                    posicao=clicked_doc.rank_number,
+                    tipo_documento=clicked_doc.type,
+                    pagina=1,
+                    timestamp=current_timestamp + random.randrange(60000) # up to one minute to click in the result
+                ))
+
+        current_date = current_date + timedelta(days=1)
+
+
+    return JsonResponse({'response': 'ok'})
+
