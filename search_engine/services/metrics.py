@@ -18,12 +18,15 @@ class Metrics:
         _, query_log = LogBusca.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
         query_log = pd.DataFrame.from_dict(query_log)
         # create columns to help on grouping
-        query_log['dia'] = query_log['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
+        if len(query_log) > 0:
+            query_log['dia'] = query_log['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
 
-        id_consultas = query_log['id_consulta'].to_list()
+            id_consultas = query_log['id_consulta'].to_list()
 
-        _, click_log = LogSearchClick.get_list_filtered(id_consultas=id_consultas)
-        click_log = pd.DataFrame.from_dict(click_log)
+            _, click_log = LogSearchClick.get_list_filtered(id_consultas=id_consultas)
+            click_log = pd.DataFrame.from_dict(click_log)
+        else:
+            click_log = pd.DataFrame.from_dict({})
 
         return query_log, click_log
     
@@ -44,8 +47,11 @@ class Metrics:
     def no_results_query(self):
         #consultas sem nenhum resultado, ou seja,
         #consultas em que a pagina é igual a 1 e a lista de documentos esta vazia
-        no_ressults = self.query_log.loc[ (self.query_log['pagina'] == 1) & (self.query_log['documentos'].str.len() == 0) ]
-        no_ressults = no_ressults.reset_index(drop=True)
+        if len(self.query_log) > 0:
+            no_ressults = self.query_log.loc[ (self.query_log['pagina'] == 1) & (self.query_log['documentos'].str.len() == 0) ]
+            no_ressults = no_ressults.reset_index(drop=True)
+        else:
+            no_ressults = pd.DataFrame.from_dict({})
         response = {
             "no_results_query":len(no_ressults),
             "detailed": no_ressults.to_dict(orient='records')
