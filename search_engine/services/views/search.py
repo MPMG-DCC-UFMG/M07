@@ -39,7 +39,7 @@ class Search(View):
             
         # Busca os documentos no elastic
         # total_docs, total_pages, documents, response_time = self._search_documents()
-        total_docs, total_pages, documents, response_time = Document().search_with_filters(self.query, self.page, self.instances, self.doc_types)
+        total_docs, total_pages, documents, response_time = Document().search_with_filters(self.query, self.page, self.instances, self.doc_types, self.start_date, self.end_date)
         # print(documents)
 
         # Grava o log da consulta

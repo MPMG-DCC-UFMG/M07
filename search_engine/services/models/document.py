@@ -55,7 +55,7 @@ class Document:
         return total_docs, total_pages, documents, response.took
 
 
-    def search_with_filters(self, query, page_number, instances, doc_types): #, start_date, end_date):
+    def search_with_filters(self, query, page_number, instances, doc_types, start_date, end_date):
         start = self.results_per_page * (page_number - 1)
         end = start + self.results_per_page
     
@@ -68,12 +68,16 @@ class Document:
         filters = []
         if instances != None and instances != []:
             filters.append(
-                self.elastic.dsl.Q({"terms": {"instancia.keyword": instances}})
+                self.elastic.dsl.Q({'terms': {'instancia.keyword': instances}})
             )
-        # if start_date != None and start_date != []:
-        #     filters.append(
-        #         self.elastic.dsl.Q({"range": {"instancia.keyword": instances}})
-        #     )
+        if start_date != None and start_date != "":
+            filters.append(
+                self.elastic.dsl.Q({'range': {'data': {'gte': start_date }}})
+            )
+        if end_date != None and end_date != "":
+            filters.append(
+                self.elastic.dsl.Q({'range': {'data': {'lte': end_date }}})
+            )
         
 
         elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=indices) \

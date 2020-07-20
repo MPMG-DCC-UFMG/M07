@@ -52,7 +52,6 @@ def search(request):
         'start_date': start_date,
         'end_date': end_date
     }
-    print(params)
     service_response = requests.get(settings.SERVICES_URL+'search', params, cookies=cookies).json()
 
     if service_response['error']:
