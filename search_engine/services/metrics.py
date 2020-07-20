@@ -36,7 +36,7 @@ class Metrics:
         unclicked_queries = []
         for i,q in self.query_log.iterrows():
             if len(q['documentos']) > 0:
-                if q['id_consulta'] not in self.click_log['id_consulta'].to_list():
+                if len(self.click_log) > 0 and q['id_consulta'] not in self.click_log['id_consulta'].to_list():
                     unclicked_queries.append(q.to_dict())
         response = {
             "no_clicks_query": len(unclicked_queries),
