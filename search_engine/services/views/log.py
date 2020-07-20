@@ -194,6 +194,7 @@ def generate_log_data(request):
             ))
 
             # result click
+            clicked = False
             if len(documents) > 0:
                 # clicked = random.choices([True, False], [click_prob, 1])
                 # clicked = clicked[0]
