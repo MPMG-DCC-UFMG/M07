@@ -19,7 +19,7 @@ class Metrics:
         query_log = pd.DataFrame.from_dict(query_log)
         # create columns to help on grouping
         query_log['dia'] = query_log['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
-        
+
         id_consultas = query_log['id_consulta'].to_list()
 
         _, click_log = LogSearchClick.get_list_filtered(id_consultas=id_consultas)
@@ -29,11 +29,12 @@ class Metrics:
     
 
     def no_clicks_query(self):
-        #consultas sem nenhum click
+        # consultas com resultado, mas sem nenhum click
         unclicked_queries = []
         for i,q in self.query_log.iterrows():
-            if q['id_consulta'] not in self.click_log['id_consulta'].to_list():
-                unclicked_queries.append(q.to_dict())
+            if len(q['documentos']) > 0:
+                if q['id_consulta'] not in self.click_log['id_consulta'].to_list():
+                    unclicked_queries.append(q.to_dict())
         response = {
             "no_clicks_query": len(unclicked_queries),
             "detailed": unclicked_queries

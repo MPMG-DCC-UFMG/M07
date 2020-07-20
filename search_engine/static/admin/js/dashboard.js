@@ -21,22 +21,27 @@ $(function(){
 
 
     var num_buscas_ctx = $("#grafico-linha-num_buscas-dia").get(0).getContext("2d");
-    var gradientStrokeFill_1 = num_buscas_ctx.createLinearGradient(0, 0, 0, 450);
-        gradientStrokeFill_1.addColorStop(1, 'rgba(255,255,255, 0.0)');
-        gradientStrokeFill_1.addColorStop(0, 'rgba(102,78,235, 0.2)');
     var num_buscas_config = {
         type: 'bar',
         data: {
-            datasets: [{
+            datasets: [
+                {label: 'Total',
                 data: total_searches_per_day['data'],
-                // borderColor: '#36a2eb',
-                backgroundColor: '#36a2eb',
+                backgroundColor: '#36a2eb',},
 
-            }],
+                {label: 'Sem cliques',
+                data: no_clicks_per_day['data'],
+                backgroundColor: '#ffcd56',},
+
+                {label: 'Sem resultados',
+                data: no_results_per_day['data'],
+                backgroundColor: '#ff9f40'},
+
+            ],
             labels: total_searches_per_day['labels']
         },
         options: {
-            legend: false
+            legend: {}
         }
     }
     var grafico_num_buscas_dia = new Chart(num_buscas_ctx, num_buscas_config);
@@ -47,15 +52,49 @@ $(function(){
         type: 'bar',
         data: {
             datasets: [{
-                data: no_clicks_per_day['data'],
+                data: porc_no_clicks_per_day['data'],
                 backgroundColor: '#ffcd56',
 
             }],
-            labels: no_clicks_per_day['labels']
+            labels: porc_no_clicks_per_day['labels']
         },
         options: {
-            legend: false
+            legend: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 100
+                    }
+                }]
+            },
         }
     }
     var grafico_sem_cliques_dia = new Chart(no_clicks_ctx, no_clicks_config);
+
+
+    var no_results_ctx = $("#grafico-consultas-sem-resultado").get(0).getContext("2d");
+    var no_results_config = {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: porc_no_results_per_day['data'],
+                backgroundColor: '#ff9f40',
+
+            }],
+            labels: porc_no_results_per_day['labels']
+        },
+        options: {
+            legend: false,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 100
+                    }
+                }]
+            },
+        }
+    }
+    var grafico_sem_resultados_dia = new Chart(no_results_ctx, no_results_config);
 });

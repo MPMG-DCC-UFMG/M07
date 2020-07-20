@@ -30,4 +30,4 @@ class LogSearchClick(ElasticModel):
         else:
             query_param = None
         
-        return LogSearchClick.get_list(query=query_param)
+        return LogSearchClick.get_list(query=query_param, page=page)

@@ -28,12 +28,11 @@ class CustomAdminSite(admin.AdminSite):
     
     def index(self, request):
         # período das métricas e estatísticas
-        end_date = datetime.today().date() + timedelta(days=1)
+        end_date = datetime.today().date() #+ timedelta(days=1)
         start_date = end_date - timedelta(days=14)
         start_date_millis = int(datetime(year=start_date.year, month=start_date.month, day=start_date.day).timestamp() * 1000)
         end_date_millis = int(datetime(year=end_date.year, month=end_date.month, day=end_date.day).timestamp() * 1000)
         days_labels = [d.strftime('%d/%m') for d in pd.date_range(start_date, end_date)]
-
 
         # métricas
         metrics = Metrics(start_date, end_date)
@@ -58,17 +57,39 @@ class CustomAdminSite(admin.AdminSite):
         total_queries_per_day = dict.fromkeys(days_labels, 0)
         for item in queries_list:
             d = item['dia']
-            total_queries_per_day[d] += 1
+            if d in total_queries_per_day:
+                total_queries_per_day[d] += 1
 
         # Consultas sem clique por dia
         no_clicks = metrics.no_clicks_query()
         no_clicks_per_day = dict.fromkeys(days_labels, 0)
         for item in no_clicks['detailed']:
             d = item['dia']
-            no_clicks_per_day[d] += 1
+            if d in no_clicks_per_day:
+                no_clicks_per_day[d] += 1
         
         # Consultas sem resultado
         no_results = metrics.no_results_query()
+        no_results_per_day = dict.fromkeys(days_labels, 0)
+        for item in no_results['detailed']:
+            d = item['dia']
+            if d in no_results_per_day:
+                no_results_per_day[d] += 1
+        
+        # porcentagens
+        porc_no_clicks_per_day = {}
+        for d, v in no_clicks_per_day.items():
+            if total_queries_per_day[d] != 0:
+                porc_no_clicks_per_day[d] = round(v/total_queries_per_day[d]*100)
+            else:
+                porc_no_clicks_per_day[d] = 0
+        
+        porc_no_results_per_day = {}
+        for d, v in no_results_per_day.items():
+            if total_queries_per_day[d] != 0:
+                porc_no_results_per_day[d] = round(v/total_queries_per_day[d]*100)
+            else:
+                porc_no_results_per_day[d] = 0
         
 
         context = {
@@ -77,6 +98,9 @@ class CustomAdminSite(admin.AdminSite):
             'total_searches_per_day': {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},
             'last_queries': queries_list[:10],
             'no_clicks_per_day': {'labels': list(no_clicks_per_day.keys()), 'data': list(no_clicks_per_day.values())},
+            'no_results_per_day': {'labels': list(no_results_per_day.keys()), 'data': list(no_results_per_day.values())},
+            'porc_no_clicks_per_day': {'labels': list(porc_no_clicks_per_day.keys()), 'data': list(porc_no_clicks_per_day.values())},
+            'porc_no_results_per_day': {'labels': list(porc_no_results_per_day.keys()), 'data': list(porc_no_results_per_day.values())},
         }
         return render(request, 'admin/index.html', context)
     

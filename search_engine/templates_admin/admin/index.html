@@ -6,6 +6,9 @@
 var indices_amounts = {{ indices_amounts|safe }};
 var total_searches_per_day = {{ total_searches_per_day|safe }};
 var no_clicks_per_day = {{ no_clicks_per_day|safe }};
+var no_results_per_day = {{ no_results_per_day|safe }};
+var porc_no_clicks_per_day = {{ porc_no_clicks_per_day|safe }};
+var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
 </script>
 {% endblock %}
 {% block content %}
@@ -205,7 +208,7 @@ var no_clicks_per_day = {{ no_clicks_per_day|safe }};
     <div class="col-md-6 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                  <h4 class="card-title">Consultas sem clique</h4>
+                  <h4 class="card-title">Porcentagem de consultas sem clique</h4>
                   <canvas id="grafico-consultas-sem-clique"></canvas>
             </div>
         </div>
@@ -213,7 +216,7 @@ var no_clicks_per_day = {{ no_clicks_per_day|safe }};
     <div class="col-md-6 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Consultas sem resultados</h4>
+                <h4 class="card-title">Porcentagem de consultas sem resultados</h4>
                 <canvas id="grafico-consultas-sem-resultado"></canvas>
             </div>
         </div>
