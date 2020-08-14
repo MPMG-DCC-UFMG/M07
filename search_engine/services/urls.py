@@ -16,4 +16,5 @@ urlpatterns = [
     path('get_log_clicks', views.get_log_clicks, name='get_log_clicks'),
     path('get_metrics', views.get_metrics, name='get_metrics'),
     path('generate_log_data', views.generate_log_data, name='generate_log_data'),
+    path('get_log_sugestoes', views.get_log_sugestoes, name='get_log_sugestoes'),
 ]

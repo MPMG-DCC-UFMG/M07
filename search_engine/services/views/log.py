@@ -6,7 +6,7 @@ import hashlib
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from services.models import LogBusca, LogSearchClick, Document
+from services.models import LogBusca, LogSearchClick, LogSugestoes, Document
 
 
 @csrf_exempt
@@ -59,32 +59,39 @@ def log_search_result_click(request):
         return JsonResponse({"success": False})
 
 
-@csrf_exempt
-@require_http_methods(["POST"])
-def log_query_suggestion(request):
-    query = request.POST['query']
-    suggestions = []
-    for i in range(5):
-        suggestions.append({'label': 'sugestão de consulta '+str(i+1),
-                            'value': 'sugestão de consulta '+str(i+1), 'rank_number': i+1, 'suggestion_id': i+1})
+# @csrf_exempt
+# @require_http_methods(["POST"])
+# def log_query_suggestion(request):
+#     query = request.POST['query']
+#     suggestions = []
+#     for i in range(5):
+#         suggestions.append({'label': 'sugestão de consulta '+str(i+1),
+#                             'value': 'sugestão de consulta '+str(i+1), 'rank_number': i+1, 'suggestion_id': i+1})
 
-    data = {
-        'suggestions': suggestions
-    }
-    return JsonResponse(data)
+#     data = {
+#         'suggestions': suggestions
+#     }
+#     return JsonResponse(data)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
 def log_query_suggestion_click(request):
-    session_id = request.POST['session_id']
-    user_id = request.POST['user_id']
-    rank_number = request.POST['rank_number']
-    suggestion_id = request.POST['suggestion_id']
-    print('[LOG SUGGESTION CLICK] session_id: {:s}, user_id: {:s}, suggestion_id: {:s}, rank_number: {:s}'.format(
-        session_id, user_id, suggestion_id, rank_number))
-    data = {}
-    return JsonResponse(data)
+    timestamp = int(time.time() * 1000)
+    rank_number = request.POST.get('rank_number', None)
+    suggestion = request.POST.get('suggestion', None)
+    
+    response = LogSugestoes().save(dict(
+        sugestao = suggestion,
+        posicao = rank_number,
+        timestamp = timestamp
+    ))
+
+    if len(response[1]) == 0:
+        return JsonResponse({"success": True})
+    else:
+        return JsonResponse({"success": False})
+
 
 
 @require_http_methods(["GET"])
@@ -92,14 +99,14 @@ def get_log_buscas(request):
     user_id = request.GET.get('user_id',  None)
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
-    page = request.GET.get('page', 1)
+    page = request.GET.get('page', 'all')
 
     if user_id == None and start_date == None and end_date == None:
         response = "Error: At least one parameter must be given."
         return JsonResponse({"response": response})
 
     log_list = LogBusca.get_list_filtered(
-        user_id=user_id, start_date=start_date, end_date=end_date, page=page)
+        id_usuario=user_id, start_date=start_date, end_date=end_date, page=page)
 
     response = {
         "data": log_list
@@ -219,3 +226,10 @@ def generate_log_data(request):
 
     return JsonResponse({'response': 'ok'})
 
+
+@require_http_methods(["GET"])
+def get_log_sugestoes(request):
+    query = request.GET['query']
+    resposta = LogSugestoes.get_suggestions(query)
+    print(resposta[1])
+    return JsonResponse({'sugestoes': resposta[1]})

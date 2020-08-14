@@ -19,6 +19,10 @@ class LogBusca(ElasticModel):
             'resultados_por_pagina',
             'documentos',
             'tempo_resposta_total'
+            'indices',
+            'instancias',
+            'data_inicial',
+            'data_final'
         ]
 
         super().__init__(index_name, meta_fields, index_fields, **kwargs)
@@ -67,3 +71,21 @@ class LogBusca(ElasticModel):
             })
 
         return LogBusca.get_list(query=query_param, page=page, sort=sort)
+
+    @staticmethod
+    def get_suggestions(query):
+        request_body = {
+            "multi_match": {
+                "query": query,
+                "type": "bool_prefix",
+                "fields": [
+                    "text_consulta",
+                    "text_consulta._2gram",
+                    "text_consulta._3gram"
+                ]
+            }
+        }
+        response = LogBusca.get_list(query=request_body, page='all')
+        total = response[0]
+        suggestions = [ hit['text_consulta'] for hit in response[1]]
+        return total, suggestions

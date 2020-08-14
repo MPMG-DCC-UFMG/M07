@@ -247,6 +247,58 @@
                 },
                 "tempo_resposta_total": {
                     "type": "long"
+                },
+                "indices": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "instancias": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "data_inicial": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "data_final": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "log_sugestoes": {
+        "mappings":{
+            "properties":{
+                "sugestao":{
+                    "type": "search_as_you_type",
+                    "max_shingle_size": 3
+                },
+                "posicao": {
+                    "type": "long"
+                },
+                "timestamp": {
+                    "type": "date"
                 }
             }
         }

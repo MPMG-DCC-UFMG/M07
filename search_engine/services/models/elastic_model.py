@@ -142,7 +142,6 @@ class ElasticModel(dict):
         for item in elastic_result:
             result_list.append(cls(**dict({'id': item.meta.id}, **item.to_dict())))
         
-        
         return total_records, result_list
     
 

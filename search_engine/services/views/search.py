@@ -54,7 +54,11 @@ class Search(View):
             documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
             pagina = self.page,
             resultados_por_pagina = self.results_per_page,
-            tempo_resposta_total = time.time() - start
+            tempo_resposta_total = time.time() - start,
+            indices = self.doc_types,
+            instancias =  self.instances,
+            data_inicial = self.start_date,
+            data_final = self.end_date
         ))
 
         end = time.time()
@@ -104,7 +108,7 @@ class Search(View):
         # internal parameters
         self.data_hora = int(time.time()*1000)
         self.algoritmo = 'BM25'
-        self.results_per_page = 10
+        self.results_per_page = 10 # TODO: numero magico
         self.id_usuario = request.user.id
         self.index = request.GET.getlist('index', settings.SEARCHABLE_INDICES.keys())
         self.query = ' '.join([w for w in self.raw_query.split() if len(w) > 1])
@@ -116,6 +120,12 @@ class Search(View):
             pre_qid = hashlib.sha1()
             pre_qid.update(bytes(str(self.data_hora) + str(self.id_usuario) + self.query + self.sid, encoding='utf-8'))
             self.qid = pre_qid.hexdigest()
+    
+
+
+
+
+
     
     
     def _search_documents(self):

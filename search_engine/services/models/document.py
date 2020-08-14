@@ -18,7 +18,7 @@ class Document:
 
     def __init__(self, searchable_indices=None):
         self.elastic = Elastic()
-        self.results_per_page = 10
+        self.results_per_page = 10 #TODO: Numero magico
         
         if searchable_indices == None:
             searchable_indices = settings.SEARCHABLE_INDICES

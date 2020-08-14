@@ -11,13 +11,13 @@ from os import listdir
 from os.path import isfile, join
 
 
-def list_files(mypath):
+def list_files(path):
     """
     List all files from a given folder
     """
-    if mypath[-1] != "/":
-        mypath = mypath+"/"
-    return [mypath+f for f in listdir(mypath) if isfile(join(mypath, f))]
+    if path[-1] != "/":
+        path = path+"/"
+    return [path+f for f in listdir(path) if isfile(join(path, f))]
 
 
 class Indexer:

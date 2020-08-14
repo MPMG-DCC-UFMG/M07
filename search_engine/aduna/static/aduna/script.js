@@ -24,10 +24,11 @@ function log_suggestion_click(item){
         type: 'post',
         dataType: 'json',
         data:{
-            session_id: 123,
-            user_id: 0,
+            // session_id: sid,
+            // user: user_name,
+            // query: request.term,
             rank_number: item['rank_number'],
-            suggestion_id: item['suggestion_id'],
+            suggestion: item['value'],
         }
     });
 }
