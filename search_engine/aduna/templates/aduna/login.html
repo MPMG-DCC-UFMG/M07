@@ -1,71 +1,35 @@
-{% load static %}
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-        <link rel="stylesheet" href="{% static 'aduna/bootstrap/css/bootstrap.min.css' %}" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-        <link rel="stylesheet" href="{% static 'aduna/jquery-ui/jquery-ui.min.css' %}">
-        <link rel="stylesheet" href="{% static 'aduna/style.css' %}">
-
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-        <title>Áduna</title>
-    </head>
-    <body>
-        <div class="vertical-center">
-            <div class="container">
-                <h1 class="aduna-title">Áduna</h1>
-                {% if messages %}
-                    <div class="row justify-content-md-center">
-                    <div class="col-sm-4">
-                        {% for message in messages %}
-                        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} fade show mb-2" style="margin: auto" role="alert">
-                        {{ message }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    </div>
-                {% endif %}
-                <form action="{% url 'aduna:login' %}" method="post">
-                    {% csrf_token %}
-                    <div class="row justify-content-md-center">
-                        <div class="col-sm-4">
-                            <div class="input-group">
-                                <input type="text" class="form-control shadow bg-white rounded" name="username" id="username" placeholder="Username" autocomplete="off">
-                            </div><br>
-                            <div class="input-group">
-                                <input type="password" class="form-control shadow bg-white rounded" name="password" id="password" placeholder="Senha" autocomplete="off">
-                            </div><br>
-                                <button type="submit" class="col btn btn-primary shadow mb-5 rounded">Login</button>
-                                <input type="hidden" name="sid" id="sid" value="{{ sid }}">
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!--
-        <h1 class="aduna-title">Áduna</h1>
-        <form action="{% url 'aduna:login' %}" class="form-signin" method="post">
-            {% csrf_token %}
-            <input type="hidden" name="sid" id="sid" value="{{ sid }}">
+{% extends "./_base.html" %}
+{% block content %}
+    <div class="vertical-center">
+        <div class="container">
+            <h1 class="aduna-title">Áduna</h1>
             {% if messages %}
-                {% for message in messages %}
-                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} col-sm-4 fade show mb-2" style="margin: auto" role="alert">
-                {{ message }}
+                <div class="row justify-content-md-center">
+                <div class="col-sm-4">
+                    {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} fade show mb-2" style="margin: auto" role="alert">
+                    {{ message }}
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                </div>
             {% endif %}
-            <div class="form-label-group">
-                <input type="text" class="form-control shadow bg-white rounded" name="username" id="username" placeholder="Username" autocomplete="off">
-            </div>
-            <div class="form-label-group">
-                <input type="password" class="form-control shadow bg-white rounded" name="password" id="password" placeholder="Senha" autocomplete="off">
-            </div>
-            <button type="submit" class="btn btn-primary shadow mb-5 rounded">Login</button>
-        </form>
-        //-->
-    </body>
+            <form action="{% url 'aduna:login' %}" method="post">
+                {% csrf_token %}
+                <div class="row justify-content-md-center">
+                    <div class="col-sm-4">
+                        <div class="input-group">
+                            <input type="text" class="form-control shadow bg-white rounded" name="username" id="username" placeholder="Username" autocomplete="off">
+                        </div><br>
+                        <div class="input-group">
+                            <input type="password" class="form-control shadow bg-white rounded" name="password" id="password" placeholder="Senha" autocomplete="off">
+                        </div><br>
+                            <button type="submit" class="col btn btn-primary shadow mb-5 rounded">Login</button>
+                            <input type="hidden" name="sid" id="sid" value="{{ sid }}">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
