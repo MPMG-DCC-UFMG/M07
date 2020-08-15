@@ -11,8 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from services.models.processo import Processo
-from services.models.diario import Diario
+from mpmg.services.models import Diario, Processo
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'm+_v4d2c!8f)vo687m)zzlqniys5!m_doe5!)zf67cmm9+qt(0'
+SECRET_KEY = 'b5=un2ho7+g%ej(kt_eey1$#x9^!!!52szjp1o4qol0j6ly^7='
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -33,15 +32,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'aduna.apps.AdunaConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_jenkins',
-    'services',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'mpmg.services',
+    'aduna',
 ]
 
 MIDDLEWARE = [
@@ -54,12 +54,19 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
 ROOT_URLCONF = 'mpmg.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates_admin')],
+        'DIRS': [],
+        # 'DIRS': [os.path.join(BASE_DIR, 'templates_admin')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,7 +135,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = '/home/rafael/UFMG/MPMG/M07/search_engine/assets/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'static')
 ]
 
 # Configure Elasticsearch server

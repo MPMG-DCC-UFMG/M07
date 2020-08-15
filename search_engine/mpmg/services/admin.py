@@ -5,8 +5,8 @@ from django.shortcuts import render
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.conf import settings
-from services.models import LogBusca
-from services.models import ElasticModel
+from mpmg.services.models import LogBusca
+from mpmg.services.models import ElasticModel
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import pandas as pd
@@ -41,6 +41,11 @@ class CustomAdminSite(admin.AdminSite):
         indices_info = ElasticModel.get_indices_info()
 
         # users = User.objects.all()
+
+        # totais
+        total_queries = metrics.query_log.id.value_counts().sum()
+        print(metrics.query_log.columns)
+        avg_query_time = round(metrics.query_log.tempo_resposta_total.mean(), 2)
         
         # dados para o gráfico de pizza com a qtde de documentos por índice
         searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
@@ -93,6 +98,8 @@ class CustomAdminSite(admin.AdminSite):
         
 
         context = {
+            'total_queries': total_queries,
+            'avg_query_time': avg_query_time,
             'indices_info': indices_info,
             'indices_amounts': indices_amounts,
             'total_searches_per_day': {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},

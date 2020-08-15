@@ -12,8 +12,6 @@ import re
 def index(request):
     if not request.session.get('auth_token'):
         return redirect('/aduna/login')
-    # if not request.session.session_key:
-    #     request.session.create()
     
     context = {
         'user_name': request.session.get('user_info')['first_name'],
@@ -27,7 +25,7 @@ def search(request):
     if request.GET.get('invalid_query', False) or not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
-    cookies = {'sessionid': request.session.get('auth_token')}
+    headers = {'Authorization': 'Token '+request.session.get('auth_token')}
 
     query = request.GET['query']
     sid = request.GET['sid']
@@ -52,46 +50,54 @@ def search(request):
         'start_date': start_date,
         'end_date': end_date
     }
-    service_response = requests.get(settings.SERVICES_URL+'search', params, cookies=cookies).json()
+    service_response = requests.get(settings.SERVICES_URL+'search', params, headers=headers)
+    response_content = service_response.json()
 
-    if service_response['error']:
-        messages.add_message(request, messages.ERROR, service_response['error_message'], extra_tags='danger')
+    if service_response.status_code == 500:
+        messages.add_message(request, messages.ERROR, response_content['error_message'], extra_tags='danger')
         return redirect('/aduna/erro')
 
-    elif service_response['is_authenticated']:
+    elif service_response.status_code == 401:
+        request.session['auth_token'] = None
+        request.session['user_info'] = None
+        return redirect('/aduna/login')
+
+    else:
         context = {
             'user_name': request.session.get('user_info')['first_name'],
             'services_url': settings.SERVICES_URL,
             'query': query,
             'page': page,
             'sid': sid,
-            'time': service_response['time'],
-            'qid': service_response['qid'],
-            'total_docs': service_response['total_docs'],
-            'results_per_page': range(service_response['results_per_page']),
-            'documents': service_response['documents'],
-            'total_pages': service_response['total_pages'],
-            'results_pagination_bar': range(min(9, service_response['total_pages'])), # Typically show 9 pages. Odd number used so we can center the current one and show 4 in each side. Show less if not enough pages
+            'time': response_content['time'],
+            'qid': response_content['qid'],
+            'total_docs': response_content['total_docs'],
+            'results_per_page': range(response_content['results_per_page']),
+            'documents': response_content['documents'],
+            'total_pages': response_content['total_pages'],
+            'results_pagination_bar': range(min(9, response_content['total_pages'])), # Typically show 9 pages. Odd number used so we can center the current one and show 4 in each side. Show less if not enough pages
             
             'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2'],
             'filter_doc_types': ['diarios', 'processos']
         }
         
         return render(request, 'aduna/search.html', context)
-    else:
-        request.session['auth_token'] = None
-        return redirect('/aduna/login')
     
 
 def document(request, doc_type, doc_id, sid):
     if not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
-    cookies = {'sessionid': request.session.get('auth_token')}
-    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id': doc_id, 'sid': sid}, cookies=cookies).json()
-    
-    if service_response['is_authenticated']:
-        document = service_response['document']
+    headers = {'Authorization': 'Token '+request.session.get('auth_token')}
+    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id': doc_id, 'sid': sid}, headers=headers)
+
+    if service_response.status_code == 401:
+        request.session['auth_token'] = None
+        request.session['user_info'] = None
+        return redirect('/aduna/login')
+    else:
+        response_content = service_response.json()
+        document = response_content['document']
         document['conteudo'] = document['conteudo'].replace('\n', '<br>')
         document['conteudo'] = re.sub('(<br>){3,}', '<br>', document['conteudo'])
         context = {
@@ -100,46 +106,41 @@ def document(request, doc_type, doc_id, sid):
             'sid': sid
         }
         return render(request, 'aduna/document.html', context)
-    else:
-        request.session['auth_token'] = None
-        return redirect('/aduna/login')
 
 
 def login(request):
     if request.method == 'GET':
-
         if request.session.get('auth_token'):
             return redirect('/aduna/')
         return render(request, 'aduna/login.html')
 
     elif request.method == 'POST':
-
         username = request.POST['username']
         password = request.POST['password']
-        service_response = requests.post(settings.SERVICES_URL+'login', {'username': username, 'password': password}).json()
-        if service_response['success']:
-            request.session['user_info'] = service_response['user_info']
-            request.session['auth_token'] = service_response['auth_token']
-            return redirect('/aduna/')
-        else:
-            messages.add_message(request, messages.ERROR, service_response['message'], extra_tags='danger')
+        service_response = requests.post(settings.SERVICES_URL+'login', {'username': username, 'password': password})
+        if service_response.status_code == 401:
+            messages.add_message(request, messages.ERROR, 'Usuário ou senha inválidos.', extra_tags='danger')
             return redirect('/aduna/login')
+        else:
+            response_content = service_response.json()
+            request.session['user_info'] = response_content['user_info']
+            request.session['auth_token'] = response_content['token']
+            return redirect('/aduna/')
+            
 
 
 def logout(request):
     if not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
-    cookies = {'sessionid': request.session.get('auth_token')}
-    
-    service_response = requests.post(settings.SERVICES_URL+'logout', {}, cookies=cookies).json()
+    # por enquanto o token dura infinitamente do lado da API.
+    # portanto, não precisamos fazer chamada nenhuma na API.
+    # vamos apenas apagar a sessão do usuário aqui
 
-    if service_response['success']:
-        print(service_response['message'])
-        messages.add_message(request, messages.INFO, service_response['message'], extra_tags='info')
-        request.session['user_info'] = None
-        request.session['auth_token'] = None
-        return redirect('/aduna/login')
+    messages.add_message(request, messages.INFO, 'Você saiu.', extra_tags='info')
+    request.session['user_info'] = None
+    request.session['auth_token'] = None
+    return redirect('/aduna/login')
 
 def erro(request):
     return render(request, 'aduna/erro.html')    

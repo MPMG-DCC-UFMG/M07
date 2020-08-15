@@ -73,9 +73,9 @@ var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
             <div class="col-lg-3 col-md-6">
               <div class="d-flex">
                 <div class="wrapper">
-                  <h3 class="mb-0 font-weight-semibold">32,451</h3>
-                  <h5 class="mb-0 font-weight-medium text-primary">Visits</h5>
-                  <p class="mb-0 text-muted">+14.00(+0.50%)</p>
+                  <h3 class="mb-0 font-weight-semibold">{{ total_queries }}</h3>
+                  <h5 class="mb-0 font-weight-medium text-primary">Consultas</h5>
+                  <p class="mb-0 text-muted">no período</p>
                 </div>
                 <div class="wrapper my-auto ml-auto ml-lg-4">
                   <canvas height="50" width="100" id="stats-line-graph-1"></canvas>
@@ -85,9 +85,9 @@ var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
             <div class="col-lg-3 col-md-6 mt-md-0 mt-4">
               <div class="d-flex">
                 <div class="wrapper">
-                  <h3 class="mb-0 font-weight-semibold">15,236</h3>
-                  <h5 class="mb-0 font-weight-medium text-primary">Impressions</h5>
-                  <p class="mb-0 text-muted">+138.97(+0.54%)</p>
+                  <h3 class="mb-0 font-weight-semibold">{{ avg_query_time }}</h3>
+                  <h5 class="mb-0 font-weight-medium text-primary">Tempo de resposta</h5>
+                  <p class="mb-0 text-muted">média em segundos</p>
                 </div>
                 <div class="wrapper my-auto ml-auto ml-lg-4">
                   <canvas height="50" width="100" id="stats-line-graph-2"></canvas>

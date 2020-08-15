@@ -1,4 +1,4 @@
-from services.elastic import Elastic
+from mpmg.services.elastic import Elastic
 
 
 class ElasticModel(dict):

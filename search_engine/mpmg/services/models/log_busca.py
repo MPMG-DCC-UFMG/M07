@@ -1,4 +1,4 @@
-from services.models.elastic_model import ElasticModel
+from mpmg.services.models.elastic_model import ElasticModel
 
 
 class LogBusca(ElasticModel):
@@ -18,11 +18,11 @@ class LogBusca(ElasticModel):
             'pagina',
             'resultados_por_pagina',
             'documentos',
-            'tempo_resposta_total'
+            'tempo_resposta_total',
             'indices',
             'instancias',
             'data_inicial',
-            'data_final'
+            'data_final',
         ]
 
         super().__init__(index_name, meta_fields, index_fields, **kwargs)

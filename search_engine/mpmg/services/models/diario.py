@@ -1,4 +1,4 @@
-from services.models.elastic_model import ElasticModel
+from mpmg.services.models.elastic_model import ElasticModel
 
 
 class Diario(ElasticModel):

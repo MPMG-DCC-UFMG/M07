@@ -1,6 +1,6 @@
-from services.elastic import Elastic
-from services.models.processo import Processo
-from services.models.diario import Diario
+from mpmg.services.elastic import Elastic
+from mpmg.services.models.processo import Processo
+from mpmg.services.models.diario import Diario
 from django.conf import settings
 import time
 import statistics

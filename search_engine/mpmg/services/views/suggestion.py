@@ -1,7 +1,7 @@
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from services.models import LogBusca
+from mpmg.services.models import LogBusca
 
 import json
 import pandas as pd

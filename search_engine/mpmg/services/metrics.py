@@ -3,8 +3,7 @@ import time
 from datetime import datetime
 import requests
 
-from services.models.log_busca import LogBusca
-from services.models.log_search_click import LogSearchClick
+from mpmg.services.models import LogBusca, LogSearchClick
 
 
 class Metrics:
