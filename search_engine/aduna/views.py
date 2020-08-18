@@ -1,3 +1,6 @@
+import re
+import requests
+from datetime import datetime
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.conf import settings
@@ -5,8 +8,6 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
-import requests
-import re
 
 
 def index(request):
@@ -78,7 +79,10 @@ def search(request):
             'documents': response_content['documents'],
             'total_pages': response_content['total_pages'],
             'results_pagination_bar': range(min(9, response_content['total_pages'])), # Typically show 9 pages. Odd number used so we can center the current one and show 4 in each side. Show less if not enough pages
-            
+            'start_date': datetime.strptime(response_content['start_date'], '%Y-%m-%d') if response_content['start_date'] != None else None,
+            'end_date': datetime.strptime(response_content['end_date'], '%Y-%m-%d') if response_content['end_date'] != None else None,
+            'instances': response_content['instances'],
+            'doc_types': response_content['doc_types'],
             'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2'],
             'filter_doc_types': ['diarios', 'processos']
         }

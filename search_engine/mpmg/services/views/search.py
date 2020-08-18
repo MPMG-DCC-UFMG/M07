@@ -66,6 +66,10 @@ class SearchView(APIView):
                 'current_page': self.page,
                 'total_pages': total_pages,
                 'qid': self.qid,
+                'start_date': self.start_date,
+                'end_date': self.end_date,
+                'instances': self.instances,
+                'doc_types': self.doc_types,
             }               
             return Response(data)
         
