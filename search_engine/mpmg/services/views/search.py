@@ -14,7 +14,7 @@ from ..ranking.tf_idf import TF_IDF
 from ..features_extractor import TermVectorsFeaturesExtractor
 
 
-class Search(APIView):
+class SearchView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):

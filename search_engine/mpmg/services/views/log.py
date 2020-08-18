@@ -86,7 +86,7 @@ class LogSearchClickView(APIView):
             return Response({"success": False})
 
 
-class LogSuggestionView(APIView):
+class LogQuerySuggestionView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
@@ -95,7 +95,7 @@ class LogSuggestionView(APIView):
         return Response({'sugestoes': resposta[1]})
 
 
-class LogSuggestionClickView(APIView):
+class LogQuerySuggestionClickView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):

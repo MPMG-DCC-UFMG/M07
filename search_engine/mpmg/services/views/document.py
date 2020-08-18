@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from mpmg.services.models import *
 
-class DocumentViewer(APIView):
+class DocumentView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def __init__(self):

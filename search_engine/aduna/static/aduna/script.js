@@ -1,4 +1,4 @@
-function log_search_result_click(link){
+function log_search_click(link){
     // var query = $('#results-container').data('executed-query');
     $.ajax({
         async: false,
@@ -7,9 +7,6 @@ function log_search_result_click(link){
         dataType: 'json',
         headers:{'Authorization': 'Token ' + AUTH_TOKEN},
         data:{
-            // session_id: 123,
-            // user_id: 0,
-            // query: query,
             rank_number: $(link).data('rank-number'),
             item_id: $(link).data('item-id'),
             item_type: $(link).data('item-type'),
@@ -26,9 +23,6 @@ function log_suggestion_click(item){
         dataType: 'json',
         headers:{'Authorization': 'Token ' + AUTH_TOKEN},
         data:{
-            // session_id: sid,
-            // user: user_name,
-            // query: request.term,
             rank_number: item['rank_number'],
             suggestion: item['value'],
         }
@@ -62,14 +56,14 @@ $(function(){
     $('#results-container .result-link').on('mousedown', function(e1){
         $('#results-container .result-link').one('mouseup', function(e2){
           if (e1.which == 2 && e1.target == e2.target) { // consider only the middle button click
-            log_search_result_click(e2.target);
+            log_search_click(e2.target);
           }
         });
       });
 
     $('#results-container .result-link').click(function(e){
         // e.preventDefault();
-        log_search_result_click(e.target);
+        log_search_click(e.target);
     });
 
     $('#instancia_filter').multiselect({
