@@ -13,6 +13,25 @@
 }
 
 
+.searchbar.navbar{
+    /* top: 0px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    z-index: 999; */
+}
+
+.searchbar.navbar.fixed-top{
+    -webkit-box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
+    box-shadow: 10px 0px 10px 0px rgba(0,0,0,0.5);
+}
+
+/* .searchresult-container{
+    margin-top: 100px;
+} */
+
+
 
 .navbar{
     margin-bottom: 40px;

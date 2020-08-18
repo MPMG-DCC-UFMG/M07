@@ -102,3 +102,28 @@ $(function(){
         altFormat: "yy-mm-dd"
     });
 });
+
+
+
+menu = $('.searchbar.navbar');
+menuPosition = menu.offset().top;
+searchBody = $('.searchresult-container')
+bodyPosition = searchBody.offset().top;
+$(window).bind('scroll', function() {
+    
+    var position = $(window).scrollTop() - menuPosition;
+    if(position >= 50){
+        if(!menu.hasClass('fixed-top')){
+            searchBody.css('margin-top', bodyPosition);
+            menu.addClass('fixed-top');
+            
+            menu.css('top', '-57px');
+            menu.animate({top: 0}, 500);
+        }
+    }
+    else{
+        menu.removeClass('fixed-top');
+        searchBody.css('margin-top', 0);
+    }
+    
+});
