@@ -69,11 +69,21 @@ $(function(){
     $('#instancia_filter').multiselect({
         includeSelectAllOption: true,
         enableFiltering: true,
+        selectAllText: 'Selecionar todas',
+        nonSelectedText: 'Nada selecionado',
+        filterPlaceholder: 'Procurar',
+        buttonClass: 'btn btn-outline-secondary',
+        buttonWidth: '100%',
     });
 
     $('#tipo_filter').multiselect({
         includeSelectAllOption: true,
         enableFiltering: true,
+        selectAllText: 'Selecionar todos',
+        nonSelectedText: 'Nada selecionado',
+        filterPlaceholder: 'Procurar',
+        buttonClass: 'btn btn-outline-secondary',
+        buttonWidth: '100%',
     });
 
     $("#start_date_filter_display").datepicker({
