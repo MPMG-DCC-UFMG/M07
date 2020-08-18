@@ -2,9 +2,10 @@ function log_search_result_click(link){
     // var query = $('#results-container').data('executed-query');
     $.ajax({
         async: false,
-        url: SERVICES_URL+'log_search_result_click',
+        url: SERVICES_URL+'log_search_click',
         type: 'post',
         dataType: 'json',
+        headers:{'Authorization': 'Token ' + AUTH_TOKEN},
         data:{
             // session_id: 123,
             // user_id: 0,
@@ -23,6 +24,7 @@ function log_suggestion_click(item){
         url: SERVICES_URL+'log_query_suggestion_click',
         type: 'post',
         dataType: 'json',
+        headers:{'Authorization': 'Token ' + AUTH_TOKEN},
         data:{
             // session_id: sid,
             // user: user_name,
@@ -40,6 +42,7 @@ $(function(){
                 url: SERVICES_URL+'query_suggestion',
                 type: 'get',
                 dataType: 'json',
+                headers:{'Authorization': 'Token ' + AUTH_TOKEN},
                 data:{
                     query: request.term
                 }
@@ -68,23 +71,17 @@ $(function(){
         // e.preventDefault();
         log_search_result_click(e.target);
     });
-});
 
-$(document).ready(function() {
     $('#instancia_filter').multiselect({
         includeSelectAllOption: true,
         enableFiltering: true,
     });
-});
 
-$(document).ready(function() {
     $('#tipo_filter').multiselect({
         includeSelectAllOption: true,
         enableFiltering: true,
     });
-});
 
-$(function() {
     $("#start_date_filter_display").datepicker({
         changeMonth: true,
         changeYear: true,
@@ -92,9 +89,7 @@ $(function() {
         altField: "#start_date_filter",
         altFormat: "yy-mm-dd"
     });
-});
 
-$(function() {
     $("#end_date_filter_display").datepicker({
         changeMonth: true,
         changeYear: true,

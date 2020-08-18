@@ -17,6 +17,7 @@ def index(request):
         'user_name': request.session.get('user_info')['first_name'],
         'sid': request.session.session_key,
         'services_url': settings.SERVICES_URL,
+        'auth_token': request.session.get('auth_token'),
     }
     return render(request, 'aduna/index.html', context)
 
@@ -64,6 +65,7 @@ def search(request):
 
     else:
         context = {
+            'auth_token': request.session.get('auth_token'),
             'user_name': request.session.get('user_info')['first_name'],
             'services_url': settings.SERVICES_URL,
             'query': query,

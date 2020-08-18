@@ -5,10 +5,9 @@ import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from django.conf import settings
-from mpmg.services.models.log_busca import LogBusca
-from mpmg.services.models.document import Document
-from .log import log_search_result
+from mpmg.services.models import LogSearch, Document
 from ..elastic import Elastic
 from ..features_extractor import FeaturesExtractor
 from ..ranking.tf_idf import TF_IDF
@@ -29,14 +28,14 @@ class Search(APIView):
             query_len = len(''.join(self.query.split()))
             if query_len < 2:
                 data = {'error_type': 'invalid_query'}
-                return Response(data, status=400) # bad request status code
+                return Response(data, status=status.HTTP_400_BAD_REQUEST)
                 
             # Busca os documentos no elastic
             total_docs, total_pages, documents, response_time = Document().search_with_filters(
                 self.query, self.page, self.instances, self.doc_types, self.start_date, self.end_date)
 
             # Grava o log da consulta
-            LogBusca().save(dict(
+            LogSearch().save(dict(
                 id_sessao = self.sid, 
                 id_consulta = self.qid,
                 id_usuario = self.id_usuario,
@@ -75,7 +74,7 @@ class Search(APIView):
                 'error_message': str(sys.exc_info())
             }
             print(sys.exc_info())
-            return Response(data, status=500)
+            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         
     def _read_parameters(self, request):

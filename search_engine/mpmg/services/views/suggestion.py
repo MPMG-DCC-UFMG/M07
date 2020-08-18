@@ -1,7 +1,7 @@
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from mpmg.services.models import LogBusca
+from mpmg.services.models import LogSearch
 
 import json
 import pandas as pd
@@ -16,7 +16,7 @@ def get_word_postion(element, query):
 def query_suggestion(request):
     query = request.GET['query']
 
-    total, search_response = LogBusca.get_suggestions(query)
+    total, search_response = LogSearch.get_suggestions(query)
     processed_suggestions = []
     if total>0:
         suggestions = pd.Series(search_response, name = "text_consulta").str.replace("\"", "").to_list() 

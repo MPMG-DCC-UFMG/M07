@@ -2,8 +2,7 @@ import pandas as pd
 import time
 from datetime import datetime
 import requests
-
-from mpmg.services.models import LogBusca, LogSearchClick
+from mpmg.services.models import LogSearch, LogSearchClick
 
 
 class Metrics:
@@ -14,7 +13,7 @@ class Metrics:
         
 
     def _get_logs(self):
-        _, query_log = LogBusca.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
+        _, query_log = LogSearch.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
         query_log = pd.DataFrame.from_dict(query_log)
         # create columns to help on grouping
         if len(query_log) > 0:

@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.conf import settings
-from mpmg.services.models import LogBusca
+from mpmg.services.models import LogSearch
 from mpmg.services.models import ElasticModel
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
@@ -22,7 +22,7 @@ class CustomAdminSite(admin.AdminSite):
     def get_urls(self):
         urls = super(CustomAdminSite, self).get_urls()
         my_urls = [
-            path('log_buscas/', self.admin_view(self.view_log_buscas)),
+            path('log_search/', self.admin_view(self.view_log_search)),
         ]
         return my_urls + urls
     
@@ -112,14 +112,14 @@ class CustomAdminSite(admin.AdminSite):
         return render(request, 'admin/index.html', context)
     
 
-    def view_log_buscas(self, request):
+    def view_log_search(self, request):
         id_sessao = request.GET.get('id_sessao', None)
         id_consulta = request.GET.get('id_consulta', None)
         id_usuario = request.GET.get('id_usuario', None)
         text_consulta = request.GET.get('text_consulta', None)
         page = request.GET.get('page', 1)
 
-        total_records, log_buscas_list = LogBusca.get_list_filtered(
+        total_records, log_buscas_list = LogSearch.get_list_filtered(
             id_sessao=id_sessao,
             id_consulta=id_consulta,
             id_usuario=id_usuario,
@@ -139,7 +139,7 @@ class CustomAdminSite(admin.AdminSite):
             result_list=log_buscas_list,
         )
         
-        return render(request, 'admin/log_buscas.html', context)
+        return render(request, 'admin/log_search.html', context)
 
 
 custom_admin_site = CustomAdminSite()

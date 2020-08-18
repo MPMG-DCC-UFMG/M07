@@ -1,11 +1,11 @@
 from mpmg.services.models.elastic_model import ElasticModel
 
 
-class LogBusca(ElasticModel):
+class LogSearch(ElasticModel):
     index_name = 'log_buscas'
 
     def __init__(self, **kwargs):
-        index_name = LogBusca.index_name
+        index_name = LogSearch.index_name
         meta_fields = ['id']
         index_fields = [
             'id_sessao',
@@ -70,7 +70,7 @@ class LogBusca(ElasticModel):
                 }
             })
 
-        return LogBusca.get_list(query=query_param, page=page, sort=sort)
+        return LogSearch.get_list(query=query_param, page=page, sort=sort)
 
     @staticmethod
     def get_suggestions(query):
@@ -85,7 +85,7 @@ class LogBusca(ElasticModel):
                 ]
             }
         }
-        response = LogBusca.get_list(query=request_body, page='all')
+        response = LogSearch.get_list(query=request_body, page='all')
         total = response[0]
         suggestions = [ hit['text_consulta'] for hit in response[1]]
         return total, suggestions

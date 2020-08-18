@@ -114,8 +114,8 @@ class ElasticModel(dict):
 
         query_param = {"bool":{"must":{"term":{"text_consulta":"glater"}}}}
         sort_param = {'data_hora':{'order':'desc'}}
-        LogBusca.results_per_page = 20
-        LogBusca.getList(query=query_param, page=3, sort=sort_param)
+        LogSearch.results_per_page = 20
+        LogSearch.getList(query=query_param, page=3, sort=sort_param)
         '''
 
         search_obj = cls.elastic.dsl.Search(using=cls.elastic.es, index=cls.index_name)

@@ -174,8 +174,8 @@ class ElasticTests(TestCase):
 
 
 from .views import log_search_result
-from services.models.log_busca import LogBusca
-from services.models.log_search_click import LogSearchClick
+from services.models import LogSearch, LogSearchClick
+
 
 class LogTests(TestCase):
     def setUp(self):
@@ -183,7 +183,7 @@ class LogTests(TestCase):
         self.client = Client()
 
     def test_log_search_result(self):
-        log_response = LogBusca().save(dict(
+        log_response = LogSearch().save(dict(
                         id_sessao = "sid", 
                         id_consulta = "test_query",
                         id_usuario = "",

@@ -143,8 +143,9 @@
 {% endblock %}
 {% block script_before %}
     <script>
-        SERVICES_URL = '{{ services_url }}';
-        QID = '{{ qid }}';
-        PAGE = '{{ page }}';
+        AUTH_TOKEN = "{{ auth_token }}";
+        SERVICES_URL = "{{ services_url }}";
+        QID = "{{ qid }}";
+        PAGE = "{{ page }}";
     </script>
 {% endblock %}
