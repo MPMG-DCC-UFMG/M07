@@ -17,85 +17,88 @@ def get_any_id():
             })
     return elastic_response["hits"]["hits"][0]["_id"]
 
-def user_login(client):
-    """Faz login no 'client' especificado."""
-    client.logout()
-    user = User.objects.get_or_create(username='testuser')[0]
-    client.force_login(user)
+def get_auth_token(client):
+    """
+    Função que retorna o token utilizado como input para o header Authorization, necessário para
+    autenticação via Django Rest Framework. Em nossos requests, o header é capitalizado e recebe
+    o prefixo HTTP_ para ser passado nos requests GET e POST, segundo especificação do Django. 
+    Para mais informações, ver trecho que fala sobre headers e META keys em: 
+    https://docs.djangoproject.com/en/dev/ref/request-response/#django.http.HttpRequest.META
+    """ 
+    response = client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '12345'})
+    return response.json()['token']
+
 
 class SearchTests(TestCase):
 
     def setUp(self):
         # Every test needs a client.
         self.client = Client()
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
 
     def test_query_request_logout(self):
         # GET request enquanto logged out.
         response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
         
-        # Checa por response 200 OK.
-        self.assertEqual(response.status_code, 200)
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
 
-        # Response to JSON
-        response = response.json()
-
-        # Checa pela resposta de não autenticado.
-        self.assertFalse(response['is_authenticated'])
 
     def test_query_request_login(self):
         # GET request enquanto logged in.
-        user_login(self.client)
-        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
-
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''}, 
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+        
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
-
+        
         # Response to JSON
         response = response.json()
 
         # Checa pela resposta de autenticado.
-        self.assertTrue(response['is_authenticated'])
+        self.assertIsNotNone(response['query'])
 
     def test_invalid_query(self):
         # GET request enquanto logged in.
-        user_login(self.client)
-        response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': 'sid', 'qid': ''})
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': 'sid', 'qid': ''},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
 
-        # Checa por response 200 OK.
-        self.assertEqual(response.status_code, 200)
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)
 
         # Response to JSON
         response = response.json()
 
-        # Checa que o resultado contém 0 resultados.
-        self.assertTrue(response['invalid_query'])
+        # Checa que a mensagem de erro é 'invalid_query'.
+        self.assertEqual(response['error_type'], 'invalid_query')
 
     
 class DocumentTests(TestCase):
     def setUp(self):
         # Every test needs a client.
         self.client = Client()
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
 
     def test_document_request_logout(self):
         # GET request enquanto logged out.
         document_id = get_any_id()
         response = self.client.get(reverse('mpmg.services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'})
 
-        # Checa por response 200 OK.
-        self.assertEqual(response.status_code, 200)
-
-        # Response to JSON
-        response = response.json()
-
-        # Checa pela resposta de não autenticado.
-        self.assertFalse(response['is_authenticated'])
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
 
     def test_document_request_login(self):
         # GET request enquanto logged in.
-        user_login(self.client)
-        
+        auth_token = get_auth_token(self.client)
         document_id = get_any_id()
-        response = self.client.get(reverse('mpmg.services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'})
+        response = self.client.get(reverse('mpmg.services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -103,8 +106,8 @@ class DocumentTests(TestCase):
         # Response to JSON
         response = response.json()
 
-        # Checa pela resposta de autenticado.
-        self.assertTrue(response['is_authenticated'])
+        # Checa por documento retornado.
+        self.assertIsNotNone(response['document'])
     
 
 class LoginTests(TestCase):
@@ -119,37 +122,33 @@ class LoginTests(TestCase):
         # POST request para logar com senha errada.
         response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '123'})
     
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
+
+        # Response to JSON
+        response = response.json()
+
+        # Checa por auth_token == None
+        self.assertIsNone(response['token'])
+
+    def test_successful_login(self):
+        # POST request para logar com senha correta.
+        response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '12345'})
+        
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
 
         # Response to JSON
         response = response.json()
 
-        # Checa por success == False e auth_token == None
-        self.assertFalse(response['success'])
-        self.assertIsNone(response['auth_token'])
+        # Checa por auth_token != None
+        self.assertIsNotNone(response['token'])
 
-    def test_succesful_login(self):
-        # POST request para logar com senha correta.
-        response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '12345'})
-    
-        # Checa por response 200 OK.
-        self.assertEqual(response.status_code, 200)
-
-        # Response to JSON
-        response = response.json()
-
-        # Checa por success == True e auth_token != None
-        self.assertTrue(response['success'])
-        self.assertIsNotNone(response['auth_token'])
-
-    def test_succesful_logout(self):
-        # POST request para logar com senha correta.
-        response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '12345'})
-
+    def test_successful_logout(self):
         # POST request para deslogar
-        response = self.client.post(reverse('mpmg.services:logout'))
-    
+        auth_token = get_auth_token(self.client)
+        response = self.client.post(reverse('mpmg.services:logout'), HTTP_AUTHORIZATION='Token '+auth_token)
+
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
 
