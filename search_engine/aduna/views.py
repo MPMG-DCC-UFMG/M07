@@ -139,9 +139,8 @@ def logout(request):
     if not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
-    # por enquanto o token dura infinitamente do lado da API.
-    # portanto, não precisamos fazer chamada nenhuma na API.
-    # vamos apenas apagar a sessão do usuário aqui
+    headers = {'Authorization': 'Token '+request.session.get('auth_token')}
+    service_response = requests.post(settings.SERVICES_URL+'logout', headers=headers)
 
     messages.add_message(request, messages.INFO, 'Você saiu.', extra_tags='info')
     request.session['user_info'] = None

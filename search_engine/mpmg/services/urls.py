@@ -4,7 +4,7 @@ from . import views
 app_name = 'mpmg.services'
 urlpatterns = [
     path('login', views.CustomAuthToken.as_view(), name='login'),
-    # path('logout', views.do_logout, name='logout'),
+    path('logout', views.TokenLogout.as_view(), name='logout'),
     path('search', views.SearchView.as_view(), name='search'),
     path('document', views.DocumentView.as_view(), name='document'),
     path('query_suggestion', views.QuerySuggestionView.as_view(), name='query_suggestion'),
