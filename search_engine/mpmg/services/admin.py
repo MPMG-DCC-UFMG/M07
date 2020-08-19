@@ -27,9 +27,16 @@ class CustomAdminSite(admin.AdminSite):
         return my_urls + urls
     
     def index(self, request):
+        start_date = request.GET.get('start_date', None)
+        end_date = request.GET.get('end_date', None)
+        if start_date != None and end_date != None:
+            start_date = datetime.strptime(start_date, '%d/%m/%Y')
+            end_date = datetime.strptime(end_date, '%d/%m/%Y')
+        else:
+            end_date = datetime.today().date() #+ timedelta(days=1)
+            start_date = end_date - timedelta(days=14)
+        
         # período das métricas e estatísticas
-        end_date = datetime.today().date() #+ timedelta(days=1)
-        start_date = end_date - timedelta(days=14)
         start_date_millis = int(datetime(year=start_date.year, month=start_date.month, day=start_date.day).timestamp() * 1000)
         end_date_millis = int(datetime(year=end_date.year, month=end_date.month, day=end_date.day).timestamp() * 1000)
         days_labels = [d.strftime('%d/%m') for d in pd.date_range(start_date, end_date)]
@@ -42,11 +49,6 @@ class CustomAdminSite(admin.AdminSite):
 
         # users = User.objects.all()
 
-        # totais
-        total_queries = metrics.query_log.id.value_counts().sum()
-        print(metrics.query_log.columns)
-        avg_query_time = round(metrics.query_log.tempo_resposta_total.mean(), 2)
-        
         # dados para o gráfico de pizza com a qtde de documentos por índice
         searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
         colors = ['#ffcd56', '#4bc0c0', '#ff9f40', '#36a2eb', '#ff6384']
@@ -58,7 +60,7 @@ class CustomAdminSite(admin.AdminSite):
                 indices_amounts['labels'].append(item['index_name'])
         
         # Buscas por dia
-        queries_list = metrics.query_log.fillna('-').to_dict('records')
+        queries_list = metrics.query_log.fillna('-').sort_values(by='data_hora', ascending=False).to_dict('records')
         total_queries_per_day = dict.fromkeys(days_labels, 0)
         for item in queries_list:
             d = item['dia']
@@ -81,7 +83,7 @@ class CustomAdminSite(admin.AdminSite):
             if d in no_results_per_day:
                 no_results_per_day[d] += 1
         
-        # porcentagens
+        # porcentagem sem clique (por dia)
         porc_no_clicks_per_day = {}
         for d, v in no_clicks_per_day.items():
             if total_queries_per_day[d] != 0:
@@ -89,6 +91,7 @@ class CustomAdminSite(admin.AdminSite):
             else:
                 porc_no_clicks_per_day[d] = 0
         
+        # porcentagem sem resultado (por dia)
         porc_no_results_per_day = {}
         for d, v in no_results_per_day.items():
             if total_queries_per_day[d] != 0:
@@ -96,10 +99,23 @@ class CustomAdminSite(admin.AdminSite):
             else:
                 porc_no_results_per_day[d] = 0
         
+        # totais
+        total_queries = metrics.query_log.id.value_counts().sum()
+        total_no_clicks = no_clicks['no_clicks_query']
+        total_no_results = no_results['no_results_query']
+        porc_total_no_clicks = int(total_no_clicks / total_queries * 100)
+        porc_total_no_results = int(total_no_results / total_queries * 100)
+        avg_query_time = round(metrics.query_log.tempo_resposta_total.mean(), 2)
 
         context = {
+            'start_date': start_date.strftime('%d/%m/%Y'),
+            'end_date': end_date.strftime('%d/%m/%Y'),
             'total_queries': total_queries,
             'avg_query_time': avg_query_time,
+            'total_no_clicks': total_no_clicks,
+            'total_no_results': total_no_results,
+            'porc_total_no_clicks': porc_total_no_clicks,
+            'porc_total_no_results': porc_total_no_results,
             'indices_info': indices_info,
             'indices_amounts': indices_amounts,
             'total_searches_per_day': {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},
