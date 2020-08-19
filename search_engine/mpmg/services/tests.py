@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-
+from mpmg.services.models import LogSearch, LogSearchClick
 from .elastic import Elastic
 
 # Create your tests here.
@@ -31,7 +31,7 @@ class SearchTests(TestCase):
 
     def test_query_request_logout(self):
         # GET request enquanto logged out.
-        response = self.client.get(reverse('services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
+        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
         
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -45,7 +45,7 @@ class SearchTests(TestCase):
     def test_query_request_login(self):
         # GET request enquanto logged in.
         user_login(self.client)
-        response = self.client.get(reverse('services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
+        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -59,7 +59,7 @@ class SearchTests(TestCase):
     def test_invalid_query(self):
         # GET request enquanto logged in.
         user_login(self.client)
-        response = self.client.get(reverse('services:search'), {'query': '', 'page': 1, 'sid': 'sid', 'qid': ''})
+        response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': 'sid', 'qid': ''})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -79,7 +79,7 @@ class DocumentTests(TestCase):
     def test_document_request_logout(self):
         # GET request enquanto logged out.
         document_id = get_any_id()
-        response = self.client.get(reverse('services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'})
+        response = self.client.get(reverse('mpmg.services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -95,7 +95,7 @@ class DocumentTests(TestCase):
         user_login(self.client)
         
         document_id = get_any_id()
-        response = self.client.get(reverse('services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'})
+        response = self.client.get(reverse('mpmg.services:document'), {'doc_type': 'diarios', 'doc_id': document_id, 'sid': '12345'})
 
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -117,7 +117,7 @@ class LoginTests(TestCase):
 
     def test_invalid_login(self):
         # POST request para logar com senha errada.
-        response = self.client.post(reverse('services:login'), {'username': 'testuser', 'password': '123'})
+        response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '123'})
     
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -131,7 +131,7 @@ class LoginTests(TestCase):
 
     def test_succesful_login(self):
         # POST request para logar com senha correta.
-        response = self.client.post(reverse('services:login'), {'username': 'testuser', 'password': '12345'})
+        response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '12345'})
     
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -145,10 +145,10 @@ class LoginTests(TestCase):
 
     def test_succesful_logout(self):
         # POST request para logar com senha correta.
-        response = self.client.post(reverse('services:login'), {'username': 'testuser', 'password': '12345'})
+        response = self.client.post(reverse('mpmg.services:login'), {'username': 'testuser', 'password': '12345'})
 
         # POST request para deslogar
-        response = self.client.post(reverse('services:logout'))
+        response = self.client.post(reverse('mpmg.services:logout'))
     
         # Checa por response 200 OK.
         self.assertEqual(response.status_code, 200)
@@ -171,10 +171,6 @@ class ElasticTests(TestCase):
         indices_list = ["diarios", "processos", "log_buscas", "log_clicks"]
         indices_exist = Elastic().es.indices.exists(index=indices_list)
         self.assertTrue(indices_exist)
-
-
-from .views import log_search_result
-from services.models import LogSearch, LogSearchClick
 
 
 class LogTests(TestCase):
