@@ -47,8 +47,6 @@ class CustomAdminSite(admin.AdminSite):
         # informação sobre os índices
         indices_info = ElasticModel.get_indices_info()
 
-        # users = User.objects.all()
-
         # dados para o gráfico de pizza com a qtde de documentos por índice
         searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
         colors = ['#ffcd56', # amarelo
@@ -69,6 +67,13 @@ class CustomAdminSite(admin.AdminSite):
         for k,v in mean_response_time.items():
             if k in response_time_per_day:
                 response_time_per_day[k] = v
+        
+        # join com usuários no dataframe
+        user_ids = metrics.query_log.id_usuario.unique()
+        users = {}
+        for user in User.objects.filter(id__in=user_ids):
+            users[user.id] = {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name}
+        metrics.query_log['nome_usuario'] = metrics.query_log['id_usuario'].apply(lambda i: users[i]['first_name'] if i in users else '')
         
         # Buscas por dia
         queries_list = metrics.query_log.fillna('-').sort_values(by='data_hora', ascending=False).to_dict('records')
