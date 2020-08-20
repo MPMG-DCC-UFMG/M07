@@ -1,6 +1,5 @@
 from mpmg.services.models.elastic_model import ElasticModel
 
-
 class LogSearch(ElasticModel):
     index_name = 'log_buscas'
 

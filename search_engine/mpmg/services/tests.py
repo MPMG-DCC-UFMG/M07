@@ -7,8 +7,8 @@ from .elastic import Elastic
 
 # Create your tests here.
 
-def get_any_id():
-    elastic_response = Elastic().es.search(index = "diarios", _source = False,\
+def get_any_id(index="diarios"):
+    elastic_response = Elastic().es.search(index = index, _source = False,\
             body = {
                 "size": 1, 
                 "query": {
@@ -176,33 +176,124 @@ class LogTests(TestCase):
     def setUp(self):
         # Every test needs a client.
         self.client = Client()
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save()
+        self.log_search = {
+                        'id_sessao': 'sid', 
+                        'id_consulta': 'test_query',
+                        'id_usuario': '',
+                        'text_consulta': 'maria',
+                        'algoritmo': '',
+                        'data_hora': 123,
+                        'tempo_resposta': 10,
+                        'documentos': ['a','b','c'],
+                        'pagina': 1,
+                        'resultados_por_pagina': 10
+                        }
+        self.log_click = {
+                        'item_id': 'test_item_id', 
+                        'rank_number': 1, 
+                        'item_type': 'test_type', 
+                        'qid': 'test_query',
+                        'page': 1
+                        }
+        self.log_click_id = get_any_id('log_clicks')
 
-    def test_log_search_result(self):
-        log_response = LogSearch().save(dict(
-                        id_sessao = "sid", 
-                        id_consulta = "test_query",
-                        id_usuario = "",
-                        text_consulta = "maria",
-                        algoritmo = "",
-                        data_hora = 123,
-                        tempo_resposta = 10,
-                        documentos = ["a","b","c"],
-                        pagina = 1,
-                        resultados_por_pagina = 10 ))
+    def test_post_log_search_result_logout(self):
+        # POST request enquanto logged out.
+        response = self.client.post(reverse('mpmg.services:log_search'), self.log_search)
 
-        self.assertTrue(len(log_response[1]) == 0)
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
 
-    def test_log_search_result_click(self):
-        log = {
-            'item_id': 'test_item_id', 
-            'rank_number': 1, 
-            'item_type': 'test_type', 
-            'qid': 'test_query',
-            'page': 1
-        }
-        response = LogSearchClick().save(log)
+    def test_post_log_search_result_login(self):
+        # POST request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.post(reverse('mpmg.services:log_search'), self.log_search,
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 200 OK.
+        self.assertEqual(response.status_code, 200)
+
+        # Response to JSON
+        response = response.json()
         
-        self.assertTrue(len(response[1]) == 0)
+        # Checa por success == True
+        self.assertTrue(response['success'])
+
+    def test_post_log_search_result_click_logout(self):
+        # POST request enquanto logged out.
+        response = self.client.post(reverse('mpmg.services:log_search_click'), self.log_click)
+
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
         
+    def test_post_log_search_result_click_login(self):
+        # POST request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.post(reverse('mpmg.services:log_search_click'), self.log_click,
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 200 OK.
+        self.assertEqual(response.status_code, 200)
+
+        # Response to JSON
+        response = response.json()
         
+        # Checa por success == True
+        self.assertTrue(response['success'])
+        
+    def test_get_log_search_result_logout(self):
+        # GET request enquanto logged out.
+        response = self.client.get(reverse('mpmg.services:log_search'), {'user_id': 1})
+
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_log_search_result_login(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:log_search'), {'user_id': 1},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 200 OK.
+        self.assertEqual(response.status_code, 200)
+
+        # Response to JSON
+        response = response.json()
+        
+        # Checa por resultado não vazio
+        self.assertIsNotNone(response['data'])
+
+    def test_get_log_search_result_click_logout(self):
+        # GET request enquanto logged out.
+        response = self.client.get(reverse('mpmg.services:log_search_click'), {'id_consultas': [self.log_click_id]})
+
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_log_search_result_click_login(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:log_search_click'), {'id_consultas': [self.log_click_id]},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 200 OK.
+        self.assertEqual(response.status_code, 200)
+
+        # Response to JSON
+        response = response.json()
+        
+        # Checa por resultado não vazio
+        self.assertIsNotNone(response['data'])
+    
+        
+class MetricTests(TestCase):
+    def setUp(self):
+        # Every test needs a client.
+        self.client = Client()
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save() 
 
