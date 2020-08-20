@@ -20,7 +20,7 @@ $(function(){
     var grafico_qtdes_indices = new Chart(qtdes_ctx, qtdes_config);
 
 
-    var num_buscas_ctx = $("#grafico-linha-num_buscas-dia").get(0).getContext("2d");
+    var num_buscas_ctx = $("#grafico-num-buscas-dia").get(0).getContext("2d");
     var num_buscas_config = {
         type: 'bar',
         data: {
@@ -45,6 +45,34 @@ $(function(){
         }
     }
     var grafico_num_buscas_dia = new Chart(num_buscas_ctx, num_buscas_config);
+
+
+    var response_time_ctx = $("#grafico-tempo-resposta").get(0).getContext("2d");
+    var response_time_config = {
+        type: 'line',
+        data: {
+            datasets: [
+                {label: 'Tempo de resposta',
+                data: response_time_per_day['data'],
+                borderColor: '#6ac472',
+                backgroundColor: '#b2e1b6',},
+            ],
+            labels: response_time_per_day['labels']
+        },
+        options: {
+            legend: false,
+            elements: {
+                point: {
+                    radius: 3,
+                    backgroundColor: "#000"
+                },
+                line: {
+                    tension: 0
+                }
+            },
+        }
+    }
+    var chart_response_time = new Chart(response_time_ctx, response_time_config);
 
 
     var no_clicks_ctx = $("#grafico-consultas-sem-clique").get(0).getContext("2d");

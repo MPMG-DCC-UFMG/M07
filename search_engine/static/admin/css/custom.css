@@ -63,6 +63,10 @@
     color: #ffc388;
 }
 
+.totals-icon.time{
+    color: #b2e1b6;
+}
+
 .last-queries-container table thead th{
     position: sticky;
     top: 0;

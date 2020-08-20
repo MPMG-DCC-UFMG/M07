@@ -9,6 +9,7 @@ var no_clicks_per_day = {{ no_clicks_per_day|safe }};
 var no_results_per_day = {{ no_results_per_day|safe }};
 var porc_no_clicks_per_day = {{ porc_no_clicks_per_day|safe }};
 var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
+var response_time_per_day = {{ response_time_per_day|safe }};
 </script>
 {% endblock %}
 {% block content %}
@@ -100,7 +101,7 @@ var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
                   <p class="mb-0 text-muted">média em segundos</p>
                 </div>
                 <div class="wrapper my-auto ml-auto ml-lg-4">
-                  <div class="totals-icon"><i class="far fa-clock"></i></div>
+                  <div class="totals-icon time"><i class="far fa-clock"></i></div>
                 </div>
               </div>
             </div>
@@ -116,36 +117,15 @@ var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
           <div class="card">
               <div class="card-body">
                     <h4 class="card-title">Número de Consultas</h4>
-                    <canvas id="grafico-linha-num_buscas-dia"></canvas>
+                    <canvas id="grafico-num-buscas-dia"></canvas>
               </div>
           </div>
       </div>
       <div class="col-md-6 grid-margin stretch-card">
           <div class="card">
               <div class="card-body">
-                  <h4 class="card-title">Últimas consultas</h4>
-                  <div class='last-queries-container'>
-                  <table id="las-queries" class="table table-striped">
-                      <thead>
-                          <tr>
-                              <th>Consulta</th>
-                              <th>Usuário</th>
-                              <th>Data</th>
-                              <th>Tempo<i class="far fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tempo de resposta em segundos"></i></th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          {% for item in last_queries %}
-                          <tr>
-                              <td>{{ item.text_consulta }}</td>
-                              <td>{{ item.id_usuario }}</td>
-                              <td>{{ item.data_hora|to_date|date:"d/m/Y G:i:s" }}</td>
-                              <td>{{ item.tempo_resposta_total|floatformat:2 }}</td>
-                          </tr>
-                          {% endfor %}
-                      </tbody>
-                  </table>
-                  </div>
+                  <h4 class="card-title">Tempo de resposta médio</h4>
+                  <canvas id="grafico-tempo-resposta"></canvas>
               </div>
           </div>
       </div>
@@ -167,6 +147,38 @@ var porc_no_results_per_day = {{ porc_no_results_per_day|safe }};
                 <canvas id="grafico-consultas-sem-resultado"></canvas>
             </div>
         </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+      <div class="card">
+          <div class="card-body">
+              <h4 class="card-title">Últimas consultas</h4>
+              <div class='last-queries-container'>
+              <table id="las-queries" class="table table-striped">
+                  <thead>
+                      <tr>
+                          <th>Consulta</th>
+                          <th>Usuário</th>
+                          <th>Data</th>
+                          <th>Tempo<i class="far fa-question-circle" data-toggle="tooltip" data-placement="top" title="Tempo de resposta em segundos"></i></th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      {% for item in last_queries %}
+                      <tr>
+                          <td>{{ item.text_consulta }}</td>
+                          <td>{{ item.id_usuario }}</td>
+                          <td>{{ item.data_hora|to_date|date:"d/m/Y G:i:s" }}</td>
+                          <td>{{ item.tempo_resposta_total|floatformat:2 }}</td>
+                      </tr>
+                      {% endfor %}
+                  </tbody>
+              </table>
+              </div>
+          </div>
+      </div>
     </div>
   </div>
 

@@ -51,13 +51,24 @@ class CustomAdminSite(admin.AdminSite):
 
         # dados para o gráfico de pizza com a qtde de documentos por índice
         searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
-        colors = ['#ffcd56', '#4bc0c0', '#ff9f40', '#36a2eb', '#ff6384']
+        colors = ['#ffcd56', # amarelo
+                  '#6ac472', # verde
+                  '#ff9f40', # laranja
+                  '#36a2eb', # azul
+                  '#ff6384'] # rosa
         indices_amounts = {'data':[], 'colors':[], 'labels':[]}
         for item in indices_info:
             if item['index_name'] in searchable_indices:
                 indices_amounts['data'].append(item['num_documents'])
                 indices_amounts['colors'].append(colors.pop())
                 indices_amounts['labels'].append(item['index_name'])
+        
+        # tempo de resposta médio por dia
+        mean_response_time = metrics.query_log.groupby(by='dia')['tempo_resposta_total'].mean().round(2).to_dict()
+        response_time_per_day = dict.fromkeys(days_labels, 0)
+        for k,v in mean_response_time.items():
+            if k in response_time_per_day:
+                response_time_per_day[k] = v
         
         # Buscas por dia
         queries_list = metrics.query_log.fillna('-').sort_values(by='data_hora', ascending=False).to_dict('records')
@@ -119,6 +130,7 @@ class CustomAdminSite(admin.AdminSite):
             'indices_info': indices_info,
             'indices_amounts': indices_amounts,
             'total_searches_per_day': {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},
+            'response_time_per_day': {'labels': list(response_time_per_day.keys()), 'data': list(response_time_per_day.values())},
             'last_queries': queries_list[:10],
             'no_clicks_per_day': {'labels': list(no_clicks_per_day.keys()), 'data': list(no_clicks_per_day.values())},
             'no_results_per_day': {'labels': list(no_results_per_day.keys()), 'data': list(no_results_per_day.values())},
