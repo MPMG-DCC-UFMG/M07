@@ -117,17 +117,27 @@ class LogQuerySuggestionClickView(APIView):
 
    
 
+from django.contrib.auth.models import User
+from ..elastic import Elastic
+class LogDataGeneratorView():
+    '''
+    Entre no shell do django: 
+        python manage.py shell
+    Execute:
+        from mpmg.services.views.log import *
+        LogDataGeneratorView().generate('01/08/2020', '25/08/2020')
+    '''
 
-
-class LogDataGeneratorView(APIView):
-
-    def get(self, request):
+    def generate(self, start_date, end_date):
         MAX_USERS = 10
         MAX_QUERIES_PER_DAY = 50
         POSSIBLE_QUERIES = ['Belo Horizonte', 'Uberlândia', 'Contagem', 'Juiz de Fora', 'Betim', 'Montes Claros', 'Ribeirão das Neves', 'Uberaba', 'Governador Valadares', 'Ipatinga', 'Sete Lagoas', 'Divinópolis', 'Santa Luzia', 'Ibirité', 'Poços de Caldas', 'Patos de Minas', 'Pouso Alegre', 'Teófilo Otoni', 'Barbacena', 'Sabará', 'Varginha', 'Conselheiro Lafaiete', 'Vespasiano', 'Itabira', 'Araguari', 'Ubá', 'Passos', 'Coronel Fabriciano', 'Muriaé', 'Araxá', 'Ituiutaba', 'Lavras', 'Nova Serrana', 'Itajubá', 'Nova Lima', 'Pará de Minas', 'Itaúna', 'Paracatu', 'Caratinga', 'Patrocínio', 'Manhuaçu', 'São João del Rei', 'Timóteo', 'Unaí', 'Curvelo', 'Alfenas', 'João Monlevade', 'Três Corações', 'Viçosa', 'Cataguases', 'Ouro Preto', 'Janaúba', 'São Sebastião do Paraíso', 'Esmeraldas', 'Januária', 'Formiga', 'Lagoa Santa', 'Pedro Leopoldo', 'Mariana', 'Ponte Nova', 'Frutal', 'Três Pontas', 'Pirapora', 'São Francisco', 'Congonhas', 'Campo Belo', 'Leopoldina', 'Lagoa da Prata', 'Guaxupé', 'Itabirito', 'Bom Despacho', 'Bocaiúva', 'Monte Carmelo', 'Diamantina', 'João Pinheiro', 'Santos Dumont', 'São Lourenço', 'Caeté', 'Santa Rita do Sapucaí', 'Igarapé', 'Visconde do Rio Branco', 'Machado', 'Almenara', 'Oliveira', 'Salinas', 'Andradas', 'Nanuque', 'Boa Esperança', 'Brumadinho', 'Arcos', 'Ouro Branco', 'Várzea da Palma', 'Iturama', 'Jaíba', 'Porteirinha', 'Matozinhos', 'Capelinha', 'Araçuaí', 'Extrema', 'São Gotardo',]
-        start_date = datetime.strptime(request.GET['start_date'], '%d/%m/%Y')
-        end_date = datetime.strptime(request.GET['end_date'], '%d/%m/%Y')
+        start_date = datetime.strptime(start_date, '%d/%m/%Y')
+        end_date = datetime.strptime(end_date, '%d/%m/%Y')
         document = Document()
+        user_ids = []
+        for user in User.objects.all():
+            user_ids.append(user.id)
 
         # num_days = (start_date - end_date).days
         current_date = start_date
@@ -163,7 +173,7 @@ class LogDataGeneratorView(APIView):
                 start = time.time()
 
                 sid = random.getrandbits(128)
-                id_usuario = random.randrange(MAX_USERS)+1
+                id_usuario = random.sample(user_ids, 1)[0]
 
                 query_timestamp = current_timestamp + random.randrange(60*60*23)*1000, # add some hours and minutes
                 query_timestamp = query_timestamp[0] # I dont know why, the operation above returns a tuple
@@ -214,6 +224,15 @@ class LogDataGeneratorView(APIView):
                 print(qid, q, len(documents)==0, clicked)
             
             current_date = current_date + timedelta(days=1)
+        print('Finished')
+    
+    def clear_logs(self):
+        elastic = Elastic()
+        s = elastic.dsl.Search(using=elastic.es, index=['log_buscas', 'log_clicks'])\
+            .update_from_dict({"query": {"match_all": {}}})
+        
+        response = s.delete()
+        print(response)
 
-
-        return Response({'response': 'ok'})
+# from mpmg.services.views.log import *
+# LogDataGeneratorView().clear_logs()

@@ -13,5 +13,4 @@ urlpatterns = [
     path('log_query_suggestion', views.LogQuerySuggestionView.as_view(), name='log_query_suggestion'),
     path('log_query_suggestion_click', views.LogQuerySuggestionClickView.as_view(), name='log_query_suggestion_click'),
     path('metrics', views.MetricsView.as_view(), name='metrics'),
-    path('generate_log_data', views.LogDataGeneratorView.as_view(), name='generate_log_data'),
 ]

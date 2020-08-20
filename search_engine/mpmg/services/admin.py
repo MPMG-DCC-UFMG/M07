@@ -62,21 +62,31 @@ class CustomAdminSite(admin.AdminSite):
                 indices_amounts['labels'].append(item['index_name'])
         
         # tempo de resposta médio por dia
-        mean_response_time = metrics.query_log.groupby(by='dia')['tempo_resposta_total'].mean().round(2).to_dict()
+        if len(metrics.query_log) > 0:
+            mean_response_time = metrics.query_log.groupby(by='dia')['tempo_resposta_total'].mean().round(2).to_dict()
+        else:
+            mean_response_time = {}
         response_time_per_day = dict.fromkeys(days_labels, 0)
         for k,v in mean_response_time.items():
             if k in response_time_per_day:
                 response_time_per_day[k] = v
         
+        
         # join com usuários no dataframe
-        user_ids = metrics.query_log.id_usuario.unique()
         users = {}
-        for user in User.objects.filter(id__in=user_ids):
-            users[user.id] = {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name}
-        metrics.query_log['nome_usuario'] = metrics.query_log['id_usuario'].apply(lambda i: users[i]['first_name'] if i in users else '')
+        if len(metrics.query_log) > 0:
+            user_ids = metrics.query_log.id_usuario.unique()
+            for user in User.objects.filter(id__in=user_ids):
+                users[user.id] = {'id': user.id, 'first_name': user.first_name, 'last_name': user.last_name}
+            metrics.query_log['nome_usuario'] = metrics.query_log['id_usuario'].apply(lambda i: users[i]['first_name'] if i in users else '')
+        else:
+            user_ids = []
         
         # Buscas por dia
-        queries_list = metrics.query_log.fillna('-').sort_values(by='data_hora', ascending=False).to_dict('records')
+        if len(metrics.query_log) > 0:
+            queries_list = metrics.query_log.fillna('-').sort_values(by='data_hora', ascending=False).to_dict('records')
+        else:
+            queries_list = []
         total_queries_per_day = dict.fromkeys(days_labels, 0)
         for item in queries_list:
             d = item['dia']
@@ -116,12 +126,20 @@ class CustomAdminSite(admin.AdminSite):
                 porc_no_results_per_day[d] = 0
         
         # totais
-        total_queries = metrics.query_log.id.value_counts().sum()
-        total_no_clicks = no_clicks['no_clicks_query']
-        total_no_results = no_results['no_results_query']
-        porc_total_no_clicks = int(total_no_clicks / total_queries * 100)
-        porc_total_no_results = int(total_no_results / total_queries * 100)
-        avg_query_time = round(metrics.query_log.tempo_resposta_total.mean(), 2)
+        if len(metrics.query_log) > 0:
+            total_queries = metrics.query_log.id.value_counts().sum()
+            total_no_clicks = no_clicks['no_clicks_query']
+            total_no_results = no_results['no_results_query']
+            porc_total_no_clicks = int(total_no_clicks / total_queries * 100)
+            porc_total_no_results = int(total_no_results / total_queries * 100)
+            avg_query_time = round(metrics.query_log.tempo_resposta_total.mean(), 2)
+        else:
+            total_queries = 0
+            total_no_clicks = 0
+            total_no_results = 0
+            porc_total_no_clicks = 0
+            porc_total_no_results = 0
+            avg_query_time = 0
 
         context = {
             'start_date': start_date.strftime('%d/%m/%Y'),
