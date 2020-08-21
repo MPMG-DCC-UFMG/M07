@@ -1,3 +1,4 @@
+import time
 from django.test import TestCase
 from django.test import Client
 from django.urls import reverse
@@ -199,6 +200,7 @@ class LogTests(TestCase):
                         'page': 1
                         }
         self.log_click_id = get_any_id('log_clicks')
+        self.current_time = int(time.time()*1000)
 
     def test_post_log_search_result_logout(self):
         # POST request enquanto logged out.
@@ -246,7 +248,7 @@ class LogTests(TestCase):
         
     def test_get_log_search_result_logout(self):
         # GET request enquanto logged out.
-        response = self.client.get(reverse('mpmg.services:log_search'), {'user_id': 1})
+        response = self.client.get(reverse('mpmg.services:log_search'), {'end_date': self.current_time})
 
         # Checa por response 401 Unauthorized.
         self.assertEqual(response.status_code, 401)
@@ -254,7 +256,7 @@ class LogTests(TestCase):
     def test_get_log_search_result_login(self):
         # GET request enquanto logged in.
         auth_token = get_auth_token(self.client)
-        response = self.client.get(reverse('mpmg.services:log_search'), {'user_id': 1},
+        response = self.client.get(reverse('mpmg.services:log_search'), {'end_date': self.current_time},
                                     HTTP_AUTHORIZATION='Token '+auth_token)
 
         # Checa por response 200 OK.
@@ -265,6 +267,10 @@ class LogTests(TestCase):
         
         # Checa por resultado não vazio
         self.assertIsNotNone(response['data'])
+
+    def test_get_log_search_result_start_end_dates(self):
+        #TODO: End date < Start date
+        pass
 
     def test_get_log_search_result_click_logout(self):
         # GET request enquanto logged out.
@@ -296,4 +302,49 @@ class MetricTests(TestCase):
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save() 
+        self.current_time = int(time.time()*1000)
 
+    def test_get_metric_logout(self):
+        # GET request enquanto logged out.
+        response = self.client.get(reverse('mpmg.services:metrics'), {'metrics': ['no_clicks_query', 'no_results_query'], 'end_date': self.current_time})
+
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_metric_login(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:metrics'), {'metrics': ['no_clicks_query', 'no_results_query'], 'end_date': self.current_time},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 200 OK.
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_metric_no_date_parameters(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:metrics'), {'metrics': ['no_clicks_query', 'no_results_query']}, 
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_metric_start_end_dates(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        print(self.current_time + 1)
+        print(self.current_time)
+        print(self.current_time + 1 < self.current_time)
+        response = self.client.get(reverse('mpmg.services:metrics'), {'metrics': ['no_clicks_query', 'no_results_query'],
+                                    'start_date': self.current_time + 1, 'end_date': self.current_time}, HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)
+
+class SuggestionTests(TestCase):
+    def setUp(self):
+        # Every test needs a client.
+        self.client = Client()
+        user = User.objects.create(username='testuser')
+        user.set_password('12345')
+        user.save() 

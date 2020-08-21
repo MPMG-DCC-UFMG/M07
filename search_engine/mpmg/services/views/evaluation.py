@@ -6,7 +6,7 @@ from ..metrics import Metrics
 
 
 class MetricsView(APIView):
-    # permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         start_date = request.GET.get('start_date', None)
@@ -15,6 +15,10 @@ class MetricsView(APIView):
 
         if start_date == None and end_date == None:
             data = {'message': 'Pelo menos uma data deve ser fornecida.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+        
+        if start_date >= end_date:
+            data = {'message': 'Data inicial deve ser anterior à data final.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         m = Metrics(start_date=start_date, end_date=end_date)
