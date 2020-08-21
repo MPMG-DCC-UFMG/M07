@@ -2,19 +2,23 @@ import pandas as pd
 import time
 from datetime import datetime
 import requests
-from mpmg.services.models import LogSearch, LogSearchClick
+from mpmg.services.models import LogSearch, LogSearchClick, LogSugestoes
 
 
 class Metrics:
     def __init__(self, start_date=None, end_date=None):
         self.start_date = start_date 
         self.end_date = end_date
-        self.query_log, self.click_log = self._get_logs()
+        self.query_log, self.click_log, self.sugestion_log = self._get_logs()
         
 
     def _get_logs(self):
         _, query_log = LogSearch.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
         query_log = pd.DataFrame.from_dict(query_log)
+        
+        _, sugestion_log = LogSugestoes.get_list_filtered(start_date=self.start_date, end_date=self.end_date)
+        sugestion_log = pd.DataFrame.from_dict(sugestion_log)
+
         # create columns to help on grouping
         if len(query_log) > 0:
             query_log['dia'] = query_log['data_hora'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
@@ -26,7 +30,7 @@ class Metrics:
         else:
             click_log = pd.DataFrame.from_dict({})
 
-        return query_log, click_log
+        return query_log, click_log, sugestion_log
     
 
     def no_clicks_query(self):
@@ -59,7 +63,7 @@ class Metrics:
     def avg_click_position(self):
         #media da posição dos clicks
         response = {
-            "avg_click_position": self.click_log['posicao'].mean()
+            "avg_click_position": self.click_log['posicao'].astype(int).mean()
         }
         return response
 
@@ -97,7 +101,7 @@ class Metrics:
         df['numero_termos'] = df['text_consulta'].apply(lambda x: len(x.replace('"', "").split(" ")))
         avg_times = df.groupby(by = ["algoritmo", "numero_termos", ], as_index =False)["tempo_resposta"].mean()
         response = {
-            "avg_response_time": df["tempo_resposta"].mean(),
+            "avg_response_time": df["tempo_resposta"].astype(int).mean(),
             "detailed": avg_times.to_dict(orient='records')
         }
         return response
@@ -120,29 +124,26 @@ class Metrics:
                 times.append(time_to_click)
 
         response = {
-            "avg_time_to_first_click": pd.Series(times).mean()
+            "avg_time_to_first_click": pd.Series(times).astype(int).mean()
         }
         return response
 
+    def avg_sugestions_click_position(self):
+        #media da posição dos clicks das sugestoes
+        response = {
+            "avg_sugestions_click_position": self.sugestion_log['posicao'].astype(int).mean()
+        }
+        return response
+    
+    def clicks_per_sugestion(self):
 
+        sugestions = self.sugestion_log[['sugestao', 'id']].groupby(by='sugestao', as_index = False).count().rename(index=str,columns={'id':'clicks'})
 
-    # def hist_clicks_per_position():
-        #     #histograma de clicks por posição
-        #     return 
+        response = {
+            "clicks_per_sugestion": sugestions.to_dict(orient='records')
+        }
+        return response
 
-#     #Using join operation - no sense, however it shows how to perform a join operation between both tables
-#     def no_clicks_query(self):
-#         #consultas sem nenhum click
-#         click_join_columns = ["id_documento", "id_consulta", "posicao", "timestamp", "tipo_documento", "pagina"]
-#         query_join_columns = ["id_consulta","pagina", "id_sessao", "id_usuario", "text_consulta", "data_hora", "tempo_resposta", "resultados_por_pagina"]
-#         query_clicks = self.click_log[click_join_columns].join(self.query_log[query_join_columns].set_index(["id_consulta", 'pagina']), on = ["id_consulta", 'pagina'])
-        
-#         unclicked_queries = []
-#         for i,row in self.query_log.iterrows():
-#             if row["id_consulta"] not in query_clicks["id_consulta"].drop_duplicates().to_list():
-#                 unclicked_queries.append(row.to_dict())
-#         response = {
-#             "total": len(unclicked_queries),
-#             "detailed": unclicked_queries
-#         }
-#         return response
+    
+
+   

@@ -22,10 +22,9 @@ def list_files(path):
 
 class Indexer:
     
-    def __init__(self):
+    def __init__(self, elastic_address = 'localhost:9200'):
 
-        config = json.load(open('../config.json'))
-        self.ELASTIC_ADDRESS = config['elasticsearch']['host'] + ":" + config['elasticsearch']['port']
+        self.ELASTIC_ADDRESS = elastic_address
         self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=120, max_retries=3, retry_on_timeout=True)
 
         csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))

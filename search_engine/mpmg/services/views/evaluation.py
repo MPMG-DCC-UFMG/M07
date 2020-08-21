@@ -6,7 +6,7 @@ from ..metrics import Metrics
 
 
 class MetricsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         start_date = request.GET.get('start_date', None)

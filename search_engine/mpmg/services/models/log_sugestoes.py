@@ -33,3 +33,39 @@ class LogSugestoes(ElasticModel):
         total = response[0]
         suggestions = [ hit['sugestao'] for hit in response[1]]
         return total, suggestions
+    
+    @staticmethod
+    def get_list_filtered(start_date=None, end_date=None, sugestao=None, page='all'):
+        query_param = {
+            "bool": {
+                "must": []
+            }
+        }
+        
+        if sugestao:
+            query_param["bool"]["must"].append({
+                "term": {
+                    "text_consulta": sugestao
+
+                }
+            })
+
+        if start_date:
+            query_param["bool"]["must"].append({
+                "range": {
+                    "timestamp": {
+                        "gte": start_date
+                    }
+                }
+            })
+
+        if end_date:
+            query_param["bool"]["must"].append({
+                "range": {
+                    "timestamp": {
+                        "lte": end_date
+                    }
+                }
+            })
+
+        return LogSugestoes.get_list(query=query_param, page=page)

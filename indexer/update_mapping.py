@@ -12,6 +12,7 @@ def main(args):
     update_settings = []
 
     mappings_path = args["mappings_path"]
+    elastic_address = args["elastic_address"]
     if args["force_reindexation"] != None:
         force_reindexation = args["force_reindexation"]
     if args["update_settings"] != None:
@@ -21,16 +22,16 @@ def main(args):
             update_settings.remove(i)
 
     if not os.path.isdir("indices"):
-            os.mkdir("indices")
-            print("Created new directory: indexer/indices")
+        os.mkdir("indices")
+        print("Created new directory: indexer/indices")
 
-    es = Elasticsearch()
+    es = Elasticsearch([elastic_address])
     settings = json.load(open('additional_settings.json'))
     updated_mappings = json.load(open(mappings_path))
     local_indices = [index for index in updated_mappings.keys() if es.indices.exists(index)]
     local_mappings = es.indices.get_mapping(local_indices)
     
-    csv_indexer = indexer.Indexer()
+    csv_indexer = indexer.Indexer(elastic_address = elastic_address)
     for index in updated_mappings.keys():
         print("Checking " + index + "...")
         
@@ -68,11 +69,12 @@ def main(args):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Verifica se o indice sofreu alguma alteracao e, nesse caso,\
-    cria o indice novamente com o dado mapping. Força update dos settings dos dados indices.')
+            cria o indice novamente com o dado mapping. Força update dos settings dos dados indices.')
     
     parser.add_argument("-force_reindexation", nargs='+', help="List of indices to force reindexation")
     parser.add_argument("-update_settings", nargs='+', help="List of indices to force settings update")
-    parser.add_argument("-mappings_path",default="mappings.json", help="Path of the mappings json file that will be used")#TODO: Add this arg in the docs
+    parser.add_argument("-mappings_path", default="mappings.json", help="Path of the mappings json file that will be used")#TODO: Add this arg in the docs
+    parser.add_argument("-elastic_address", default="localhost:9200", help="Elasticsearch address. Format: <ip>:<port>")#TODO: Add this arg in the docs
 
     # Get all args
     args = vars(parser.parse_args())
