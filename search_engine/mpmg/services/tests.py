@@ -269,8 +269,22 @@ class LogTests(TestCase):
         self.assertIsNotNone(response['data'])
 
     def test_get_log_search_result_start_end_dates(self):
-        #TODO: End date < Start date
-        pass
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:log_search'), {'start_date': self.current_time + 1, 'end_date': self.current_time},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)
+
+    def test_get_log_search_result_no_parameters(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:log_search'), 
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)
 
     def test_get_log_search_result_click_logout(self):
         # GET request enquanto logged out.
@@ -332,9 +346,6 @@ class MetricTests(TestCase):
     def test_get_metric_start_end_dates(self):
         # GET request enquanto logged in.
         auth_token = get_auth_token(self.client)
-        print(self.current_time + 1)
-        print(self.current_time)
-        print(self.current_time + 1 < self.current_time)
         response = self.client.get(reverse('mpmg.services:metrics'), {'metrics': ['no_clicks_query', 'no_results_query'],
                                     'start_date': self.current_time + 1, 'end_date': self.current_time}, HTTP_AUTHORIZATION='Token '+auth_token)
 
@@ -348,3 +359,36 @@ class SuggestionTests(TestCase):
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save() 
+
+    def test_get_suggestion_logout(self):
+        # GET request enquanto logged out.
+        response = self.client.get(reverse('mpmg.services:query_suggestion'), {'query': 'maria'})
+
+        # Checa por response 401 Unauthorized.
+        self.assertEqual(response.status_code, 401)
+
+    def test_get_suggestion_login(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        response = self.client.get(reverse('mpmg.services:query_suggestion'), {'query': 'maria'},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+
+        # Checa por response 200 OK.
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_suggestion_empty_query(self):
+        # GET request enquanto logged in.
+        auth_token = get_auth_token(self.client)
+        # Primeiro caso: sem passar 'query'
+        response = self.client.get(reverse('mpmg.services:query_suggestion'), 
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+                  
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)
+
+        # Segundo caso: passando query vazia
+        response = self.client.get(reverse('mpmg.services:query_suggestion'), {'query': ''},
+                                    HTTP_AUTHORIZATION='Token '+auth_token)
+                  
+        # Checa por response 400 Bad Request.
+        self.assertEqual(response.status_code, 400)

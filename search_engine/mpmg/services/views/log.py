@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import random
 import string
 import hashlib
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -19,8 +20,12 @@ class LogSearchView(APIView):
         page = request.GET.get('page', 'all')
 
         if user_id == None and start_date == None and end_date == None:
-            response = "Error: At least one parameter must be given."
-            return Response({"response": response})
+            data = {'message': 'Pelo menos um parâmetro deve ser fornecido.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
+        elif start_date and end_date and start_date >= end_date:
+            data = {'message': 'Data inicial deve ser anterior à data final.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
         log_list = LogSearch.get_list_filtered(
             id_usuario=user_id, start_date=start_date, end_date=end_date, page=page)

@@ -17,7 +17,7 @@ class MetricsView(APIView):
             data = {'message': 'Pelo menos uma data deve ser fornecida.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
         
-        if start_date >= end_date:
+        elif start_date and end_date and start_date >= end_date:
             data = {'message': 'Data inicial deve ser anterior à data final.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 

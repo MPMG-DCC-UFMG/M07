@@ -4,12 +4,17 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from mpmg.services.models import LogSearch
+from rest_framework import status
 
 class QuerySuggestionView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
-        query = request.GET['query']
+        query = request.GET.get('query', None)
+        if not query or len(query) < 1:
+            data = {'message': 'Termo de consulta inválido.'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
+
         total, search_response = LogSearch.get_suggestions(query)
         processed_suggestions = []
         if total>0:
