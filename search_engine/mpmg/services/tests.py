@@ -41,7 +41,7 @@ class SearchTests(TestCase):
 
     def test_query_request_logout(self):
         # GET request enquanto logged out.
-        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''})
+        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': '123456789'})
         
         # Checa por response 401 Unauthorized.
         self.assertEqual(response.status_code, 401)
@@ -50,7 +50,7 @@ class SearchTests(TestCase):
     def test_query_request_login(self):
         # GET request enquanto logged in.
         auth_token = get_auth_token(self.client)
-        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': 'sid', 'qid': ''}, 
+        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': '123456789'}, 
                                     HTTP_AUTHORIZATION='Token '+auth_token)
         
         # Checa por response 200 OK.
@@ -65,7 +65,7 @@ class SearchTests(TestCase):
     def test_invalid_query(self):
         # GET request enquanto logged in.
         auth_token = get_auth_token(self.client)
-        response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': 'sid', 'qid': ''},
+        response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': '123456789'},
                                     HTTP_AUTHORIZATION='Token '+auth_token)
 
         # Checa por response 400 Bad Request.
@@ -180,17 +180,23 @@ class LogTests(TestCase):
         user = User.objects.create(username='testuser')
         user.set_password('12345')
         user.save()
+        self.current_time = int(time.time()*1000)
         self.log_search = {
-                        'id_sessao': 'sid', 
+                        'id_sessao': '123456789', 
                         'id_consulta': 'test_query',
-                        'id_usuario': '',
+                        'id_usuario': 1,
                         'text_consulta': 'maria',
-                        'algoritmo': '',
-                        'data_hora': 123,
-                        'tempo_resposta': 10,
-                        'documentos': ['a','b','c'],
+                        'algoritmo': 'BM25',
+                        'data_hora': self.current_time,
+                        'tempo_resposta': 1.0,
                         'pagina': 1,
-                        'resultados_por_pagina': 10
+                        'resultados_por_pagina': 10,
+                        'documentos': ['a','b','c'],
+                        'tempo_resposta_total': 1.0,
+                        'indices':'',
+                        'instancias': '',
+                        'data_inicial': '',
+                        'data_final': '',
                         }
         self.log_click = {
                         'item_id': 'test_item_id', 
@@ -200,7 +206,6 @@ class LogTests(TestCase):
                         'page': 1
                         }
         self.log_click_id = get_any_id('log_clicks')
-        self.current_time = int(time.time()*1000)
 
     def test_post_log_search_result_logout(self):
         # POST request enquanto logged out.

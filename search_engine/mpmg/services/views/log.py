@@ -45,14 +45,19 @@ class LogSearchView(APIView):
         response = LogSearch().save(dict(
             id_sessao=request.POST['id_sessao'],
             id_consulta=request.POST['id_consulta'],
-            id_usuario=request.POST['id_usuario'],
+            id_usuario=int(request.POST['id_usuario']),
             text_consulta=request.POST['text_consulta'],
             algoritmo=request.POST['algoritmo'],
-            data_hora=request.POST['data_hora'],
-            tempo_resposta=request.POST['tempo_resposta'],
-            pagina=request.POST['pagina'],
-            resultados_por_pagina=request.POST['resultados_por_pagina'],
-            documentos=request.POST['documentos']
+            data_hora=int(request.POST['data_hora']),
+            tempo_resposta=float(request.POST['tempo_resposta']),
+            pagina=int(request.POST['pagina']),
+            resultados_por_pagina=int(request.POST['resultados_por_pagina']),
+            documentos=request.POST.getlist('documentos'),
+            tempo_resposta_total=float(request.POST['tempo_resposta_total']),
+            indices=request.POST.getlist('indices'),
+            instancias=request.POST.getlist('instancias'),
+            data_inicial=request.POST['data_inicial'],
+            data_final=request.POST['data_final'],
         ))
 
         if len(response[1]) == 0:
@@ -130,6 +135,7 @@ class LogDataGeneratorView():
         python manage.py shell
     Execute:
         from mpmg.services.views.log import *
+        LogDataGeneratorView().clear_logs() # caso queira deletar os logs existentes
         LogDataGeneratorView().generate('01/08/2020', '25/08/2020')
     '''
 
@@ -238,6 +244,3 @@ class LogDataGeneratorView():
         
         response = s.delete()
         print(response)
-
-# from mpmg.services.views.log import *
-# LogDataGeneratorView().clear_logs()
