@@ -1,0 +1,32 @@
+{% extends "./base.html" %}
+{% load static %}
+{% load custom_tags %}
+{% block content %}
+<div class="content-wrapper">
+    <div class="row page-title-header">
+        <div class="col-12">
+            <div class="page-header">
+                <h4 class="page-title">Configurações</h4>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 grid-margin">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Algoritmo de Busca</h4>
+                    <form action="{% url 'admin:save_config' %}" method="post">
+                        {% csrf_token %}
+                        {{ form.as_p }}
+                        <div class="row justify-content-end">
+                            <div class="pr-3">
+                                <button class="btn btn-primary" type="submit">Salvar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock%}

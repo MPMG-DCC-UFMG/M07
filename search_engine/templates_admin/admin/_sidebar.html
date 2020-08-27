@@ -30,7 +30,7 @@
             <div class="collapse" id="ui-basic">
             <ul class="nav flex-column sub-menu">
                 <li class="nav-item">
-                <a class="nav-link" href="/admin/log_search">Consultas</a>
+                <a class="nav-link" href="{% url 'admin:log_search' %}">Consultas</a>
                 </li>
                 <li class="nav-item">
                 <a class="nav-link" href="#">Cliques</a>
@@ -48,6 +48,12 @@
             <a class="nav-link" href="pages/charts/chartjs.html">
             <i class="menu-icon typcn typcn-th-large-outline"></i>
             <span class="menu-title">Métricas</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'admin:config' %}">
+            <i class="menu-icon typcn typcn-th-large-outline"></i>
+            <span class="menu-title" >Configurações</span>
             </a>
         </li>
     </ul>

@@ -5,3 +5,4 @@ from .log_sugestoes import LogSugestoes
 from .diario import Diario
 from .processo import Processo
 from .document import Document
+from .config import Config
