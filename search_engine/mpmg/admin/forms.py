@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 from django.forms import ModelChoiceField
-from .models import Config
+from ..services.models import Config
 
 class ConfigForm(ModelForm):
     def __init__(self, *args, **kwargs):

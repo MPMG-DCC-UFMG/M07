@@ -6,14 +6,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import Group, User
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.conf import settings
-from mpmg.services.models import LogSearch
-from mpmg.services.models import ElasticModel
+from ..services.models import LogSearch
+from ..services.models.elastic_model import ElasticModel
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User
 import pandas as pd
-from .metrics import Metrics
+from ..services.metrics import Metrics
 from .forms import ConfigForm
-from .elastic import Elastic
+from ..services.elastic import Elastic
 import requests
 
 
