@@ -15,6 +15,7 @@ from ..services.metrics import Metrics
 from .forms import ConfigForm
 from ..services.elastic import Elastic
 import requests
+from .config import ConfigView
 
 
 class CustomAdminSite(admin.AdminSite):
@@ -28,8 +29,8 @@ class CustomAdminSite(admin.AdminSite):
         urls = super(CustomAdminSite, self).get_urls()
         my_urls = [
             path('log_search/', self.admin_view(self.view_log_search), name='log_search'),
-            path('config/', self.admin_view(self.view_config), name='config'),
-            path('save_config/', self.admin_view(self.view_save_config), name='save_config'),
+            path('config/', self.admin_view(ConfigView().view_config), name='config'),
+            path('save_config/', self.admin_view(ConfigView().view_save_config), name='save_config'),
         ]
         return my_urls + urls
     
@@ -226,28 +227,6 @@ class CustomAdminSite(admin.AdminSite):
         )
         
         return render(request, 'admin/log_search.html', context)
-
-    def view_config(self, request):
-        es = Elastic()
-        current_algo = es.get_cur_algo()
-        form = ConfigForm(initial={'algorithm': current_algo})
-
-        context = dict(
-            self.each_context(request), # Include common variables for rendering the admin template.
-            form = form,
-        )
-        
-        return render(request, 'admin/config.html', context)
-
-    def view_save_config(self, request):
-        # TODO: Enviar requests pro ES pra realmente efetivar as mudanças escolhidas
-        algorithm = request.POST['algorithm']
-
-        context = dict(
-            self.each_context(request), # Include common variables for rendering the admin template.
-        )
-        
-        return redirect(reverse('admin:config'))
 
 custom_admin_site = CustomAdminSite()
 
