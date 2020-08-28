@@ -41,8 +41,19 @@ class Indexer:
             line = dict(line)
             doc = {}
             for field in columns:
-                if line[field]!= '':
-                    doc[field] = line[field]
+                if line[field] == '':
+                    continue
+                
+                field_name = field
+                field_type = None
+                if len(field.split(":")) > 1:
+                    field_name = field.split(":")[0]
+                    field_type = field.split(":")[-1]
+                
+                if field_type == "list":
+                    doc[field_name] = eval(line[field])
+                else:
+                    doc[field_name] = line[field]
             
             yield {
                 "_index": index,
