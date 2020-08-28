@@ -20,6 +20,7 @@ import requests
 class CustomAdminSite(admin.AdminSite):
 
     def __init__(self):
+        self.results_per_page = 10
         super(CustomAdminSite, self).__init__()
 
   
@@ -147,53 +148,81 @@ class CustomAdminSite(admin.AdminSite):
             porc_total_no_results = 0
             avg_query_time = 0
 
-        context = {
-            'start_date': start_date.strftime('%d/%m/%Y'),
-            'end_date': end_date.strftime('%d/%m/%Y'),
-            'total_queries': total_queries,
-            'avg_query_time': avg_query_time,
-            'total_no_clicks': total_no_clicks,
-            'total_no_results': total_no_results,
-            'porc_total_no_clicks': porc_total_no_clicks,
-            'porc_total_no_results': porc_total_no_results,
-            'indices_info': indices_info,
-            'indices_amounts': indices_amounts,
-            'total_searches_per_day': {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},
-            'response_time_per_day': {'labels': list(response_time_per_day.keys()), 'data': list(response_time_per_day.values())},
-            'last_queries': queries_list[:10],
-            'no_clicks_per_day': {'labels': list(no_clicks_per_day.keys()), 'data': list(no_clicks_per_day.values())},
-            'no_results_per_day': {'labels': list(no_results_per_day.keys()), 'data': list(no_results_per_day.values())},
-            'porc_no_clicks_per_day': {'labels': list(porc_no_clicks_per_day.keys()), 'data': list(porc_no_clicks_per_day.values())},
-            'porc_no_results_per_day': {'labels': list(porc_no_results_per_day.keys()), 'data': list(porc_no_results_per_day.values())},
-        }
+        context = dict(
+            self.each_context(request), # admin variables
+            start_date= start_date.strftime('%d/%m/%Y'),
+            end_date= end_date.strftime('%d/%m/%Y'),
+            total_queries= total_queries,
+            avg_query_time= avg_query_time,
+            total_no_clicks= total_no_clicks,
+            total_no_results= total_no_results,
+            porc_total_no_clicks= porc_total_no_clicks,
+            porc_total_no_results= porc_total_no_results,
+            indices_info= indices_info,
+            indices_amounts= indices_amounts,
+            total_searches_per_day= {'labels': list(total_queries_per_day.keys()), 'data': list(total_queries_per_day.values())},
+            response_time_per_day= {'labels': list(response_time_per_day.keys()), 'data': list(response_time_per_day.values())},
+            last_queries= queries_list[:10],
+            no_clicks_per_day= {'labels': list(no_clicks_per_day.keys()), 'data': list(no_clicks_per_day.values())},
+            no_results_per_day= {'labels': list(no_results_per_day.keys()), 'data': list(no_results_per_day.values())},
+            porc_no_clicks_per_day= {'labels': list(porc_no_clicks_per_day.keys()), 'data': list(porc_no_clicks_per_day.values())},
+            porc_no_results_per_day= {'labels': list(porc_no_results_per_day.keys()), 'data': list(porc_no_results_per_day.values())},
+        )
         return render(request, 'admin/index.html', context)
     
 
     def view_log_search(self, request):
-        id_sessao = request.GET.get('id_sessao', None)
-        id_consulta = request.GET.get('id_consulta', None)
-        id_usuario = request.GET.get('id_usuario', None)
-        text_consulta = request.GET.get('text_consulta', None)
-        page = request.GET.get('page', 1)
+        id_sessao = request.GET.get('id_sessao', '')
+        id_consulta = request.GET.get('id_consulta', '')
+        id_usuario = request.GET.get('id_usuario', '')
+        text_consulta = request.GET.get('text_consulta', '')
+        algoritmo = request.GET.get('algoritmo', '')
+        page = int(request.GET.get('page', 1))
+        start_date = request.GET.get('start_date', '')
+        end_date = request.GET.get('end_date', '')
+        tempo = request.GET.get('tempo', '')
+        tempo_op = request.GET.get('tempo_op')
 
         total_records, log_buscas_list = LogSearch.get_list_filtered(
             id_sessao=id_sessao,
             id_consulta=id_consulta,
             id_usuario=id_usuario,
             text_consulta=text_consulta,
+            algoritmo=algoritmo,
             page=page, 
+            start_date=start_date,
+            end_date=end_date,
+            tempo=tempo,
+            tempo_op=tempo_op,
             sort={'data_hora':{'order':'desc'}}
         )
 
+        total_pages = (total_records // self.results_per_page) + 1
+
+        url_params = "&id_sessao=%s&id_consulta=%s&id_usuario=%s"\
+                    "&text_consulta=%s&algoritmo=%s&start_date=%s"\
+                    "&end_date=%s&tempo=%s&tempo_op=%s"\
+                    % (id_sessao, id_consulta, id_usuario,\
+                    text_consulta, algoritmo, start_date, end_date, tempo, tempo_op)
+
         context = dict(
-            self.each_context(request), # Include common variables for rendering the admin template.
+            self.each_context(request), # admin template variables.
             id_sessao=id_sessao,
             id_consulta=id_consulta,
             id_usuario=id_usuario,
             text_consulta=text_consulta,
+            algoritmo=algoritmo,
+            start_date=start_date,
+            end_date=end_date,
+            tempo=tempo,
+            tempo_op=tempo_op,
+            result_list=log_buscas_list,
             page=page,
             total_records=total_records,
-            result_list=log_buscas_list,
+            results_per_page=self.results_per_page,
+            total_pages=total_pages,
+            pagination_items=range(min(9, total_pages)),
+            url_params=url_params,
         )
         
         return render(request, 'admin/log_search.html', context)

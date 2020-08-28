@@ -1,3 +1,4 @@
+from datetime import datetime
 from mpmg.services.models.elastic_model import ElasticModel
 
 class LogSearch(ElasticModel):
@@ -28,12 +29,28 @@ class LogSearch(ElasticModel):
 
     
     @staticmethod
-    def get_list_filtered(id_sessao=None, id_consulta=None, id_usuario=None, text_consulta=None, start_date=None, end_date=None, page='all', sort=None):
+    def get_list_filtered(id_sessao=None, id_consulta=None, id_usuario=None, text_consulta=None, algoritmo=None, start_date=None, end_date=None, page='all', tempo=None, tempo_op=None, sort=None):
         query_param = {
             "bool": {
                 "must": []
             }
         }
+
+        if id_sessao:
+            query_param["bool"]["must"].append({
+                "term": {
+                    "id_sessao": id_sessao
+
+                }
+            })
+        
+        if id_consulta:
+            query_param["bool"]["must"].append({
+                "term": {
+                    "id_consulta": id_consulta
+
+                }
+            })
 
         if id_usuario:
             query_param["bool"]["must"].append({
@@ -50,8 +67,21 @@ class LogSearch(ElasticModel):
 
                 }
             })
+        
+        if algoritmo:
+            query_param["bool"]["must"].append({
+                "term": {
+                    "algoritmo": algoritmo
+
+                }
+            })
 
         if start_date:
+            if type(start_date) == str: # de string para datetime
+                start_date = datetime.strptime(start_date, '%d/%m/%Y')
+            if type(start_date) == datetime: # de datetime para milisegundos
+                start_date = int(datetime(year=start_date.year, month=start_date.month, day=start_date.day).timestamp() * 1000)
+
             query_param["bool"]["must"].append({
                 "range": {
                     "data_hora": {
@@ -61,6 +91,11 @@ class LogSearch(ElasticModel):
             })
 
         if end_date:
+            if type(end_date) == str: # de string para datetime
+                end_date = datetime.strptime(end_date, '%d/%m/%Y')
+            if type(end_date) == datetime: # de datetime para milisegundos
+                end_date = int(datetime(year=end_date.year, month=end_date.month, day=end_date.day).timestamp() * 1000)
+
             query_param["bool"]["must"].append({
                 "range": {
                     "data_hora": {
@@ -68,6 +103,22 @@ class LogSearch(ElasticModel):
                     }
                 }
             })
+        
+        if tempo and tempo_op:
+            if tempo_op == 'e':
+                    query_param["bool"]["must"].append({
+                    "term": {
+                        "tempo_resposta_total": tempo
+                    }
+                })
+            else:
+                query_param["bool"]["must"].append({
+                    "range": {
+                        "tempo_resposta_total": {
+                            tempo_op: tempo
+                        }
+                    }
+                })
 
         return LogSearch.get_list(query=query_param, page=page, sort=sort)
 

@@ -1482,22 +1482,22 @@ pre {
   .table td {
     padding: 12px 15px;
     vertical-align: top;
-    border-top: 1px solid #dee2e6; }
+    border-top: 1px solid #999; }
   .table thead th {
     vertical-align: bottom;
-    border-bottom: 2px solid #dee2e6; }
+    border-bottom: 2px solid #999; }
   .table tbody + tbody {
-    border-top: 2px solid #dee2e6; }
+    border-top: 2px solid #999; }
 
 .table-sm th,
 .table-sm td {
   padding: 0.3rem; }
 
 .table-bordered {
-  border: 1px solid #dee2e6; }
+  border: 1px solid #999; }
   .table-bordered th,
   .table-bordered td {
-    border: 1px solid #dee2e6; }
+    border: 1px solid #999; }
   .table-bordered thead th,
   .table-bordered thead td {
     border-bottom-width: 2px; }
