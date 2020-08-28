@@ -233,20 +233,20 @@
                     }
                 },
                 "pagina": {
-                    "type": "long"
+                    "type": "integer"
                 },
                 "resultados_por_pagina": {
-                    "type": "long"
+                    "type": "integer"
                 },
                 "tempo_resposta": {
-                    "type": "long"
+                    "type": "float"
                 },
                 "text_consulta": {
                     "type": "search_as_you_type",
                     "max_shingle_size": 3
                 },
                 "tempo_resposta_total": {
-                    "type": "long"
+                    "type": "float"
                 },
                 "indices": {
                     "type": "text",
