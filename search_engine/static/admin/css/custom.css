@@ -82,6 +82,10 @@
     margin-bottom: 20px;
 }
 
+.sidebar .nav-item.active .nav-link{
+    background-color: #0f25d5 !important;
+}
+
 .form-control{
     border: 1px solid #999;
 }

@@ -3,7 +3,7 @@
     <div class="sidebar-title">Áduna Admin</div>
     <ul class="nav">
         <li class="nav-item nav-category">Menu Principal</li>
-        <li class="nav-item">
+        <li class="nav-item {% if request.resolver_match.view_name == 'admin:index' %}active{%endif%}">
                 <a class="nav-link" href="{% url 'admin:index' %}">
                     <i class="menu-icon typcn typcn-document-text"></i>
                     <span class="menu-title">Dashboard</span>
@@ -22,14 +22,14 @@
             {% endfor %}
         {% endfor %}
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
+            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="{% if request.resolver_match.view_name in 'admin:log_search' %}true{% else %}false{%endif%}" aria-controls="ui-basic">
             <i class="menu-icon typcn typcn-coffee"></i>
             <span class="menu-title">Logs</span>
             <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="ui-basic">
+            <div class="collapse {% if request.resolver_match.view_name in 'admin:log_search' %}show{%endif%}" id="ui-basic">
             <ul class="nav flex-column sub-menu">
-                <li class="nav-item">
+                <li class="nav-item {% if request.resolver_match.view_name == 'admin:log_search' %}active{%endif%}">
                 <a class="nav-link" href="{% url 'admin:log_search' %}">Consultas</a>
                 </li>
                 <li class="nav-item">
@@ -39,18 +39,18 @@
             </div>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="pages/forms/basic_elements.html">
+            <a class="nav-link" href="#">
             <i class="menu-icon typcn typcn-shopping-bag"></i>
             <span class="menu-title">Rankings</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="pages/charts/chartjs.html">
+            <a class="nav-link" href="#">
             <i class="menu-icon typcn typcn-th-large-outline"></i>
             <span class="menu-title">Métricas</span>
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {% if request.resolver_match.view_name == 'admin:config' %}active{%endif%}">
             <a class="nav-link" href="{% url 'admin:config' %}">
             <i class="menu-icon typcn typcn-th-large-outline"></i>
             <span class="menu-title" >Configurações</span>
