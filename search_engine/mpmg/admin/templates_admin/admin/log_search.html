@@ -15,7 +15,8 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Filtro</h4>
-                    <form method="get">
+                    <form id="log-search-form" method="get">
+                        <input type="hidden" name='results_per_page' value="{{ results_per_page }}" data-no-reset />
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
@@ -76,7 +77,7 @@
                         </div>
                         <div class="row justify-content-end">
                             <div class="pr-3">
-                                <button class="btn btn-secondary" type="button">Limpar</button>
+                                <button class="btn btn-secondary clear-form" type="button">Limpar</button>
                                 <button class="btn btn-primary" type="submit">Filtrar</button>
                             </div>
                         </div>
@@ -96,11 +97,11 @@
                         </div>
                         <div class="col text-right">
                             Registros por página:  
-                            <select>
-                                <option value="10">10</option>
-                                <option value="30">30</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
+                            <select class='results-per-page' data-target-form="log-search-form">
+                                <option value="10"  {% if results_per_page == 10 %}selected="selected"{% endif %}>10</option>
+                                <option value="30"  {% if results_per_page == 30 %}selected="selected"{% endif %}>30</option>
+                                <option value="50"  {% if results_per_page == 50 %}selected="selected"{% endif %}>50</option>
+                                <option value="100" {% if results_per_page == 100 %}selected="selected"{% endif %}>100</option>
                             </select>
                         </div>
                     </div>

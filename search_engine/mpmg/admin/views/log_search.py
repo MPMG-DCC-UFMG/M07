@@ -9,6 +9,7 @@ class LogSearchView(admin.AdminSite):
         super(LogSearchView, self).__init__()
     
     def view_log_search(self, request):
+        results_per_page = int(request.GET.get('results_per_page', self.results_per_page))
         id_sessao = request.GET.get('id_sessao', '')
         id_consulta = request.GET.get('id_consulta', '')
         id_usuario = request.GET.get('id_usuario', '')
@@ -19,7 +20,9 @@ class LogSearchView(admin.AdminSite):
         end_date = request.GET.get('end_date', '')
         tempo = request.GET.get('tempo', '')
         tempo_op = request.GET.get('tempo_op')
+        self.results_per_page = results_per_page
 
+        LogSearch.results_per_page = self.results_per_page
         total_records, log_buscas_list = LogSearch.get_list_filtered(
             id_sessao=id_sessao,
             id_consulta=id_consulta,

@@ -45,5 +45,24 @@ return datepicker.regional[ "pt-BR" ];
 $(function(){
     
     $('.datepicker').datepicker();
-    $('[data-toggle="tooltip"]').tooltip({boundary:"viewport"});
+	$('[data-toggle="tooltip"]').tooltip({boundary:"viewport"});
+	
+	$('.results-per-page').change(function(){
+		var targetForm = $(this).data('target-form');
+		var selectedValue = $(this).val();
+		$('#'+targetForm).find('input[name=results_per_page]').val(selectedValue);
+		$('#'+targetForm).submit();
+	});
+
+	$('.clear-form').click(function(){
+		var formObj = $(this).parents('form');
+		formObj.find('input,select').each(function(i){
+			if($(this).attr('data-no-reset') == undefined){
+				if($(this).prop("tagName") == "INPUT")
+					$(this).val("")
+				else if($(this).prop("tagName") == "SELECT")
+					$(this)[0].selectedIndex = 0;
+			}
+		});
+	});
 });
