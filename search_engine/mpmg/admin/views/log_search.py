@@ -21,7 +21,7 @@ class LogSearchView(admin.AdminSite):
         tempo = request.GET.get('tempo', '')
         tempo_op = request.GET.get('tempo_op')
         self.results_per_page = results_per_page
-
+        print(request.GET)
         LogSearch.results_per_page = self.results_per_page
         total_records, log_buscas_list = LogSearch.get_list_filtered(
             id_sessao=id_sessao,

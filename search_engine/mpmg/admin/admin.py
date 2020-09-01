@@ -18,6 +18,7 @@ class AdunaAdmin(admin.AdminSite):
         new_urls = [
             path('', self.admin_view(DashboardView().view_dashboard), name='index'),
             path('log_search/', self.admin_view(LogSearchView().view_log_search), name='log_search'),
+            path('log_click/', self.admin_view(LogSearchClickView().view_log_click), name='log_search_click'),
             path('config/', self.admin_view(ConfigView().view_config), name='config'),
             path('save_config/', self.admin_view(ConfigView().view_save_config), name='save_config'),
         ]

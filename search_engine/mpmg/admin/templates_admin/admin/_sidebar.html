@@ -22,18 +22,18 @@
             {% endfor %}
         {% endfor %}
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="{% if request.resolver_match.view_name in 'admin:log_search' %}true{% else %}false{%endif%}" aria-controls="ui-basic">
+            <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="{% if request.resolver_match.view_name in 'admin:log_search,admin:log_search_click' %}true{% else %}false{%endif%}" aria-controls="ui-basic">
             <i class="menu-icon typcn typcn-coffee"></i>
             <span class="menu-title">Logs</span>
             <i class="menu-arrow"></i>
             </a>
-            <div class="collapse {% if request.resolver_match.view_name in 'admin:log_search' %}show{%endif%}" id="ui-basic">
+            <div class="collapse {% if request.resolver_match.view_name in 'admin:log_search,admin:log_search_click' %}show{%endif%}" id="ui-basic">
             <ul class="nav flex-column sub-menu">
                 <li class="nav-item {% if request.resolver_match.view_name == 'admin:log_search' %}active{%endif%}">
-                <a class="nav-link" href="{% url 'admin:log_search' %}">Consultas</a>
+                <a class="nav-link" href="{% url 'admin:log_search' %}">Buscas</a>
                 </li>
-                <li class="nav-item">
-                <a class="nav-link" href="#">Cliques</a>
+                <li class="nav-item {% if request.resolver_match.view_name == 'admin:log_search_click' %}active{%endif%}">
+                <a class="nav-link" href="{% url 'admin:log_search_click' %}">Cliques em Buscas</a>
                 </li>
             </ul>
             </div>
