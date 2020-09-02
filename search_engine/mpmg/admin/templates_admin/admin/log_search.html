@@ -107,7 +107,7 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <table class="table table-striped table-bordered">
+                            <table id="log-search-table" class="table table-striped table-bordered results-table">
                                 <thead>
                                     <tr>
                                         <th>ID Sessão</th>
@@ -121,7 +121,7 @@
                                 </thead>
                                 <tbody>
                                 {% for item in result_list %}
-                                    <tr>
+                                    <tr data-id-sessao="{{ item.id_sessao }}">
                                         <td><span>{{ item.id_sessao }}</span></td>
                                         <td>{{ item.id_consulta }}</td>
                                         <td>{{ item.id_usuario }}</td>
@@ -148,4 +148,40 @@
         </div>
     </div>
 </div>
+
+<div id="log-search-detail" class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title"><b>Sessão <span class="detalhe-id-sessao"></span></b></h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <b>Usuário: </b><span class="detalhe-nome-usuario"></span>
+            <br><br>
+            <h4><b>Consultas efetuadas:</b></h4>
+            <div class="detalhe-consultas"></div>
+        </div>
+        <div id="detalhe-template-consulta" class="invisible">
+            <div class="detalhe-item-consulta">
+                <span class="detalhe-texto-consulta" style="font-size: 20px;"></span><br>
+                <p><b>ID da Consulta: </b><span class="detalhe-id-consulta"></span></p>
+                <p><b>Algoritmo:</b><span class="detalhe-algoritmo"></span></p>
+                <div class="detalhe-paginas"></div>
+            </div>
+            <div class="detalhe-item-pagina">
+                <p>Página <span class="detalhe-numero-pagina"></span>:</p>
+                <p><b>Data:</b><span class="detalhe-data-hora"></span></p>
+                <p><b>Tempo de resposta:</b><span class="detalhe-tempo-resposta"></span></p>
+                <p><b>Documentos:</b><br><span class="detalhe-documentos"></span></p>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock%}

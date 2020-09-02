@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.shortcuts import render
+from django.http import JsonResponse
 from mpmg.services.models import LogSearch
 
 class LogSearchView(admin.AdminSite):
@@ -21,7 +22,7 @@ class LogSearchView(admin.AdminSite):
         tempo = request.GET.get('tempo', '')
         tempo_op = request.GET.get('tempo_op')
         self.results_per_page = results_per_page
-        print(request.GET)
+        
         LogSearch.results_per_page = self.results_per_page
         total_records, log_buscas_list = LogSearch.get_list_filtered(
             id_sessao=id_sessao,
@@ -66,3 +67,28 @@ class LogSearchView(admin.AdminSite):
         )
         
         return render(request, 'admin/log_search.html', context)
+    
+
+    def view_detail(self, request):
+        id_sessao = request.GET['id_sessao']
+        num_results, results_list = LogSearch.get_list_filtered(id_sessao=id_sessao)
+        
+        session_detail = {'id_sessao':'', 'id_usuario':'', 'consultas':{}}
+        for item in results_list:
+            session_detail['id_sessao'] = item.id_sessao
+            session_detail['id_usuario'] = item.id_usuario
+
+            if item.id_consulta not in session_detail['consultas']:
+                session_detail['consultas'][item.id_consulta] = {
+                'text_consulta': item.text_consulta,
+                'algoritmo': item.algoritmo,
+                'paginas': {}
+                }
+            session_detail['consultas'][item.id_consulta]['paginas'][str(item.pagina)] = {
+                'data_hora': item.data_hora,
+                'tempo_resposta_total': item.tempo_resposta_total,
+                'documentos': item.documentos
+            }
+
+        context = dict(session_detail=session_detail)
+        return JsonResponse(context)        

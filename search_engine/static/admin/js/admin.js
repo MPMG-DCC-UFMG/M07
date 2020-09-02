@@ -65,4 +65,42 @@ $(function(){
 			}
 		});
 	});
+
+	$('#log-search-table tr').click(function(){
+		var id_sessao = $(this).data('id-sessao');
+		$('.detalhe-consultas').html('')
+		var ajax = $.get('/admin/log_search_detail/?id_sessao='+id_sessao)
+		ajax.done(function(response){
+			response = response['session_detail'];
+			$('.detalhe-id-sessao').html(id_sessao);
+			$('.detalhe-nome-usuario').html(response['id_usuario']);
+
+			for(var id_consulta in response['consultas']){
+				var template_consulta = $($("#detalhe-template-consulta .detalhe-item-consulta").get(0).outerHTML);
+				template_consulta.find('.detalhe-id-consulta').html(id_consulta);
+				template_consulta.find('.detalhe-texto-consulta').html(response['consultas'][id_consulta]['text_consulta']);
+				template_consulta.find('.detalhe-algoritmo').html(response['consultas'][id_consulta]['algoritmo']);
+
+				for(var num_pagina in response['consultas'][id_consulta]['paginas']){
+					var template_pagina = $($("#detalhe-template-consulta .detalhe-item-pagina").get(0).outerHTML);
+					template_pagina.find('.detalhe-numero-pagina').html(num_pagina);
+					template_pagina.find('.detalhe-data-hora').html(response['consultas'][id_consulta]['paginas'][num_pagina]['data_hora']);
+					template_pagina.find('.detalhe-tempo-resposta').html(response['consultas'][id_consulta]['paginas'][num_pagina]['tempo_resposta_total']);
+					for(var i=0; i<response['consultas'][id_consulta]['paginas'][num_pagina]['documentos'].length; i++){
+						var doc_id = response['consultas'][id_consulta]['paginas'][num_pagina]['documentos'][i];
+						template_pagina.find('.detalhe-documentos').append(doc_id+'<br>');
+					}
+					template_consulta.find('.detalhe-paginas').append(template_pagina);
+				}
+
+				$('.detalhe-consultas').append(template_consulta);
+			}
+		});
+		
+		ajax.fail(function(){
+			console.log('falha');
+		});
+
+		$('#log-search-detail').modal();
+	});
 });
