@@ -7,7 +7,8 @@ class ConfigForm(ModelForm):
         super().__init__(*args, **kwargs)
         # self.fields['algorithm'].widget.attrs.update({'required': True})
         self.fields['algorithm'].label = 'Algoritmo'
+        self.fields['num_repl'].label = 'Replicas por índice'
 
     class Meta:
         model = Config
-        fields = ['algorithm']
+        fields = ['algorithm', 'num_repl', 'max_result_window']

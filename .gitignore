@@ -23,15 +23,17 @@ db.sqlite3
 db.sqlite3-journal
 search_engine/db.sqlite3
 search_engine/mpmg/settings.py
-## Django-Jenkins reports
+
+# Django-Jenkins reports
 reports
 
-
-
-# Virstual env
+# Virtual env
 search_engine/env/
 
 # Extensions
 *.sqlite3
 *.ipynb
 *.xml
+
+# VS Code
+.vscode
