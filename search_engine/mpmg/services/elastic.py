@@ -17,10 +17,20 @@ class Elastic:
         for index in settings.SEARCHABLE_INDICES.keys():
             resp = self.es.indices.get_settings(index=index, name='*sim*')
             try:
-                sim = resp[index]['settings']['index']['similarity']['my_similarity']['type']
+                sim = resp[index]['settings']['index']['similarity']['default']['type']
             except:
                 sim = "BM25" # Default value
         return sim
+
+    def set_cur_algo(self):
+        for index in settings.SEARCHABLE_INDICES.keys():
+            self.es.indices.close(index)
+            try:
+                resp = self.es.indices.put_settings(body={'similarity': {'default': {'type': 'DFR', 'basic_model': 'g', 'after_effect': 'l', 'normalization': 'h2', 'normalization.h2.c': '3.0'}}}, index=index)
+            except:
+                print('Não foi possível alterar o algoritmo de ranqueamento para o índice {}'.format(index))
+            self.es.indices.open(index)
+        return resp
 
     def get_cur_replicas(self):
         for index in settings.SEARCHABLE_INDICES.keys():
@@ -28,7 +38,7 @@ class Elastic:
             try:
                 num_repl = resp[index]['settings']['index']['number_of_replicas']
             except:
-                print('Não foi possível encontrar o número de replicas para o indice {}'.format(index))
+                print('Não foi possível encontrar o número de replicas para o índice {}'.format(index))
         return num_repl
     
     def set_cur_replicas(self, value):
@@ -36,7 +46,7 @@ class Elastic:
             try:
                 resp = self.es.indices.put_settings(body={'number_of_replicas': value}, index=index)
             except:
-                print('Não foi possível atualizar o número de replicas para o indice {}'.format(index))
+                print('Não foi possível atualizar o número de replicas para o índice {}'.format(index))
         return resp
 
     def get_max_result_window(self):
@@ -54,6 +64,6 @@ class Elastic:
             try:
                 resp = self.es.indices.put_settings(body={'max_result_window': value}, index=index)
             except:
-                print('Não foi possível atualizar o <i>max_result_window</i> para o indice {}'.format(index))
+                print('Não foi possível atualizar o <i>max_result_window</i> para o índice {}'.format(index))
         return resp
     
