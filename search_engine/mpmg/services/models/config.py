@@ -3,7 +3,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 class Config(models.Model):
     ALGORITHMS = (
-        ('BM25', 'Okapi BM-25'),
+        ('BM25', 'Okapi BM25'),
         ('DFR', 'Divergence from Randomness (DFR)'),
         ('DFI', 'Divergence from Independence (DFI)'),
         ('LMD', 'LM Dirichlet'),
