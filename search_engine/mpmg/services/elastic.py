@@ -39,16 +39,18 @@ class Elastic:
     def set_cur_algo(self, algo, **kwargs):
         for index in settings.SEARCHABLE_INDICES.keys():
             cur_settings = self.es.indices.get_settings(index=index, name='*sim*')
-            # É necessário "limpar" as configurações de similaridade já definidas anteriormente
-            # Para tal, o ES requer que definamos todas as configurações (e apenas elas) já atribuídas a 
-            # outros modelos como null.
             body = {'similarity': {'default': {}}}
-            for setting, value in cur_settings[index]['settings']['index']['similarity']['default'].items():
-                if type(value) == dict:
-                    for sub_setting in value.keys():
-                        body['similarity']['default']['{}.{}'.format(setting, sub_setting)] = None
-                else:
-                    body['similarity']['default'][setting] = None
+            
+            if cur_settings: 
+                # Se houver configuração prévia, é necessário "limpar" as configurações de similaridade 
+                # já definidas anteriormente. Para tal, o ES requer que definamos todas as configurações
+                # (e apenas elas) já atribuídas a outros modelos como null.
+                for setting, value in cur_settings[index]['settings']['index']['similarity']['default'].items():
+                    if type(value) == dict:
+                        for sub_setting in value.keys():
+                            body['similarity']['default']['{}.{}'.format(setting, sub_setting)] = None
+                    else:
+                        body['similarity']['default'][setting] = None
 
             body['similarity']['default']['type'] = algo
             if algo == 'BM25':

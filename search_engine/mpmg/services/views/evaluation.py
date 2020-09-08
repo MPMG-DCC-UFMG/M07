@@ -21,6 +21,11 @@ class MetricsView(APIView):
             data = {'message': 'Data inicial deve ser anterior à data final.'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
 
+        if start_date:
+            start_date = int(start_date)
+        if end_date:
+            end_date = int(end_date)
+
         m = Metrics(start_date=start_date, end_date=end_date)
 
         callable_funcs = []
