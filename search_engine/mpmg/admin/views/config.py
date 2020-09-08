@@ -28,11 +28,10 @@ class ConfigView(admin.AdminSite):
         return render(request, 'admin/config.html', context)
 
     def view_save_config(self, request):
-        # TODO: Salvar algoritmo escolhido
-        algorithm = request.POST['algorithm']
+        algo = request.POST['algorithm']
         num_repl = request.POST['num_repl']
         max_result_window = request.POST['max_result_window']
-        self.es.set_cur_algo()
+        self.es.set_cur_algo(algo)
         self.es.set_cur_replicas(num_repl)
         self.es.set_max_result_window(max_result_window)
         context = dict(
