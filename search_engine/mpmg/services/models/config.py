@@ -6,7 +6,9 @@ class Config(models.Model):
         ('BM25', 'Okapi BM25'),
         ('DFR', 'Divergence from Randomness (DFR)'),
         ('DFI', 'Divergence from Independence (DFI)'),
-        ('LMD', 'LM Dirichlet'),
+        ('IB', 'Information based model'),
+        ('LMDirichlet', 'Language Model: Dirichlet priors'),
+        ('LMJelinekMercer', 'Language Model: Jelinek-Mercer smoothing method'),
     )
     algorithm = models.CharField(max_length=50, choices=ALGORITHMS, blank=False, default='BM25')
     num_repl = models.PositiveSmallIntegerField(default=1, validators=[MaxValueValidator(50), MinValueValidator(0)])

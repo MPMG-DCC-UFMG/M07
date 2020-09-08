@@ -40,6 +40,8 @@ class Elastic:
         for index in settings.SEARCHABLE_INDICES.keys():
             cur_settings = self.es.indices.get_settings(index=index, name='*sim*')
             # É necessário "limpar" as configurações de similaridade já definidas anteriormente
+            # Para tal, o ES requer que definamos todas as configurações (e apenas elas) já atribuídas a 
+            # outros modelos como null.
             body = {'similarity': {'default': {}}}
             for setting, value in cur_settings[index]['settings']['index']['similarity']['default'].items():
                 if type(value) == dict:
@@ -83,11 +85,39 @@ class Elastic:
                 independence_measure = kwargs.get('independence_measure', 'standardized')
                 body['similarity']['default']['independence_measure'] = independence_measure
 
+            elif algo == 'IB':
+                distribution = kwargs.get('distribution', 'll')
+                lamb = kwargs.get('lambda', 'df')
+                normalization = kwargs.get('normalization', 'h2')
+
+                body['similarity']['default']['distribution'] = distribution
+                body['similarity']['default']['lambda'] = lamb
+                body['similarity']['default']['normalization'] = normalization
+
+                # Regularization parameter
+                parameter = 'c'
+                default_param_value = '1.0'
+                if normalization == 'h3':
+                    default_param_value = '800.0'
+                elif normalization == 'z':
+                    parameter = 'z'
+                    default_param_value = '0.3'
+
+                normalization_param = kwargs.get('normalization_param', default_param_value)
+                body['similarity']['default']['normalization.{}.{}'.format(normalization, parameter)] = normalization_param
+
+            elif algo == 'LMDirichlet':
+                mu = kwargs.get('mu', '2000.0')
+                body['similarity']['default']['mu'] = mu
+
+            elif algo == 'LMJelinekMercer':
+                lamb = kwargs.get('lambda', '0.1')
+                body['similarity']['default']['lambda'] = lamb
+
             else:
                 print('Algoritmo de ranqueamento inválido para o índice {}'.format(index))
-
+            
             try:
-            # print(body)
                 resp = self.close_then_modify(index, body)
             except:
                 traceback.print_exc(file=sys.stdout)
