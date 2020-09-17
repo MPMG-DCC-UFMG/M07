@@ -104,3 +104,30 @@ $(function(){
 		$('#log-search-detail').modal();
 	});
 });
+	
+function get_algo_options(){
+	var selected_algo = $('#id_algorithm').val().toLowerCase();
+	$( "#id_algorithm" ).children('option').each(function( index ) {
+		var algo = $( this ).val().toLowerCase();
+		var elements_by_class = $('.' + algo);
+		$.each(elements_by_class, function() {
+			var cur_id = $( this ).attr('id');
+			if (algo == selected_algo) { // Mostrar opções
+				$('#' + cur_id).show();
+				$( "label[for='" + cur_id + "']").show();
+			}
+			else { // Esconder opções
+				$('#' + cur_id).hide();
+				$( "label[for='" + cur_id + "']").hide();
+			}
+		});
+	});
+};
+
+$(function(){
+	get_algo_options();
+  
+	$('#id_algorithm').change(function(){
+		get_algo_options();
+	});
+});
