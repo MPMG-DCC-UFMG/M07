@@ -114,11 +114,14 @@ function get_algo_options(){
 			var cur_id = $( this ).attr('id');
 			if (algo == selected_algo) { // Mostrar opções
 				$('#' + cur_id).show();
+				$('#' + cur_id)[0].disabled = false;
 				$( "label[for='" + cur_id + "']").show();
 			}
 			else { // Esconder opções
+				$('#' + cur_id)[0].disabled = true;
 				$('#' + cur_id).hide();
 				$( "label[for='" + cur_id + "']").hide();
+				
 			}
 		});
 	});
