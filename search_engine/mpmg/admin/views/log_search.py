@@ -1,7 +1,9 @@
+from datetime import datetime
 from django.contrib import admin
 from django.shortcuts import render
 from django.http import JsonResponse
-from mpmg.services.models import LogSearch
+from django.contrib.auth.models import User
+from mpmg.services.models import LogSearch, LogSearchClick
 
 class LogSearchView(admin.AdminSite):
 
@@ -72,23 +74,35 @@ class LogSearchView(admin.AdminSite):
     def view_detail(self, request):
         id_sessao = request.GET['id_sessao']
         num_results, results_list = LogSearch.get_list_filtered(id_sessao=id_sessao)
-        
-        session_detail = {'id_sessao':'', 'id_usuario':'', 'consultas':{}}
+        id_consultas = set()
+        session_detail = {'id_sessao':'', 'id_usuario':'', 'nome_usuario':'', 'consultas':{}}
         for item in results_list:
             session_detail['id_sessao'] = item.id_sessao
             session_detail['id_usuario'] = item.id_usuario
-
+            session_detail['nome_usuario'] = User.objects.get(id=item.id_usuario).first_name
+            id_consultas.add(item.id_consulta)
+            
             if item.id_consulta not in session_detail['consultas']:
                 session_detail['consultas'][item.id_consulta] = {
                 'text_consulta': item.text_consulta,
                 'algoritmo': item.algoritmo,
+                'resultados_por_pagina': int(item.resultados_por_pagina),
                 'paginas': {}
                 }
             session_detail['consultas'][item.id_consulta]['paginas'][str(item.pagina)] = {
-                'data_hora': item.data_hora,
-                'tempo_resposta_total': item.tempo_resposta_total,
-                'documentos': item.documentos
+                'data_hora': (datetime.fromtimestamp(item.data_hora/1000)).strftime("%d/%m/%Y %H:%M:%S"),
+                'tempo_resposta_total': round(item.tempo_resposta_total, 2),
+                'tipos': [d.split(':')[0] for d in item.documentos],
+                'documentos': [d.split(':')[1] for d in item.documentos],
+                'cliques': ['-'] * len(item.documentos)
             }
+        
+        num_click_results, click_results_list = LogSearchClick.get_list_filtered(id_consultas=list(id_consultas))
+        for item in click_results_list:
+            resultados_por_pagina = session_detail['consultas'][item.id_consulta]['resultados_por_pagina']
+            posicao = int(item.posicao) - ((int(item.pagina)-1) * resultados_por_pagina) #desconta as páginas anteriores pra ter uma posição entre 1 a 10
+            posicao = posicao - 1 # os índices do array começam no zero
+            session_detail['consultas'][item.id_consulta]['paginas'][str(item.pagina)]['cliques'][posicao] = (datetime.fromtimestamp(item.timestamp/1000)).strftime("%H:%M:%S")
 
         context = dict(session_detail=session_detail)
         return JsonResponse(context)        

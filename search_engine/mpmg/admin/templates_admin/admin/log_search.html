@@ -164,19 +164,59 @@
             <h4><b>Consultas efetuadas:</b></h4>
             <div class="detalhe-consultas"></div>
         </div>
-        <div id="detalhe-template-consulta" class="invisible">
-            <div class="detalhe-item-consulta">
-                <span class="detalhe-texto-consulta" style="font-size: 20px;"></span><br>
-                <p><b>ID da Consulta: </b><span class="detalhe-id-consulta"></span></p>
-                <p><b>Algoritmo:</b><span class="detalhe-algoritmo"></span></p>
-                <div class="detalhe-paginas"></div>
-            </div>
-            <div class="detalhe-item-pagina">
-                <p>Página <span class="detalhe-numero-pagina"></span>:</p>
-                <p><b>Data:</b><span class="detalhe-data-hora"></span></p>
-                <p><b>Tempo de resposta:</b><span class="detalhe-tempo-resposta"></span></p>
-                <p><b>Documentos:</b><br><span class="detalhe-documentos"></span></p>
-            </div>
+        <div id="detalhe-template-consulta" class="d-none">
+            <table class="detalhe-item-consulta">
+                <thead>
+                    <tr><th class="detalhe-texto-consulta"></th></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="row">
+                                <div class="col-md-auto"><b>ID da Consulta: </b><span class="detalhe-id-consulta"></span></div>
+                                <div class="col-md-auto"><b>Algoritmo:</b><span class="detalhe-algoritmo"></span></div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <nav>
+                                <div class="nav nav-tabs" role="tablist">
+                                  <a class="nav-item nav-link active" data-toggle="tab" href="" role="tab" aria-controls="nav-home" aria-selected="true">Página <span class="detalhe-numero-pagina">1</span></a>
+                                </div>
+                            </nav>
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="nav-home-tab">
+                                    <div class="row">
+                                        <div class="col-md-auto"><b>Data:</b> <span class="detalhe-data-hora"></span></div>
+                                        <div class="col"><b>Tempo de resposta:</b> <span class="detalhe-tempo-resposta"></span></div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col">
+                                            <b>Documentos:</b><br>
+                                            <table class="table table-striped detalhe-documentos">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Tipo</th>
+                                                        <th>ID Documento</th>
+                                                        <th>Clicado?</th>
+                                                        <th>Visualizar</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
