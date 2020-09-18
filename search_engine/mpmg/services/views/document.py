@@ -13,7 +13,6 @@ class DocumentView(APIView):
             self.searchable_indexes[k] = eval(v)
 
     def get(self, request):
-        sid = request.GET['sid']
         doc_type = request.GET['doc_type']
         doc_id = request.GET['doc_id']
         

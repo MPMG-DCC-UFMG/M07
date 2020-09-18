@@ -43,7 +43,7 @@ class SearchView(APIView):
                 algoritmo = self.algoritmo,
                 data_hora = self.data_hora,
                 tempo_resposta = response_time,
-                documentos = [ i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
+                documentos = [ i['type']+':'+i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
                 pagina = self.page,
                 resultados_por_pagina = self.results_per_page,
                 tempo_resposta_total = time.time() - start,

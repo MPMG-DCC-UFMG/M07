@@ -94,3 +94,65 @@
     background-color: #bbb;
     cursor: pointer;
 }
+
+#log-search-detail .modal-lg{
+    max-width: 800px;
+}
+
+#log-search-detail .modal-content{
+    background-color: transparent;
+}
+
+#log-search-detail .modal-body, #log-search-detail .modal-footer{
+    background-color: white;
+}
+
+#log-search-detail .modal-header{
+    background-color: #4066aa;
+    color: white;
+}
+
+#log-search-detail .modal-header .close{
+    padding: 2rem 2rem;
+    color: white;
+    opacity: 1;
+}
+
+.detalhe-item-consulta{
+    width: 100%;
+    border: 1px solid #adadad;
+}
+
+.detalhe-item-consulta>thead  th{
+    background-color: #6495ed;
+    color: white;
+    font-size: 22px;
+    padding: 6px;
+}
+
+.detalhe-item-consulta td{
+    padding: 6px;
+}
+
+.detalhe-item-consulta .nav-tabs{
+    border-color: #adadad;
+}
+
+.detalhe-item-consulta .nav-tabs .nav-link.active{
+    border-color: #adadad #adadad #fff;
+}
+
+.detalhe-item-consulta .tab-content{
+    border: 1px solid #adadad;
+    border-top-width: 0;
+    padding: 12px;
+}
+
+.detalhe-item-consulta .detalhe-documentos th{
+    text-align: center;
+}
+
+.detalhe-item-consulta .detalhe-documentos th:nth-child(2),
+.detalhe-item-consulta .detalhe-documentos th:nth-child(3){
+    text-align: left;
+}

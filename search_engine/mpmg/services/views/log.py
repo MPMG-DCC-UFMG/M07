@@ -207,7 +207,7 @@ class LogDataGeneratorView():
                     algoritmo = 'BM25',
                     data_hora = query_timestamp,
                     tempo_resposta = took,
-                    documentos = [ i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
+                    documentos = [ i.type+':'+i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
                     pagina = 1,
                     resultados_por_pagina = 10,
                     tempo_resposta_total = time.time() - start

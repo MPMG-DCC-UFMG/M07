@@ -16,7 +16,6 @@ def index(request):
     
     context = {
         'user_name': request.session.get('user_info')['first_name'],
-        'sid': request.session.session_key,
         'services_url': settings.SERVICES_URL,
         'auth_token': request.session.get('auth_token'),
     }
@@ -29,8 +28,8 @@ def search(request):
     
     headers = {'Authorization': 'Token '+request.session.get('auth_token')}
 
+    sid = request.session.session_key
     query = request.GET['query']
-    sid = request.GET['sid']
     qid = request.GET.get('qid', '')
     page = int(request.GET.get('page', 1))
     instances = request.GET.getlist('instance', [])
@@ -90,12 +89,13 @@ def search(request):
         return render(request, 'aduna/search.html', context)
     
 
-def document(request, doc_type, doc_id, sid):
+def document(request, doc_type, doc_id):
     if not request.session.get('auth_token'):
         return redirect('/aduna/login')
     
     headers = {'Authorization': 'Token '+request.session.get('auth_token')}
-    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id': doc_id, 'sid': sid}, headers=headers)
+    sid = request.session.session_key
+    service_response = requests.get(settings.SERVICES_URL+'document', {'doc_type': doc_type, 'doc_id': doc_id}, headers=headers)
 
     if service_response.status_code == 401:
         request.session['auth_token'] = None
@@ -108,8 +108,7 @@ def document(request, doc_type, doc_id, sid):
         document['conteudo'] = re.sub('(<br>){3,}', '<br>', document['conteudo'])
         context = {
             'user_name': request.session.get('user_info')['first_name'],
-            'document': document,
-            'sid': sid
+            'document': document
         }
         return render(request, 'aduna/document.html', context)
 
