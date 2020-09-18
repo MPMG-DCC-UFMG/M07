@@ -53,7 +53,7 @@ class Config(models.Model):
     # BM25 parameters
     k1 = models.CharField(max_length=10, default='1.2')
     b = models.CharField(max_length=10, default='0.75')
-    discount_overlaps = models.BooleanField(default=True)
+    discount_overlaps = models.CharField(max_length=10, default='True', choices=(('true', 'True'), ('false', 'False')))
     # DFR parameters
     basic_model = models.CharField(max_length=10, choices=BASIC_MODELS, blank=False, default='g')
     after_effect = models.CharField(max_length=10, choices=AFTER_EFFECTS, blank=False, default='b')

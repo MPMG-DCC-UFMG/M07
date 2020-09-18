@@ -31,10 +31,10 @@ class Elastic:
         for index in settings.SEARCHABLE_INDICES.keys():
             resp = self.es.indices.get_settings(index=index, name='*sim*')
             try:
-                sim = resp[index]['settings']['index']['similarity']['default']['type']
+                sim_settings = resp[index]['settings']['index']['similarity']['default']
             except:
-                sim = "BM25" # Default value
-        return sim
+                sim_settings = {'type': 'BM25'} # Default value
+        return sim_settings
 
     def set_cur_algo(self, **kwargs):
         algo = kwargs.get('algorithm')
@@ -57,7 +57,7 @@ class Elastic:
             if algo == 'BM25':
                 k1 = kwargs.get('k1', '1.2')
                 b = kwargs.get('b', '0.75')
-                discount_overlaps = kwargs.get('discount_overlaps', False)
+                discount_overlaps = kwargs.get('discount_overlaps', 'true')
 
                 body['similarity']['default']['k1'] = k1
                 body['similarity']['default']['b'] = b
@@ -73,16 +73,17 @@ class Elastic:
                 body['similarity']['default']['normalization'] = normalization
                 
                 # Regularization parameter
-                parameter = 'c'
-                default_param_value = '1.0'
-                if normalization == 'h3':
-                    default_param_value = '800.0'
-                elif normalization == 'z':
-                    parameter = 'z'
-                    default_param_value = '0.3'
+                if normalization != 'no':
+                    parameter = 'c'
+                    default_param_value = '1.0'
+                    if normalization == 'h3':
+                        default_param_value = '800.0'
+                    elif normalization == 'z':
+                        parameter = 'z'
+                        default_param_value = '0.3'
 
-                normalization_param = kwargs.get('normalization_parameter_dfr', default_param_value)
-                body['similarity']['default']['normalization.{}.{}'.format(normalization, parameter)] = normalization_param
+                    normalization_param = kwargs.get('normalization_parameter_dfr', default_param_value)
+                    body['similarity']['default']['normalization.{}.{}'.format(normalization, parameter)] = normalization_param
 
             elif algo == 'DFI':
                 independence_measure = kwargs.get('independence_measure', 'standardized')
@@ -98,16 +99,17 @@ class Elastic:
                 body['similarity']['default']['normalization'] = normalization
 
                 # Regularization parameter
-                parameter = 'c'
-                default_param_value = '1.0'
-                if normalization == 'h3':
-                    default_param_value = '800.0'
-                elif normalization == 'z':
-                    parameter = 'z'
-                    default_param_value = '0.3'
+                if normalization != 'no':
+                    parameter = 'c'
+                    default_param_value = '1.0'
+                    if normalization == 'h3':
+                        default_param_value = '800.0'
+                    elif normalization == 'z':
+                        parameter = 'z'
+                        default_param_value = '0.3'
 
-                normalization_param = kwargs.get('normalization_parameter_ib', default_param_value)
-                body['similarity']['default']['normalization.{}.{}'.format(normalization, parameter)] = normalization_param
+                    normalization_param = kwargs.get('normalization_parameter_ib', default_param_value)
+                    body['similarity']['default']['normalization.{}.{}'.format(normalization, parameter)] = normalization_param
 
             elif algo == 'LMDirichlet':
                 mu = kwargs.get('mu', '2000.0')
