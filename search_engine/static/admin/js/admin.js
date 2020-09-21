@@ -149,6 +149,11 @@ function get_algo_options(){
 				$('#' + cur_id).show();
 				$('#' + cur_id)[0].disabled = false;
 				$( "label[for='" + cur_id + "']").show();
+				if (($('#id_normalization_' + algo).val()) == 'no') {
+					$('#id_normalization_parameter_' + algo)[0].disabled = true;
+					$('#id_normalization_parameter_' + algo).hide();
+					$("label[for='id_normalization_parameter_" + algo + "']").hide();
+				}
 			}
 			else { // Esconder opções
 				$('#' + cur_id)[0].disabled = true;
@@ -163,7 +168,7 @@ function get_algo_options(){
 $(function(){
 	get_algo_options();
   
-	$('#id_algorithm').change(function(){
+	$('#id_algorithm, #id_normalization_ib, #id_normalization_dfr').change(function(){
 		get_algo_options();
 	});
 });
