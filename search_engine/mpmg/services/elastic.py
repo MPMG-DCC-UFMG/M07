@@ -33,7 +33,7 @@ class Elastic:
             try:
                 sim_settings = resp[index]['settings']['index']['similarity']['default']
             except:
-                sim_settings = {'type': 'BM25'} # Default value
+                sim_settings = {'type': 'BM25', 'k1': 1.2, 'b': 0.75, 'discount_overlaps': True} # Default value
         return sim_settings
 
     def set_cur_algo(self, **kwargs):
