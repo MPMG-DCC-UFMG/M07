@@ -27,8 +27,8 @@ class Elastic:
         self.es.indices.open(index)
         return resp
 
-    def get_cur_algo(self):
-        for index in settings.SEARCHABLE_INDICES.keys():
+    def get_cur_algo(self, indices=settings.SEARCHABLE_INDICES.keys()):
+        for index in indices:
             resp = self.es.indices.get_settings(index=index, name='*sim*')
             try:
                 sim_settings = resp[index]['settings']['index']['similarity']['default']

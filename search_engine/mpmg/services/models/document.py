@@ -25,8 +25,11 @@ class Document:
             searchable_indices = {}
             for k, v in settings.SEARCHABLE_INDICES.items(): # converte a string para classe
                 searchable_indices[k] = eval(v)
-
+        else:
+            for k, v in searchable_indices.items(): # converte a string para classe
+                searchable_indices[k] = eval(v)
         self.searchable_indices = searchable_indices
+        print(searchable_indices)
         self.index_names = list(self.searchable_indices.keys())
 
     

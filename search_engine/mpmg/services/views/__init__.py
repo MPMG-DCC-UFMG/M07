@@ -4,3 +4,4 @@ from .log import *
 from .authentication import *
 from .suggestion import *
 from .evaluation import *
+from .search_comparison import *
