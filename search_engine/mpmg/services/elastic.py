@@ -39,6 +39,9 @@ class Elastic:
     def set_cur_algo(self, **kwargs):
         algo = kwargs.get('algorithm')
         for index in settings.SEARCHABLE_INDICES.keys():
+            if kwargs.get('compare') == 'replica':
+                index = index + '-replica'
+
             cur_settings = self.es.indices.get_settings(index=index, name='*sim*')
             body = {'similarity': {'default': {}}}
             

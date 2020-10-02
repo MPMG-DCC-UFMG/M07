@@ -41,6 +41,12 @@
 .total-docs{
     font-size: 14px;
     color: #52565A;
+    margin-bottom: 10px;
+}
+
+.algorithm{
+    font-size: 14px;
+    color: #52565A;
     margin-bottom: 30px;
 }
 

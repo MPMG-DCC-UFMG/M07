@@ -47,6 +47,12 @@ class Config(models.Model):
         ('ttf', 'Total term frequency'),
     )
 
+    INDICES = (
+        ('regular', 'Regular'),
+        ('replica', 'Replicas'),
+    )
+
+    compare = models.CharField(max_length=10, choices=INDICES, default='')
     algorithm = models.CharField(max_length=50, choices=ALGORITHMS, blank=False, default='BM25')
     num_repl = models.PositiveSmallIntegerField(default=1, validators=[MaxValueValidator(50), MinValueValidator(0)])
     max_result_window = models.PositiveIntegerField(default=10000, validators=[MinValueValidator(1)])
