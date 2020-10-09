@@ -6,6 +6,7 @@ import traceback
 import sys
 from elasticsearch import helpers
 from django.conf import settings
+from mpmg.services.models.search_configs import SearchableIndicesConfigs
 
 class Elastic:
     def __init__(self):
@@ -28,7 +29,7 @@ class Elastic:
         return resp
 
     def get_cur_algo(self):
-        for index in settings.SEARCHABLE_INDICES.keys():
+        for index in SearchableIndicesConfigs.get_indices_list():
             resp = self.es.indices.get_settings(index=index, name='*sim*')
             try:
                 sim_settings = resp[index]['settings']['index']['similarity']['default']
@@ -38,7 +39,7 @@ class Elastic:
 
     def set_cur_algo(self, **kwargs):
         algo = kwargs.get('algorithm')
-        for index in settings.SEARCHABLE_INDICES.keys():
+        for index in SearchableIndicesConfigs.get_indices_list():
             cur_settings = self.es.indices.get_settings(index=index, name='*sim*')
             body = {'similarity': {'default': {}}}
             
@@ -132,7 +133,7 @@ class Elastic:
         return resp
 
     def get_cur_replicas(self):
-        for index in settings.SEARCHABLE_INDICES.keys():
+        for index in SearchableIndicesConfigs.get_indices_list():
             resp = self.es.indices.get_settings(index=index, name='*replicas')
             try:
                 num_repl = resp[index]['settings']['index']['number_of_replicas']
@@ -142,7 +143,7 @@ class Elastic:
         return num_repl
     
     def set_cur_replicas(self, value):
-        for index in settings.SEARCHABLE_INDICES.keys():
+        for index in SearchableIndicesConfigs.get_indices_list():
             try:
                 resp = self.es.indices.put_settings(body={'number_of_replicas': value}, index=index)
             except:
@@ -151,7 +152,7 @@ class Elastic:
         return resp
 
     def get_max_result_window(self):
-        for index in settings.SEARCHABLE_INDICES.keys():
+        for index in SearchableIndicesConfigs.get_indices_list():
             resp = self.es.indices.get_settings(index=index, name='*max_result_window')
             try:
                 max_result_window = resp[index]['settings']['index']['max_result_window']
@@ -161,7 +162,7 @@ class Elastic:
         return max_result_window
     
     def set_max_result_window(self, value):
-        for index in settings.SEARCHABLE_INDICES.keys():
+        for index in SearchableIndicesConfigs.get_indices_list():
             try:
                 resp = self.es.indices.put_settings(body={'max_result_window': value}, index=index)
             except:

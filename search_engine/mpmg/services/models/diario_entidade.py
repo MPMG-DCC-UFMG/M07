@@ -1,11 +1,11 @@
 from mpmg.services.models.elastic_model import ElasticModel
 
 
-class Processo(ElasticModel):
-    index_name = 'processos'
+class DiarioEntidade(ElasticModel):
+    index_name = 'diarios_entidades'
 
     def __init__(self, **kwargs):
-        index_name = Processo.index_name
+        index_name = DiarioEntidade.index_name
         meta_fields = ['id', 'rank_number', 'description', 'type']
         index_fields = [
             'titulo',
@@ -16,4 +16,3 @@ class Processo(ElasticModel):
         ]
         
         super().__init__(index_name, meta_fields, index_fields, **kwargs)
-    

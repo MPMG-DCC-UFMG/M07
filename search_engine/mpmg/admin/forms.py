@@ -1,7 +1,30 @@
-from django.forms import ModelForm
-from django.forms import ModelChoiceField
+from django.forms import ModelForm, Form
+from django.forms import ModelChoiceField, BooleanField, IntegerField
 from django.utils.translation import gettext_lazy as _
-from ..services.models import Config
+from ..services.models import Config, WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
+
+
+class SearchConfigsForm(ModelForm):
+    class Meta:  
+        model = SearchConfigs  
+        fields = "__all__"  
+
+class AddWeightedSearchFieldForm(ModelForm):
+    class Meta:  
+        model = WeightedSearchFieldsConfigs  
+        fields = "__all__"  
+
+class EditWeightedSearchFieldForm(Form):
+    weight = IntegerField(min_value = 1)
+    searchable = BooleanField(required=False)
+
+class AddSearchableIndexForm(ModelForm):
+    class Meta:  
+        model = SearchableIndicesConfigs  
+        fields = "__all__"  
+
+class EditSearchableIndexForm(Form):
+    searchable = BooleanField(required=False)
 
 class ConfigForm(ModelForm):
     def __init__(self, *args, **kwargs):
@@ -66,3 +89,7 @@ class ConfigForm(ModelForm):
                   'lambda_ib',
                   'mu',
                   'distribution']
+
+
+
+        

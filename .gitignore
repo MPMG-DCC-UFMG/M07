@@ -23,6 +23,7 @@ db.sqlite3
 db.sqlite3-journal
 search_engine/db.sqlite3
 search_engine/mpmg/settings.py
+mpmg/services/migrations/
 
 # Django-Jenkins reports
 reports
