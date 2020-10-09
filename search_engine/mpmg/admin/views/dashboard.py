@@ -40,6 +40,15 @@ class DashboardView(admin.AdminSite):
                   '#ff9f40', # laranja
                   '#36a2eb', # azul
                   '#ff6384'] # rosa
+        colors = [
+            '#f94144',
+            '#f3722c',
+            '#f8961e',
+            '#f9c74f',
+            '#90be6d',
+            '#43aa8b',
+            '#577590',
+        ]
         indices_amounts = {'data':[], 'colors':[], 'labels':[]}
         for item in indices_info:
             if item['index_name'] in searchable_indices:
@@ -110,6 +119,11 @@ class DashboardView(admin.AdminSite):
                 porc_no_results_per_day[d] = round(v/total_queries_per_day[d]*100)
             else:
                 porc_no_results_per_day[d] = 0
+        
+
+        print('TEMPO MEDIO', metrics.avg_time_to_first_click())
+
+
         
         # totais
         if len(metrics.query_log) > 0:

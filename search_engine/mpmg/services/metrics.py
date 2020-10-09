@@ -2,6 +2,7 @@ import pandas as pd
 import time
 from datetime import datetime
 import requests
+from collections import defaultdict
 from mpmg.services.models import LogSearch, LogSearchClick, LogSugestoes
 
 
@@ -109,23 +110,35 @@ class Metrics:
     def avg_time_to_first_click(self):
         #Calcula o tempo medio ate o primeiro click
         queries = self.query_log['id_consulta'].drop_duplicates().to_list() #calcular todas as queries
+        
+        times_by_date = defaultdict(list)
         times = []
         for q in queries:
             target_queries = self.query_log[self.query_log['id_consulta'] == q]
             target_queries = target_queries.sort_values(by='data_hora').reset_index(drop=True)
+            dia = target_queries['dia'][0]
             first_query = target_queries['data_hora'][0]
 
-            if q in self.click_log["id_consulta"].to_list():
-                clicks = self.click_log[self.click_log['id_consulta'] == q]
-                clicks = clicks.sort_values(by='timestamp', ).reset_index(drop=True)
-                first_click = clicks['timestamp'][0]
+            if len(self.click_log) > 0:
+                if q in self.click_log["id_consulta"].to_list():
+                    clicks = self.click_log[self.click_log['id_consulta'] == q]
+                    clicks = clicks.sort_values(by='timestamp', ).reset_index(drop=True)
+                    first_click = clicks['timestamp'][0]
 
-                time_to_click = first_click - first_query
-                times.append(time_to_click)
-
+                    time_to_click = first_click - first_query
+                    times.append(time_to_click)
+                    times_by_date[dia].append(time_to_click)
+        
+        
+        for k,v in times_by_date.items():
+            times_by_date[k] = pd.Series(v).astype(int).mean()
+                
+        
         response = {
-            "avg_time_to_first_click": pd.Series(times).astype(int).mean()
+            "avg_time_to_first_click": times_by_date,
+            "avg_time_to_first_click_by_date": pd.Series(times).astype(int).mean()
         }
+
         return response
 
     def avg_sugestions_click_position(self):
