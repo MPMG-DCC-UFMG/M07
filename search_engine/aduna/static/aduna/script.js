@@ -127,3 +127,7 @@ $(window).bind('scroll', function() {
     }
     
 });
+
+$(document).ready(function() {
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+});

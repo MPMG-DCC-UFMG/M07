@@ -91,3 +91,11 @@
     padding: 10px;
     background-color: #ddd;
 }
+
+.tooltip > .tooltip-inner {
+    background-color: #007bff;
+    color: #FFFFFF;
+    padding: 15px;
+    font-size: 15px;
+  }
+

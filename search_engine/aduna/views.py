@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
+from collections import defaultdict
 
 
 def index(request):
@@ -157,7 +158,7 @@ def search_comparison(request):
     headers = {'Authorization': 'Token '+request.session.get('auth_token')}
 
     sid = request.session.session_key
-    query = request.GET['query']
+    query = request.GET.get('query', 'comparação de busca')
     qid = request.GET.get('qid', '')
     page = int(request.GET.get('page', 1))
     instances = request.GET.getlist('instance', [])
@@ -192,6 +193,14 @@ def search_comparison(request):
         return redirect('/aduna/login')
 
     else:
+        # Verificação dos ids de resposta
+        id_pos = defaultdict(list)
+        for result in response_content['documents']:
+            id_pos[result['id']].append((response_content['algorithm_base'],result['rank_number']))
+        for result in response_content['documents_repl']:
+            id_pos[result['id']].append((response_content['algorithm_repl'],result['rank_number']))
+
+        print(id_pos)
         context = {
             'auth_token': request.session.get('auth_token'),
             'user_name': request.session.get('user_info')['first_name'],
@@ -219,6 +228,7 @@ def search_comparison(request):
             'response_time_repl': response_content['response_time_repl'],
             'algorithm_base': response_content['algorithm_base'],
             'algorithm_repl': response_content['algorithm_repl'],
+            'id_pos': dict(id_pos), # Converte de volta pra dict, pois o Django Template Language não lê defaultdict
         }
         
         return render(request, 'aduna/search_comparison.html', context)
