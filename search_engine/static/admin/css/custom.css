@@ -1,3 +1,16 @@
+.dashboard-tabs.nav-tabs{
+    border-bottom: 1px solid #a4a9ae;
+}
+
+
+.dashboard-tabs.nav-tabs .nav-link.active{
+    border-color: #a4a9ae #a4a9ae #fff;
+}
+
+.dashboard-tabs.nav-tabs .nav-link{
+    font-size: 18px;
+}
+
 .fa-circle.yellow{
     color: yellow;
 }
@@ -41,10 +54,22 @@
     font-size: 70px;
     line-height: 50px;
     color: #ddd;
-    transform: rotate(15deg);
-    -webkit-transform: rotate(15deg);
-    -moz-transform: rotate(15deg);
-    -ms-transform: rotate(15deg);
+}
+
+.totals-icon.space-usage{
+    color: #457b9d;
+}
+
+.totals-icon.num-records{
+    color: #e76f51;
+}
+
+.totals-icon.cpu-usage{
+    color: #f4a261;
+}
+
+.totals-icon.mem-usage{
+    color: #2a9d8f;
 }
 
 .totals-icon.search{
@@ -56,15 +81,43 @@
 }
 
 .totals-icon.no-click{
+    transform: rotate(15deg);
+    -webkit-transform: rotate(15deg);
+    -moz-transform: rotate(15deg);
+    -ms-transform: rotate(15deg);
     color: #ffe29c;
 }
 
 .totals-icon.no-result{
+    transform: rotate(15deg);
+    -webkit-transform: rotate(15deg);
+    -moz-transform: rotate(15deg);
+    -ms-transform: rotate(15deg);
     color: #ffc388;
 }
 
 .totals-icon.time{
+    transform: rotate(15deg);
+    -webkit-transform: rotate(15deg);
+    -moz-transform: rotate(15deg);
+    -ms-transform: rotate(15deg);
     color: #b2e1b6;
+}
+
+.totals-icon.click-pos{
+    color: #114b5f;
+}
+
+.totals-icon.num-clicks{
+    color: #688e26;
+}
+
+.totals-icon.time-click{
+    color: #faa613;
+}
+
+.totals-icon.session-duration{
+    color: #f44708;
 }
 
 .last-queries-container table thead th{
