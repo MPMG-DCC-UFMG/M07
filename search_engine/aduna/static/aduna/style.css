@@ -93,9 +93,10 @@
 }
 
 .tooltip > .tooltip-inner {
-    background-color: #007bff;
+    background-color: #033d7a;
     color: #FFFFFF;
     padding: 15px;
     font-size: 15px;
+    white-space: pre-wrap;
   }
 

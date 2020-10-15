@@ -84,20 +84,17 @@
                     <div id="results-container" data-executed-query="{{ query }}">
                     {% for doc in documents %}
                         <div class="result-item">
-                            <h3><a class="result-link" href="{% url 'aduna:document' doc.type doc.id %}" data-rank-number="{{ doc.rank_number }}" data-item-id="{{ doc.id }}" data-item-type="{{ doc.type }}" >{{ doc.titulo }}</a></h3>
-                            <div class="result-description">
-                                {% for key, value in id_pos.items %} 
-                                {% if key == doc.id %}
-                                    <p class="hide">{{value}}</p>
-                                {% endif %}
-                                {% endfor %}
-                            </div>
+                        {% for key, value in id_pos.items %} 
+                        {% if key == doc.id %}
+                            <h3><a class="result-link" href="{% url 'aduna:document' doc.type|slice:"-8" doc.id %}" data-rank-number="{{ doc.rank_number }}" data-item-id="{{ doc.id }}" data-item-type="{{ doc.type }}" title="{{ value }}" data-toggle="tooltip" data-html="true">{{ doc.titulo }}</a></h3>
                             <div class="result-description">
                                 {{ doc.description|safe }}
                             </div>
                             <div class="source-description">
                                 Fonte: {{ doc.source }}
                             </div>
+                        {% endif %}
+                        {% endfor %}      
                         </div>
                     {% endfor %}
                     </div>
@@ -110,7 +107,7 @@
                         <div class="result-item">
                         {% for key, value in id_pos.items %} 
                         {% if key == doc.id %}
-                            <h3><a class="result-link" href="{% url 'aduna:document' doc.type|slice:"-8" doc.id %}" data-rank-number="{{ doc.rank_number }}" data-item-id="{{ doc.id }}" data-item-type="{{ doc.type }}" title="{{ value }}" data-toggle="tooltip">{{ doc.titulo }}</a></h3>
+                            <h3><a class="result-link" href="{% url 'aduna:document' doc.type|slice:"-8" doc.id %}" data-rank-number="{{ doc.rank_number }}" data-item-id="{{ doc.id }}" data-item-type="{{ doc.type }}" title="{{ value }}" data-toggle="tooltip" data-html="true">{{ doc.titulo }}</a></h3>
                             <div class="result-description">
                                 {{ doc.description|safe }}
                             </div>

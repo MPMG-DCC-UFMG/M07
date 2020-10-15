@@ -196,11 +196,17 @@ def search_comparison(request):
         # Verificação dos ids de resposta
         id_pos = defaultdict(list)
         for result in response_content['documents']:
-            id_pos[result['id']].append((response_content['algorithm_base'],result['rank_number']))
+            id_pos[result['id']].append('{}: {}ª posição'.format(response_content['algorithm_base'], result['rank_number']))
         for result in response_content['documents_repl']:
-            id_pos[result['id']].append((response_content['algorithm_repl'],result['rank_number']))
+            if id_pos[result['id']]:
+                id_pos[result['id']].append('<br>')    
+            id_pos[result['id']].append('{}: {}ª posição'.format(response_content['algorithm_repl'], result['rank_number']))
 
         print(id_pos)
+        id_pos = dict(id_pos)
+        for k, v in id_pos.items():
+            id_pos[k] = ''.join(v)
+
         context = {
             'auth_token': request.session.get('auth_token'),
             'user_name': request.session.get('user_info')['first_name'],
@@ -228,7 +234,7 @@ def search_comparison(request):
             'response_time_repl': response_content['response_time_repl'],
             'algorithm_base': response_content['algorithm_base'],
             'algorithm_repl': response_content['algorithm_repl'],
-            'id_pos': dict(id_pos), # Converte de volta pra dict, pois o Django Template Language não lê defaultdict
+            'id_pos': id_pos, # Converte de volta pra dict, pois o Django Template Language não lê defaultdict
         }
         
         return render(request, 'aduna/search_comparison.html', context)
