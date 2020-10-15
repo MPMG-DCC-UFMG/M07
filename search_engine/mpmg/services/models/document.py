@@ -1,8 +1,9 @@
 from mpmg.services.elastic import Elastic
 from mpmg.services.models.processo import Processo
 from mpmg.services.models.diario import Diario
+from mpmg.services.models.diario_entidade import DiarioEntidade
+from mpmg.services.models.search_configs import SearchableIndicesConfigs
 from django.conf import settings
-from mpmg.services.models import *
 
 class Document:
     '''
@@ -60,54 +61,35 @@ class Document:
         
         return total_docs, total_pages, documents, response.took
 
-
-    def search_with_filters(self, query, page_number, instances, doc_types, start_date, end_date):
-        start = self.results_per_page * (page_number - 1)
-        end = start + self.results_per_page
-    
-        indices = self.index_names
-        if doc_types != None and doc_types != []:
-            indices = doc_types
-
-        must = [self.elastic.dsl.Q('query_string', query=query, default_field='conteudo')]
         
-        filters = []
-        if instances != None and instances != []:
-            filters.append(
-                self.elastic.dsl.Q({'terms': {'instancia.keyword': instances}})
-            )
-        if start_date != None and start_date != "":
-            filters.append(
-                self.elastic.dsl.Q({'range': {'data': {'gte': start_date }}})
-            )
-        if end_date != None and end_date != "":
-            filters.append(
-                self.elastic.dsl.Q({'range': {'data': {'lte': end_date }}})
-            )
+    def costumized_search(self, indices, must_queries, filter_queries, page_number, results_per_page):
         
+        start = results_per_page * (page_number - 1)
+        end = start + results_per_page
 
         elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=indices) \
                         .source(['fonte', 'titulo', 'conteudo']) \
-                        .query("bool", must = must, filter = filters)[start:end] \
+                        .query("bool", must = must_queries, filter = filter_queries)[start:end] \
                         .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False, type="unified")                        
-
+        
         response = elastic_request.execute()
         total_docs = response.hits.total.value
-        total_pages = (total_docs // self.results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
+        total_pages = (total_docs // results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
         documents = []
 
         for i, item in enumerate(response):
             dict_data = item.to_dict()
             dict_data['id'] = item.meta.id
             dict_data['description'] = item.meta.highlight.conteudo[0]
-            dict_data['rank_number'] = self.results_per_page * (page_number-1) + (i+1)
+            dict_data['rank_number'] = results_per_page * (page_number-1) + (i+1)
             dict_data['type'] = item.meta.index
-
-            result_class = self.searchable_indices[item.meta.index]
+            
+            index_model_class_name = SearchableIndicesConfigs.get_index_model_class_name(item.meta.index)
+            result_class = eval(index_model_class_name)
             documents.append(result_class(**dict_data))
         
         return total_docs, total_pages, documents, response.took
-    
+        
 
     def test_search_time(self):
         import numpy as np

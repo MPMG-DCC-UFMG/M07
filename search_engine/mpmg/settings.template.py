@@ -146,10 +146,3 @@ ELASTICSEARCH_DSL = {
 }
 
 SERVICES_URL = 'http://127.0.0.1:8000/services/'
-
-# Indices to search
-#   - Requires class import (e.g. from services.models.processo import Processo)
-SEARCHABLE_INDICES = {
-                'diarios': Diario,
-                'processos': Processo
-            }

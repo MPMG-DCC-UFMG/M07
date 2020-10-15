@@ -12,17 +12,24 @@ class LogSearch(ElasticModel):
             'id_consulta',
             'id_usuario',
             'text_consulta',
-            'algoritmo',
             'data_hora',
             'tempo_resposta',
+            'tempo_resposta_total',
+            'documentos',
             'pagina',
             'resultados_por_pagina',
-            'documentos',
-            'tempo_resposta_total',
             'indices',
+            
+            'algoritmo',
+            'algoritmo_variaveis',
+
+            'campos_ponderados'
+            
             'instancias',
             'data_inicial',
             'data_final',
+
+            
         ]
 
         super().__init__(index_name, meta_fields, index_fields, **kwargs)

@@ -335,19 +335,7 @@
     "log_buscas": {
         "mappings": {
             "properties": {
-                "algoritmo": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "data_hora": {
-                    "type": "date"
-                },
-                "documentos": {
+                "id_sessao": {
                     "type": "text",
                     "fields": {
                         "keyword": {
@@ -365,7 +353,7 @@
                         }
                     }
                 },
-                "id_sessao": {
+                "id_usuario": {
                     "type": "text",
                     "fields": {
                         "keyword": {
@@ -374,7 +362,20 @@
                         }
                     }
                 },
-                "id_usuario": {
+                "text_consulta": {
+                    "type": "search_as_you_type",
+                    "max_shingle_size": 3
+                },
+                "data_hora": {
+                    "type": "date"
+                },
+                "tempo_resposta": {
+                    "type": "float"
+                },
+                "tempo_resposta_total": {
+                    "type": "float"
+                },
+                "documentos": {
                     "type": "text",
                     "fields": {
                         "keyword": {
@@ -389,17 +390,34 @@
                 "resultados_por_pagina": {
                     "type": "integer"
                 },
-                "tempo_resposta": {
-                    "type": "float"
-                },
-                "text_consulta": {
-                    "type": "search_as_you_type",
-                    "max_shingle_size": 3
-                },
-                "tempo_resposta_total": {
-                    "type": "float"
-                },
                 "indices": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "algoritmo": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "algoritmo_variaveis": {
+                    "type": "text",
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword",
+                            "ignore_above": 256
+                        }
+                    }
+                },
+                "compos_ponderados": {
                     "type": "text",
                     "fields": {
                         "keyword": {
@@ -427,15 +445,6 @@
                     }
                 },
                 "data_final": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "cpf": {
                     "type": "text",
                     "fields": {
                         "keyword": {
