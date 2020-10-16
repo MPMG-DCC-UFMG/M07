@@ -15,7 +15,7 @@ from ..features_extractor import TermVectorsFeaturesExtractor
 from ..query import Query
 
 class SearchView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         start = time.time() # Medindo wall-clock time da requisição completa
@@ -43,7 +43,7 @@ class SearchView(APIView):
             'results_per_page': self.query.results_per_page,
             'documents': documents,
             'current_page': self.query.page,
-            'total_pages': self.query.total_pages,
+            'total_pages': total_pages,
             'qid': self.query.qid,
             'start_date': self.query.start_date,
             'end_date': self.query.end_date,
