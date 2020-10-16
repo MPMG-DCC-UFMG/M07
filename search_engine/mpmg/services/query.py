@@ -106,7 +106,7 @@ class Query:
             indices = self.indices,
             
             algoritmo = self.algo_configs['type'],
-            algoritmo_variaveis = self.algo_configs,
+            algoritmo_variaveis = str(self.algo_configs),
 
             campos_ponderados = self.weighted_fields,
 
