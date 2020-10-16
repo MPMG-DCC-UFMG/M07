@@ -21,8 +21,8 @@ class SearchView(APIView):
         start = time.time() # Medindo wall-clock time da requisição completa
 
         # try:
-        #     self.elastic = Elastic()
-        #     self._generate_query(request)
+        self.elastic = Elastic()
+        self._generate_query(request)
 
             # valida o tamanho da consulta
         if self.query.is_valid():
