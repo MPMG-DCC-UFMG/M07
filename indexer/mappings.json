@@ -71,71 +71,30 @@
     "diarios_entidades": {
         "mappings": {
             "properties": {
-                "titulo": {
-                    "type": "text",
-                    "term_vector" : "with_positions_offsets",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
                 "conteudo": {
-                    "type": "text",
-                    "term_vector" : "with_positions_offsets",
+                    "type": "text", 
+                    "term_vector": "with_positions_offsets", 
                     "fields": {
                         "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "tipo_documento": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
+                            "type": "keyword", 
                             "ignore_above": 256
                         }
                     }
                 },
                 "data": {
                     "type": "date"
-                
-                },
-                "fonte": {
-                    "type": "text",
+                }, 
+                "entidade_cep": {
+                    "type": "text", 
                     "fields": {
                         "keyword": {
-                            "type": "keyword",
+                            "type": "keyword", 
                             "ignore_above": 256
                         }
                     }
                 },
-                "metadata_ultima_modificacao":{
-                    "type": "date"
-                },
-                "metadata_titulo": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "instancia": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                },
-                "entidade_pessoa": {
-                    "type": "text",
+                "entidade_cnpj": {
+                    "type": "text", 
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -143,29 +102,29 @@
                         }
                     }
                 }, 
-                "entidade_organizacao": {
-                    "type": "text",
+                "entidade_cpf": {
+                    "type": "text", 
                     "fields": {
                         "keyword": {
-                            "type": "keyword",
+                            "type": "keyword", 
                             "ignore_above": 256
                         }
                     }
                 }, 
-                "entidade_tempo": {
+                "entidade_jurisprudencia": {
                     "type": "text",
-                    "fields": {
+                     "fields": {
                         "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
+                             "type": "keyword", 
+                             "ignore_above": 256
                         }
                     }
                 }, 
-                "entidade_local": {
+                "entidade_legislacao": {
                     "type": "text",
                     "fields": {
                         "keyword": {
-                            "type": "keyword",
+                            "type": "keyword", 
                             "ignore_above": 256
                         }
                     }
@@ -179,43 +138,109 @@
                         }
                     }
                 }, 
-                "entidade_cpf": {
+                "entidade_local": {
                     "type": "text",
                     "fields": {
                         "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                }, 
-                "entidade_cnpj": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
-                            "ignore_above": 256
-                        }
-                    }
-                }, 
-                "entidade_processo_licitacao": {
-                    "type": "text",
-                    "fields": {
-                        "keyword": {
-                            "type": "keyword",
+                            "type": "keyword", 
                             "ignore_above": 256
                         }
                     }
                 }, 
                 "entidade_municipio": {
-                    "type": "text",
+                    "type": "text", 
                     "fields": {
                         "keyword": {
-                            "type": "keyword",
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "entidade_organizacao": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "entidade_pessoa": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "entidade_processo_licitacao": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "entidade_tempo": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "fonte": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "instancia": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "metadata_titulo": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "metadata_ultima_modificacao": {
+                    "type": "date"
+                }, 
+                "tipo_documento": {
+                    "type": "text", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
+                            "ignore_above": 256
+                        }
+                    }
+                }, 
+                "titulo": {
+                    "type": "text", 
+                    "term_vector": "with_positions_offsets", 
+                    "fields": {
+                        "keyword": {
+                            "type": "keyword", 
                             "ignore_above": 256
                         }
                     }
                 }
-
             }
         }
     },
