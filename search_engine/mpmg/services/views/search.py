@@ -20,44 +20,44 @@ class SearchView(APIView):
     def get(self, request):
         start = time.time() # Medindo wall-clock time da requisição completa
 
-        try:
-            self.elastic = Elastic()
-            self._generate_query(request)
+        # try:
+        #     self.elastic = Elastic()
+        #     self._generate_query(request)
 
             # valida o tamanho da consulta
-            if self.query.is_valid():
-                data = {'error_type': 'invalid_query'}
-                return Response(data, status=status.HTTP_400_BAD_REQUEST)
-                
-            # Busca os documentos no elastic
-            total_docs, total_pages, documents, response_time = self.query.execute()
-
-            end = time.time()
-            wall_time = end - start
+        if self.query.is_valid():
+            data = {'error_type': 'invalid_query'}
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
             
-            data = {
-                'query': self.query.query,
-                'total_docs': total_docs,
-                'time': wall_time,
-                'time_elastic': response_time,
-                'results_per_page': self.query.results_per_page,
-                'documents': documents,
-                'current_page': self.query.page,
-                'total_pages': self.query.total_pages,
-                'qid': self.query.qid,
-                'start_date': self.query.start_date,
-                'end_date': self.query.end_date,
-                'instances': self.query.instances,
-                'doc_types': self.query.doc_types,
-            }               
-            return Response(data)
+        # Busca os documentos no elastic
+        total_docs, total_pages, documents, response_time = self.query.execute()
+
+        end = time.time()
+        wall_time = end - start
         
-        except Exception as e:
-            data = {
-                'error_message': str(sys.exc_info())
-            }
-            print(sys.exc_info())
-            return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data = {
+            'query': self.query.query,
+            'total_docs': total_docs,
+            'time': wall_time,
+            'time_elastic': response_time,
+            'results_per_page': self.query.results_per_page,
+            'documents': documents,
+            'current_page': self.query.page,
+            'total_pages': self.query.total_pages,
+            'qid': self.query.qid,
+            'start_date': self.query.start_date,
+            'end_date': self.query.end_date,
+            'instances': self.query.instances,
+            'doc_types': self.query.doc_types,
+        }               
+        return Response(data)
+        
+        # except Exception as e:
+        #     data = {
+        #         'error_message': str(sys.exc_info())
+        #     }
+        #     print(sys.exc_info())
+        #     return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         
     def _generate_query(self, request):
