@@ -25,7 +25,8 @@ class SearchView(APIView):
         self._generate_query(request)
 
             # valida o tamanho da consulta
-        if self.query.is_valid():
+        if not self.query.is_valid():
+            print("query invalida")
             data = {'error_type': 'invalid_query'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
             

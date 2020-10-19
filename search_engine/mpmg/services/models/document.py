@@ -30,7 +30,6 @@ class Document:
             for k, v in searchable_indices.items(): # converte a string para classe
                 searchable_indices[k] = eval(v)
         self.searchable_indices = searchable_indices
-        print(searchable_indices)
         self.index_names = list(self.searchable_indices.keys())
 
     
@@ -62,7 +61,7 @@ class Document:
         return total_docs, total_pages, documents, response.took
 
         
-    def costumized_search(self, indices, must_queries, filter_queries, page_number, results_per_page):
+    def custum_search(self, indices, must_queries, filter_queries, page_number, results_per_page):
         
         start = results_per_page * (page_number - 1)
         end = start + results_per_page
@@ -91,20 +90,20 @@ class Document:
         return total_docs, total_pages, documents, response.took
         
 
-    def test_search_time(self):
-        import numpy as np
-        queries = ['Ação', 'Ação civil pública', 'Ação originária', 'Ação cautelar', 'Ação rescisória', 'Ação trabalhista', 'Acidente de trabalho', 'Acórdão', 'Acordo', 'Agravo', 'agravo de instrumento', 'agravo de petição', 'Alçada', 'A quo', 'Arbitragem', 'Arquivado', 'Arquivo provisório', 'Audiência de instrução e julgamento', 'Autônomo', 'Autos', 'Autuação', 'Aviso-prévio', 'Avulso', 'Bis in idem', 'Caput', 'CTPS', 'Carga', 'Carta precatória', 'Carta rogatória', 'Carta de sentença', 'Celetista', 'Consolidado', 'Certidão de objeto e pé', 'Certificado digital', 'Citação', 'Coisa julgada', 'Cipa', 'CNDT', 'Comissão de Conciliação Prévia', 'Conciliação', 'Composição', 'Conclusos', 'Conflito de competência', 'Contrarrazões', 'Contribuição sindical ', 'Assistencial', 'Confederativa', 'Cooperativa', 'Correição', 'Custas', 'DSR', 'Decadência', 'Décimo terceiro salário', 'Decisão interlocutória', 'Declaração de pobreza', 'Desembargador', 'Deserção', 'Despacho', 'Dilação', 'Diligência', 'Dissídio', 'Dissídio coletivo', 'Dissídio individual', 'Distribuição', 'Edital', 'E-doc', 'Efeito suspensivo', 'Embargos', 'de declaração', 'à execução que', 'de terceiro', 'Ementa', 'Empregado', 'Empregador', 'Execução', 'Ex nunc', 'Ex officio', 'Exordial', 'Ex tunc', 'Estatutário', 'FAT', 'Férias', 'FGTS', 'Foro', 'Gorjeta', 'GRU', 'Habeas corpus', 'Habeas data', 'Hasta Pública', 'Homologação', 'Honorários', 'Hora extra', 'Impedimento', 'Instância', 'grau de jurisdição', 'Intempestivo', 'Jornada de trabalho', 'Juiz', 'Juiz classista', 'Jurisdição', 'Jurisprudência', 'Juros de mora', 'Jus postulandi', 'Justa causa', 'Justiça gratuita', 'Laudo', 'Leilão judicial', 'Licitação', 'Lide', 'Liminar', 'Liquidação', 'Litigante de má fé', 'Litisconsórcio', 'Litispendência', 'Lockout', 'Mandado judicial', 'Mandado de segurança', 'Medida cautelar', 'Mérito da ação', 'Ministério do Trabalho', 'Ministério Público do Trabalho', 'Normas regulamentares', 'Notificação', 'Obreiro', 'Oficial de justiça', 'Ônus da prova', 'Orientação jurisprudencial', 'Ouvidoria', 'PAT', 'Parecer', 'Partes', 'Penhora', 'Perícia', 'Petição', 'Plantão judiciário', 'Portaria', 'Praça pública', 'Precad', 'Precatório', 'Preliminar', 'Preposto', 'Prescrição', 'Prioridade', 'Processo', 'Processos pendentes', 'Procuração', 'ad judicia', 'Protelatório', 'Procrastinatório', 'Provimento', 'PJe-JT', 'Recesso', 'Reclamado', 'Reclamante', 'Recolhimento previdenciário', 'Recurso ordinário', 'Recurso', 'ex officio', 'Redução a termo', 'Relator', 'Relatório', 'Responsabilidade solidária', 'Subsidiária', 'Revelia', 'Revisor', 'Rito', 'Rito ou procedimento sumário', 'Rito ou procedimento sumaríssimo', 'Salário', 'Segredo de justiça', 'Seguro desemprego', 'Sentença', 'Sessão de julgamento', 'Sindicato', 'Sisdoc', 'Sobrestado', 'Sobreaviso', 'Substabelecimento', 'Sucumbência', 'Súmula', 'Suspeição', 'Sustentação oral', 'SRTE', 'Testemunha', 'Transação', 'Trânsito em julgado', 'Turma', 'Tutela', 'Ulterior', 'Vara do Trabalho', 'Vínculo empregatício', 'Voto']
-        self.results_per_page = 100
-        for i, q in enumerate(queries):
-            print(i, q)
-            try:
-                result = self.search(q, 1)
-                took = []
-                took.append(result[3])
-            except:
-                print('erro')
-                continue
+    # def test_search_time(self):
+    #     import numpy as np
+    #     queries = ['Ação', 'Ação civil pública', 'Ação originária', 'Ação cautelar', 'Ação rescisória', 'Ação trabalhista', 'Acidente de trabalho', 'Acórdão', 'Acordo', 'Agravo', 'agravo de instrumento', 'agravo de petição', 'Alçada', 'A quo', 'Arbitragem', 'Arquivado', 'Arquivo provisório', 'Audiência de instrução e julgamento', 'Autônomo', 'Autos', 'Autuação', 'Aviso-prévio', 'Avulso', 'Bis in idem', 'Caput', 'CTPS', 'Carga', 'Carta precatória', 'Carta rogatória', 'Carta de sentença', 'Celetista', 'Consolidado', 'Certidão de objeto e pé', 'Certificado digital', 'Citação', 'Coisa julgada', 'Cipa', 'CNDT', 'Comissão de Conciliação Prévia', 'Conciliação', 'Composição', 'Conclusos', 'Conflito de competência', 'Contrarrazões', 'Contribuição sindical ', 'Assistencial', 'Confederativa', 'Cooperativa', 'Correição', 'Custas', 'DSR', 'Decadência', 'Décimo terceiro salário', 'Decisão interlocutória', 'Declaração de pobreza', 'Desembargador', 'Deserção', 'Despacho', 'Dilação', 'Diligência', 'Dissídio', 'Dissídio coletivo', 'Dissídio individual', 'Distribuição', 'Edital', 'E-doc', 'Efeito suspensivo', 'Embargos', 'de declaração', 'à execução que', 'de terceiro', 'Ementa', 'Empregado', 'Empregador', 'Execução', 'Ex nunc', 'Ex officio', 'Exordial', 'Ex tunc', 'Estatutário', 'FAT', 'Férias', 'FGTS', 'Foro', 'Gorjeta', 'GRU', 'Habeas corpus', 'Habeas data', 'Hasta Pública', 'Homologação', 'Honorários', 'Hora extra', 'Impedimento', 'Instância', 'grau de jurisdição', 'Intempestivo', 'Jornada de trabalho', 'Juiz', 'Juiz classista', 'Jurisdição', 'Jurisprudência', 'Juros de mora', 'Jus postulandi', 'Justa causa', 'Justiça gratuita', 'Laudo', 'Leilão judicial', 'Licitação', 'Lide', 'Liminar', 'Liquidação', 'Litigante de má fé', 'Litisconsórcio', 'Litispendência', 'Lockout', 'Mandado judicial', 'Mandado de segurança', 'Medida cautelar', 'Mérito da ação', 'Ministério do Trabalho', 'Ministério Público do Trabalho', 'Normas regulamentares', 'Notificação', 'Obreiro', 'Oficial de justiça', 'Ônus da prova', 'Orientação jurisprudencial', 'Ouvidoria', 'PAT', 'Parecer', 'Partes', 'Penhora', 'Perícia', 'Petição', 'Plantão judiciário', 'Portaria', 'Praça pública', 'Precad', 'Precatório', 'Preliminar', 'Preposto', 'Prescrição', 'Prioridade', 'Processo', 'Processos pendentes', 'Procuração', 'ad judicia', 'Protelatório', 'Procrastinatório', 'Provimento', 'PJe-JT', 'Recesso', 'Reclamado', 'Reclamante', 'Recolhimento previdenciário', 'Recurso ordinário', 'Recurso', 'ex officio', 'Redução a termo', 'Relator', 'Relatório', 'Responsabilidade solidária', 'Subsidiária', 'Revelia', 'Revisor', 'Rito', 'Rito ou procedimento sumário', 'Rito ou procedimento sumaríssimo', 'Salário', 'Segredo de justiça', 'Seguro desemprego', 'Sentença', 'Sessão de julgamento', 'Sindicato', 'Sisdoc', 'Sobrestado', 'Sobreaviso', 'Substabelecimento', 'Sucumbência', 'Súmula', 'Suspeição', 'Sustentação oral', 'SRTE', 'Testemunha', 'Transação', 'Trânsito em julgado', 'Turma', 'Tutela', 'Ulterior', 'Vara do Trabalho', 'Vínculo empregatício', 'Voto']
+    #     self.results_per_page = 100
+    #     for i, q in enumerate(queries):
+    #         print(i, q)
+    #         try:
+    #             result = self.search(q, 1)
+    #             took = []
+    #             took.append(result[3])
+    #         except:
+    #             print('erro')
+    #             continue
         
-        print('mean', np.array(took).mean())
-        print('std', np.array(took).std())
+    #     print('mean', np.array(took).mean())
+    #     print('std', np.array(took).std())
         

@@ -28,8 +28,15 @@ class Elastic:
         self.es.indices.open(index)
         return resp
 
-    def get_cur_algo(self):
-        for index in SearchableIndicesConfigs.get_indices_list():
+
+
+#Sobre as funcs abaixo:
+# Modifiquei get_cur_algo e set_cur_algo, para funcionarem com o parametro group, que indica de qual grupo estamos falando
+# As outras vao fazer oq fazer para todos os indices, entao isso tem q ser REVISTO e acertado para que 
+# somente façam a modificação ou peguem o valor de um grupo
+
+    def get_cur_algo(self, group):
+        for index in SearchableIndicesConfigs.get_indices_list(group=group):
             resp = self.es.indices.get_settings(index=index, name='*sim*')
             try:
                 sim_settings = resp[index]['settings']['index']['similarity']['default']
@@ -39,9 +46,13 @@ class Elastic:
 
     def set_cur_algo(self, **kwargs):
         algo = kwargs.get('algorithm')
-        for index in SearchableIndicesConfigs.get_indices_list():
-            if kwargs.get('compare') == 'replica':
-                index = index + '-replica'
+        
+        group = 'regular'
+        if kwargs.get('compare') == 'replica':
+            group = 'replica'
+        
+        for index in SearchableIndicesConfigs.get_indices_list(group=group):
+            
             cur_settings = self.es.indices.get_settings(index=index, name='*sim*')
             body = {'similarity': {'default': {}}}
             

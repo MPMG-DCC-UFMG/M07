@@ -12,7 +12,7 @@ class ConfigView(admin.AdminSite):
         self.es = Elastic()
 
     def view_config(self, request):
-        sim_settings = self.es.get_cur_algo()
+        sim_settings = self.es.get_cur_algo() #TODO: acertar isso para passar como parametro o grupo
         current_num_repl = self.es.get_cur_replicas()
         max_result_window = self.es.get_max_result_window()
         algo = sim_settings['type']

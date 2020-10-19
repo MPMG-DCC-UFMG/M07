@@ -16,21 +16,35 @@ class SearchConfigs(models.Model):
             return cls.objects.all()[0].results_per_page
 
 class SearchableIndicesConfigs(models.Model):
+    GROUPS = (
+        ('regular', 'regular'),
+        ('replica', 'replica'),
+    )
+
+    MODELS = (
+        ('Diario', 'Diario'),
+        ('Processo', 'Processo'),
+    )
+
     index = models.CharField(max_length=50, blank=False, primary_key=True)
-    index_model = models.CharField(max_length=50, blank=False)
+    index_model = models.CharField(max_length=50, blank=False, choices=MODELS)
     searchable = models.BooleanField(default=True, blank=False)
+    group = models.CharField(max_length=10, blank=False, choices=GROUPS)
     
     @classmethod
-    def get_searchble_indices(cls):
+    def get_searchable_indices(cls, models = list(dict(MODELS).values()), groups = list(dict(GROUPS).values())):
         searchble_indices = []
         for index in cls.objects.all():
-            if index.searchable:
+            if index.searchable and index.group in groups and index.index_model in models:
                 searchble_indices.append(index.index)
         return searchble_indices
 
     @classmethod
-    def get_indices_list(cls):
-        return [index.index for index in cls.objects.all()]
+    def get_indices_list(cls, group='_all'):
+        if group == '_all':
+            return [index.index for index in cls.objects.all()]
+        else:
+            return [index.index for index in cls.objects.filter(group=group)]
 
     @classmethod
     def get_index_model_class_name(cls, index):

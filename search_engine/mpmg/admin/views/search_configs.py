@@ -4,7 +4,7 @@ from django.urls import reverse
 from mpmg.admin.forms import AddWeightedSearchFieldForm, EditWeightedSearchFieldForm, AddSearchableIndexForm, EditSearchableIndexForm, SearchConfigsForm
 from mpmg.services.models import WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
 
-
+#typo
 class SearchConfigsView(admin.AdminSite): 
     def __init__(self):
         super(SearchConfigsView, self).__init__()
@@ -50,6 +50,7 @@ class SearchConfigsView(admin.AdminSite):
             form = EditSearchableIndexForm(request.POST) 
             if form.is_valid():  
                 searchable_index.searchable = form.cleaned_data['searchable']
+                searchable_index.group = form.cleaned_data['group']
                 searchable_index.save()
                 return redirect(reverse('admin:search_configs'))
         else:

@@ -84,7 +84,7 @@ def search(request):
             'instances': response_content['instances'],
             'doc_types': response_content['doc_types'],
             'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2'],
-            'filter_doc_types': ['diarios', 'processos']
+            'filter_doc_types': ['Diario', 'Processo']
         }
         
         return render(request, 'aduna/search.html', context)

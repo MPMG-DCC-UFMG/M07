@@ -1,30 +1,55 @@
 from django.forms import ModelForm, Form
-from django.forms import ModelChoiceField, BooleanField, IntegerField
+from django.forms import ModelChoiceField, BooleanField, IntegerField, ChoiceField
 from django.utils.translation import gettext_lazy as _
 from ..services.models import Config, WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
 
 
 class SearchConfigsForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['results_per_page'].label = 'Resultados por pagina'
+        
     class Meta:  
         model = SearchConfigs  
-        fields = "__all__"  
+        fields = ['results_per_page']
 
 class AddWeightedSearchFieldForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['field'].label = 'Campo'
+        self.fields['field_name'].label = 'Descrição do campo'
+        self.fields['weight'].label = 'Peso'
+        self.fields['searchable'].label = 'Buscavel'
+
     class Meta:  
         model = WeightedSearchFieldsConfigs  
-        fields = "__all__"  
+        fields = ['field',
+                  'field_name',
+                  'weight',
+                  'searchable']  
 
 class EditWeightedSearchFieldForm(Form):
-    weight = IntegerField(min_value = 1)
-    searchable = BooleanField(required=False)
+
+    weight = IntegerField(min_value = 1, label='Peso')
+    searchable = BooleanField(required=False, label='Buscavel')
 
 class AddSearchableIndexForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['index'].label = 'Index'
+        self.fields['index_model'].label = 'Model'
+        self.fields['searchable'].label = 'Buscavel'
+
     class Meta:  
         model = SearchableIndicesConfigs  
-        fields = "__all__"  
+        fields = ['index',
+                  'index_model',
+                  'searchable',
+                  'group']
 
 class EditSearchableIndexForm(Form):
-    searchable = BooleanField(required=False)
+    searchable = BooleanField(required=False, label='Buscavel')
+    group = ChoiceField(required=True, choices=SearchableIndicesConfigs.GROUPS, label='Conjunto')
 
 class ConfigForm(ModelForm):
     def __init__(self, *args, **kwargs):

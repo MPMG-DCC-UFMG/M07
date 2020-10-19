@@ -129,12 +129,13 @@ class LogQuerySuggestionClickView(APIView):
 
 from django.contrib.auth.models import User
 from ..elastic import Elastic
+from mpmg.services.query import Query
 class LogDataGeneratorView():
     '''
     Entre no shell do django: 
         python manage.py shell
     Execute:
-        from mpmg.services.views.log import *
+        from mpmg.services.views.log import *?
         LogDataGeneratorView().clear_logs() # caso queira deletar os logs existentes
         LogDataGeneratorView().generate('01/08/2020', '25/08/2020')
     '''
@@ -181,7 +182,6 @@ class LogDataGeneratorView():
 
             # execute queries
             for q in day_queries:
-                start = time.time()
 
                 sid = random.getrandbits(128)
                 id_usuario = random.sample(user_ids, 1)[0]
@@ -194,24 +194,25 @@ class LogDataGeneratorView():
                 qid = qid.hexdigest()
 
                 try:
-                    total_docs, total_pages, documents, took = document.search(q, 1)
+                    query_obj = Query(q,1,qid,sid,id_usuario)
+                    total_docs, total_pages, documents, took = query_obj.execute()
                 except:
                     print('ERRO:', current_date, q)
                     continue
                 
-                LogSearch().save(dict(
-                    id_sessao = sid, 
-                    id_consulta = qid,
-                    id_usuario = id_usuario,
-                    text_consulta = q,
-                    algoritmo = 'BM25',
-                    data_hora = query_timestamp,
-                    tempo_resposta = took,
-                    documentos = [ i.type+':'+i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
-                    pagina = 1,
-                    resultados_por_pagina = 10,
-                    tempo_resposta_total = time.time() - start
-                ))
+                # LogSearch().save(dict(
+                #     id_sessao = sid, 
+                #     id_consulta = qid,
+                #     id_usuario = id_usuario,
+                #     text_consulta = q,
+                #     algoritmo = 'BM25',
+                #     data_hora = query_timestamp,
+                #     tempo_resposta = took,
+                #     documentos = [ i.type+':'+i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
+                #     pagina = 1,
+                #     resultados_por_pagina = 10,
+                #     tempo_resposta_total = time.time() - start
+                # ))
 
                 # result click
                 clicked = False

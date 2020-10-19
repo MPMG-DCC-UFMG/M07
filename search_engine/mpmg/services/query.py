@@ -7,8 +7,8 @@ from mpmg.services.models import LogSearch, Document, WeightedSearchFieldsConfig
 
 #Classe funciona como uma especie de interface para usar o Models/Document
 class Query:
-    def __init__(self, raw_query, page, qid, sid, user_id, instances, 
-                doc_types, start_date, end_date):
+    def __init__(self, raw_query, page, qid, sid, user_id, instances=[], 
+                doc_types=[], start_date=None, end_date=None, group='regular'):
         self.start_time = time.time()
         self.raw_query = raw_query
         self.page = page
@@ -20,6 +20,10 @@ class Query:
         self.doc_types = doc_types
         self.start_date = start_date
         self.end_date = end_date
+        if self.instances == [] or self.instances == None or self.instances == "":
+            self.instances = [] 
+        if self.doc_types == [] or self.doc_types == None or self.doc_types == "":
+            self.doc_types = [] 
         if self.start_date == "":
             self.start_date = None
         if self.end_date == "":
@@ -27,13 +31,15 @@ class Query:
 
         self.data_hora = int(time.time()*1000)
         self.query = ' '.join([w for w in self.raw_query.split() if len(w) > 1])
-        self.searchable_indices = SearchableIndicesConfigs.get_searchble_indices()
+        self.group = group
         
-        self.algo_configs = Elastic().get_cur_algo()
+        self.algo_configs = Elastic().get_cur_algo(group=self.group)
         self.results_per_page =  SearchConfigs.get_results_per_page()
 
         self.weighted_fields =  WeightedSearchFieldsConfigs.get_weigted_search_fields()
         self._generate_query_id()
+
+        self.indices = self._get_search_indices()
 
     def _generate_query_id(self):
         if not self.qid:
@@ -48,8 +54,10 @@ class Query:
 
     def is_valid(self):
         query_len = len(''.join(self.query.split()))
-        if query_len < 2:
+        if query_len < 2 or len(self.indices)==0:
             return False
+        else:
+            return True
 
     def _get_must_queries(self):
         must_queries = [Elastic().dsl.Q('query_string', query=self.query, fields=self.weighted_fields)]
@@ -72,27 +80,29 @@ class Query:
             )
         return filters_queries
 
-    def _get_search_indices(self):
-        indices = self.searchable_indices
-        if self.doc_types != None and self.doc_types != []:
-            indices = self.doc_types
-        return indices
-
     def execute(self):
         must_queries = self._get_must_queries()
         filter_queries = self._get_filters_queries()
-        self.indices = self._get_search_indices()
         
-        self.total_docs, self.total_pages, self.documents, self.response_time  = Document().costumized_search( self.indices,
+        self.total_docs, self.total_pages, self.documents, self.response_time  = Document().custum_search( self.indices,
             must_queries, filter_queries, self.page, self.results_per_page)
-        
+    
         self._log()
 
         return self.total_docs, self.total_pages, self.documents, self.response_time 
 
+    def _get_search_indices(self):
+        if len(self.doc_types) > 0:
+            indices = SearchableIndicesConfigs.get_searchable_indices(models=self.doc_types, groups=[self.group])
+            # print(indices)
+            return indices
+        else:
+            indices = SearchableIndicesConfigs.get_searchable_indices(groups=[self.group])
+            # print(indices)
+            return indices
 
-    def _log(self): 
-        LogSearch().save(dict(
+    def _log(self):
+        data = dict(
             id_sessao = self.sid,
             id_consulta = self.qid,
             id_usuario = self.user_id,
@@ -114,7 +124,9 @@ class Query:
             data_inicial = self.start_date,
             data_final = self.end_date
 
-        ))
+        )
+        # print(data)
+        LogSearch().save(data)
 
         
 

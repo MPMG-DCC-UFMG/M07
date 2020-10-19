@@ -12,6 +12,7 @@ from ..elastic import Elastic
 from ..features_extractor import FeaturesExtractor
 from ..ranking.tf_idf import TF_IDF
 from ..features_extractor import TermVectorsFeaturesExtractor
+from mpmg.services.query import Query
 
 
 class CompareView(APIView):
@@ -21,68 +22,41 @@ class CompareView(APIView):
         start = time.time() # Medindo wall-clock time da requisição completa
 
         try:
-            self.elastic = Elastic()
-            self._read_parameters(request)
+            self._generate_queries(request)
 
-            # valida o tamanho da consulta
-            query_len = len(''.join(self.query.split()))
-            if query_len < 2:
+            if not self.regular_query.is_valid() or not self.replica_query.is_valid():
                 data = {'error_type': 'invalid_query'}
                 return Response(data, status=status.HTTP_400_BAD_REQUEST)
                 
             # Busca os documentos no elastic com Algoritmo 1
-            total_docs, total_pages, documents, response_time = Document().search_with_filters(
-                self.query, self.page, self.instances, self.doc_types, self.start_date, self.end_date)
+            total_docs, total_pages, documents, response_time = self.regular_query.execute()
 
             # Busca os documentos no elastic com Algoritmo 2 (nos índices replica)
-            replica_indices = {}
-            for k, v in settings.SEARCHABLE_INDICES.items(): # converte a string para classe
-                replica_indices[k + '-replica'] = v
-            total_docs_repl, total_pages_repl, documents_repl, response_time_repl = Document(searchable_indices=replica_indices).search_with_filters(
-                self.query, self.page, self.instances, self.doc_types, self.start_date, self.end_date)
-
-            # Grava o log da consulta
-            # LogSearch().save(dict(
-            #     id_sessao = self.sid, 
-            #     id_consulta = self.qid,
-            #     id_usuario = self.id_usuario,
-            #     text_consulta = self.query,
-            #     algoritmo = self.algoritmo,
-            #     data_hora = self.data_hora,
-            #     tempo_resposta = response_time,
-            #     documentos = [ i['type']+':'+i['id'] for i in sorted(documents, key = lambda x: x['rank_number']) ],
-            #     pagina = self.page,
-            #     resultados_por_pagina = self.results_per_page,
-            #     tempo_resposta_total = time.time() - start,
-            #     indices = self.doc_types,
-            #     instancias =  self.instances,
-            #     data_inicial = self.start_date,
-            #     data_final = self.end_date
-            # ))
+            total_docs_repl, total_pages_repl, documents_repl, response_time_repl = self.replica_query.execute()
 
             end = time.time()
             wall_time = end - start
             
             data = {
-                'query': self.query,
+                'query': self.regular_query.query,
                 'total_docs': total_docs,
                 'time': wall_time,
                 'response_time': response_time,
-                'results_per_page': self.results_per_page,
+                'results_per_page': self.regular_query.results_per_page,
                 'documents': documents,
-                'current_page': self.page,
+                'current_page': self.regular_query.page,
                 'total_pages': total_pages,
-                'qid': self.qid,
-                'start_date': self.start_date,
-                'end_date': self.end_date,
-                'instances': self.instances,
-                'doc_types': self.doc_types,
+                'qid': self.regular_query.qid, #sera retornado o qid de somente uma consulta
+                'start_date': self.regular_query.start_date, 
+                'end_date': self.regular_query.end_date,
+                'instances': self.regular_query.instances,
+                'doc_types': self.regular_query.doc_types,
                 'total_docs_repl': total_docs_repl,
                 'total_pages_repl': total_pages_repl,
                 'documents_repl': documents_repl,
                 'response_time_repl': response_time_repl,
-                'algorithm_base': self.elastic.get_cur_algo()['type'],
-                'algorithm_repl': self.elastic.get_cur_algo(['diarios-replica'])['type'],
+                'algorithm_base': self.regular_query.algo_configs['type'],#TODO: acertar isso para passar como parametro o grupo
+                'algorithm_repl': self.replica_query.algo_configs['type'],#TODO: acertar isso para passar como parametro o grupo
             }               
             return Response(data)
         
@@ -92,35 +66,22 @@ class CompareView(APIView):
             }
             print(sys.exc_info())
             return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
-        
-    def _read_parameters(self, request):
-        # url parameters
-        self.raw_query = request.GET['query']
-        self.page = int(request.GET.get('page', 1))
-        self.sid = request.GET['sid']
-        self.qid = request.GET.get('qid', '')
-        self.instances = request.GET.getlist('instances', [])
-        self.doc_types = request.GET.getlist('doc_types', [])
-        self.start_date = request.GET.get('start_date', None)
-        self.end_date = request.GET.get('end_date', None)
-        if self.start_date == "":
-            self.start_date = None
-        if self.end_date == "":
-            self.end_date = None
-
-        # internal parameters
-        self.data_hora = int(time.time()*1000)
-        self.algoritmo = 'BM25'
-        self.results_per_page = 10
-        self.id_usuario = request.user.id
-        self.index = request.GET.getlist('index', settings.SEARCHABLE_INDICES.keys())
-        self.query = ' '.join([w for w in self.raw_query.split() if len(w) > 1])
-        self._generate_query_id()
     
+    def _generate_queries(self, request):
+        # url parameters
+        raw_query = request.GET['query']
+        page = int(request.GET.get('page', 1))
+        sid = request.GET['sid']
+        qid = request.GET.get('qid', '')
+        instances = request.GET.getlist('instances', [])
+        doc_types = request.GET.getlist('doc_types', [])
+        start_date = request.GET.get('start_date', None)
+        end_date = request.GET.get('end_date', None)
+        user_id = request.user.id
 
-    def _generate_query_id(self):
-        if not self.qid:
-            pre_qid = hashlib.sha1()
-            pre_qid.update(bytes(str(self.data_hora) + str(self.id_usuario) + self.query + self.sid, encoding='utf-8'))
-            self.qid = pre_qid.hexdigest()
+        self.regular_query = Query(raw_query, page, qid, sid, user_id, instances, 
+                doc_types, start_date, end_date)
+
+        self.replica_query = Query(raw_query, page, qid, sid, user_id, instances, 
+                doc_types, start_date, end_date, group='replica') #Modificar o doc_types para incluir os indices do outro alg
+        
