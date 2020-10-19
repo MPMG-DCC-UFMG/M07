@@ -46,7 +46,7 @@ class CompareView(APIView):
                 'documents': documents,
                 'current_page': self.regular_query.page,
                 'total_pages': total_pages,
-                'qid': self.regular_query.qid, #sera retornado o qid de somente uma consulta
+                'qid': self.regular_query.qid, #TODO:sera retornado o qid de somente uma consulta
                 'start_date': self.regular_query.start_date, 
                 'end_date': self.regular_query.end_date,
                 'instances': self.regular_query.instances,
