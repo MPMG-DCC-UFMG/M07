@@ -125,4 +125,109 @@ $(function(){
         }
     }
     var grafico_sem_resultados_dia = new Chart(no_results_ctx, no_results_config);
+
+
+    var posicao_clique_ctx = $("#grafico-posicao-clique").get(0).getContext("2d");
+    var posicao_clique_config = {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: avg_click_position_per_day['data'],
+                backgroundColor: '#114b5f',
+
+            }],
+            labels: avg_click_position_per_day['labels']
+        },
+        options: {
+            legend: false,
+            scales: {
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Posição no ranking'
+                  }
+                }]
+            }
+        }
+    }
+    var grafico_posicao_clique = new Chart(posicao_clique_ctx, posicao_clique_config);
+
+    
+    var tempo_clique_ctx = $("#grafico-tempo-ate-clique").get(0).getContext("2d");
+    var tempo_clique_config = {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: time_to_first_click_per_day['data'],
+                backgroundColor: '#faa613',
+
+            }],
+            labels: time_to_first_click_per_day['labels']
+        },
+        options: {
+            legend: false,
+            scales: {
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Tempo em segundos'
+                  }
+                }]
+            }
+        }
+    }
+    var grafico_tempo_clique = new Chart(tempo_clique_ctx, tempo_clique_config);
+
+
+    var cliques_por_consulta_ctx = $("#grafico-cliques-por-consulta").get(0).getContext("2d");
+    var cliques_por_consulta_config = {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: avg_clicks_per_query_per_day['data'],
+                backgroundColor: '#688e26',
+
+            }],
+            labels: avg_clicks_per_query_per_day['labels']
+        },
+        options: {
+            legend: false,
+            scales: {
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Média de cliques'
+                  }
+                }]
+            }
+        }
+    }
+    var grafico_cliques_por_consulta = new Chart(cliques_por_consulta_ctx, cliques_por_consulta_config);
+
+
+    var duracao_sessao_ctx = $("#grafico-duracao-sessao").get(0).getContext("2d");
+    var duracao_sessao_config = {
+        type: 'bar',
+        data: {
+            datasets: [{
+                data: avg_session_duration_per_day['data'],
+                backgroundColor: '#f44708',
+
+            }],
+            labels: avg_session_duration_per_day['labels']
+        },
+        options: {
+            legend: false,
+            scales: {
+                yAxes: [{
+                  scaleLabel: {
+                    display: true,
+                    labelString: 'Duração em segundos'
+                  }
+                }]
+            }
+        }
+    }
+    var grafico_duracao_sessao = new Chart(duracao_sessao_ctx, duracao_sessao_config);
+    
 });

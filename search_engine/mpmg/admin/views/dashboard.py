@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 from django.contrib import admin
 from django.shortcuts import render
@@ -121,7 +122,49 @@ class DashboardView(admin.AdminSite):
                 porc_no_results_per_day[d] = 0
         
 
-        print('TEMPO MEDIO', metrics.avg_time_to_first_click())
+        #posição média dos cliques
+        avg_click_position_dict = metrics.avg_click_position()['avg_click_position_per_day']
+        avg_click_position_per_day = dict.fromkeys(days_labels, 0)
+        if len(avg_click_position_dict) > 0:
+            for d, v in avg_click_position_dict.items():
+                if d in avg_click_position_per_day:
+                    avg_click_position_per_day[d] = round(v, 2)
+        
+        avg_click_position = round(np.mean(list(avg_click_position_per_day.values())), 2)
+
+
+        # tempo até o primeiro clique
+        time_to_first_click_dict = metrics.avg_time_to_first_click()['avg_time_to_first_click_by_date']
+        time_to_first_click_per_day = dict.fromkeys(days_labels, 0)
+        if len(time_to_first_click_dict) > 0:
+            for d, v in time_to_first_click_dict.items():
+                if d in time_to_first_click_per_day:
+                    time_to_first_click_per_day[d] = round(v/1000)
+        
+        avg_time_to_first_click = int(np.mean(list(time_to_first_click_per_day.values())))
+        
+
+        # cliques por consulta
+        avg_clicks_per_query_dict = metrics.avg_clicks_per_query()['avg_clicks_per_query_by_day']
+        avg_clicks_per_query_per_day = dict.fromkeys(days_labels, 0)
+        if len(avg_clicks_per_query_dict) > 0:
+            for item in avg_clicks_per_query_dict:
+                d = item['dia']
+                v = item['mean']
+                if d in avg_clicks_per_query_per_day:
+                    avg_clicks_per_query_per_day[d] = round(v, 2)
+        
+        avg_clicks_per_query = round(np.mean(list(avg_clicks_per_query_per_day.values())), 2)
+
+
+        # tempo das sessões
+        avg_session_duration_dict = metrics.avg_session_duration()
+        avg_session_duration_per_day = dict.fromkeys(days_labels, 0)
+        for day, mean in avg_session_duration_dict.items():
+            if day in avg_session_duration_per_day:
+                avg_session_duration_per_day[day] = mean
+        
+        avg_session_duration = int(np.mean(list(avg_session_duration_per_day.values())))
 
 
         
@@ -160,5 +203,13 @@ class DashboardView(admin.AdminSite):
             no_results_per_day= {'labels': list(no_results_per_day.keys()), 'data': list(no_results_per_day.values())},
             porc_no_clicks_per_day= {'labels': list(porc_no_clicks_per_day.keys()), 'data': list(porc_no_clicks_per_day.values())},
             porc_no_results_per_day= {'labels': list(porc_no_results_per_day.keys()), 'data': list(porc_no_results_per_day.values())},
+            time_to_first_click_per_day= {'labels': list(time_to_first_click_per_day.keys()), 'data': list(time_to_first_click_per_day.values())},
+            avg_time_to_first_click= avg_time_to_first_click,
+            avg_click_position= avg_click_position,
+            avg_click_position_per_day = {'labels':list(avg_click_position_per_day.keys()), 'data': list(avg_click_position_per_day.values())},
+            avg_clicks_per_query= avg_clicks_per_query,
+            avg_clicks_per_query_per_day = {'labels': list(avg_clicks_per_query_per_day.keys()), 'data': list(avg_clicks_per_query_per_day.values())},
+            avg_session_duration = avg_session_duration,
+            avg_session_duration_per_day = {'labels': list(avg_session_duration_per_day.keys()), 'data': list(avg_session_duration_per_day.values())},
         )
         return render(request, 'admin/index.html', context)

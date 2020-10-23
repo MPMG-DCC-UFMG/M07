@@ -1,3 +1,5 @@
+import math
+import numpy as np
 import pandas as pd
 import time
 from datetime import datetime
@@ -28,6 +30,9 @@ class Metrics:
 
             _, click_log = LogSearchClick.get_list_filtered(id_consultas=id_consultas)
             click_log = pd.DataFrame.from_dict(click_log)
+            
+            if len(click_log) > 0:
+                click_log['dia'] = click_log['timestamp'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
         else:
             click_log = pd.DataFrame.from_dict({})
 
@@ -64,7 +69,8 @@ class Metrics:
     def avg_click_position(self):
         #media da posição dos clicks
         response = {
-            "avg_click_position": self.click_log['posicao'].astype(int).mean()
+            "avg_click_position": self.click_log['posicao'].astype(int).mean() if len(self.click_log) > 0 else [],
+            "avg_click_position_per_day": self.click_log.groupby(by='dia').mean()['posicao'].to_dict() if len(self.click_log) > 0 else []
         }
         return response
 
@@ -94,6 +100,65 @@ class Metrics:
             "clicks_per_position": self.click_log.groupby(by='posicao', as_index=False ).count()[['posicao','id_documento']].to_dict(orient='records')
         }
         return data
+    
+
+    def avg_clicks_per_query(self):
+        if len(self.query_log) > 0:
+            query_ids = self.query_log['id_consulta'].unique()
+        else:
+            query_ids = []
+
+        if len(self.click_log) > 0:
+            valid_clicks = self.click_log['id_consulta'].isin(query_ids)
+            df_count = self.click_log[valid_clicks].groupby(by=['id_consulta', 'dia']).count().reset_index()
+            df_count = df_count[['id_consulta', 'dia', 'id']].rename(columns={'id':'count'})
+            
+            avg_clicks_per_query_by_day = df_count.groupby(by='dia').mean().reset_index().rename(columns={'count':'mean'})
+            return {'avg_clicks_per_query_by_day': avg_clicks_per_query_by_day.to_dict(orient='records')}
+        else:
+            return {'avg_clicks_per_query_by_day': {}}
+    
+
+    def avg_session_duration(self):
+        avg_session_duration_by_day = {}
+        if len(self.query_log) > 0:
+            joint_df = self.query_log.set_index('id_consulta').join(self.click_log.set_index('id_consulta'), lsuffix='_query', rsuffix='_click')
+            joint_df = joint_df.reset_index()
+            joint_df = joint_df[['id_sessao', 'id_consulta', 'data_hora', 'timestamp', 'dia_query']]
+            
+            durations_by_date = defaultdict(list)    
+            session_ids = joint_df['id_sessao'].unique()
+            for s in session_ids:
+                # A última interação do usuário na sessão pode ter sido a execução de uma consulta ou o clique em um link.
+                # Por isso começo olhando a data da primeira consulta como início de sessão e pego a interação mais antiga 
+                # como data de fim de sessão, que pode estar no log de consulta ou no log de click
+                target_records = joint_df[joint_df['id_sessao'] == s]
+                target_records = target_records.sort_values(by=['data_hora', 'timestamp']).reset_index(drop=True)
+
+                dia = target_records['dia_query'][0]
+                start_timestamp = target_records.iloc[0]['data_hora']
+                end_query_timestamp = target_records.iloc[-1]['data_hora']
+                end_click_timestamp = target_records.iloc[-1]['timestamp']
+
+                if start_timestamp == end_query_timestamp and math.isnan(end_click_timestamp):
+                    # Não consigo ter uma data de fim de sessão nos casos em que o usuário fez uma consulta e não fez mais nada.
+                    continue
+                else:
+                    end_timestamp = end_click_timestamp if end_click_timestamp > end_query_timestamp else end_query_timestamp
+                    duration = int((end_timestamp - start_timestamp) / 1000)
+                    durations_by_date[dia].append(duration)
+                
+            # faz a média de cada dia
+            for day, durations in durations_by_date.items():
+                avg_session_duration_by_day[day] = int(np.mean(durations))
+            
+            
+        return avg_session_duration_by_day
+        
+
+
+
+
 
     def avg_response_time(self):
         #calcula o tempo de resposta medio geral e o tempo de resposta medio para cada tamanho de consulta para cada algoritimo usado
@@ -109,7 +174,10 @@ class Metrics:
 
     def avg_time_to_first_click(self):
         #Calcula o tempo medio ate o primeiro click
-        queries = self.query_log['id_consulta'].drop_duplicates().to_list() #calcular todas as queries
+        if len(self.query_log) > 0:
+            queries = self.query_log['id_consulta'].drop_duplicates().to_list() #calcular todas as queries
+        else:
+            queries = {}
         
         times_by_date = defaultdict(list)
         times = []
@@ -135,8 +203,8 @@ class Metrics:
                 
         
         response = {
-            "avg_time_to_first_click": times_by_date,
-            "avg_time_to_first_click_by_date": pd.Series(times).astype(int).mean()
+            "avg_time_to_first_click": pd.Series(times).astype(int).mean(),
+            "avg_time_to_first_click_by_date": times_by_date,
         }
 
         return response

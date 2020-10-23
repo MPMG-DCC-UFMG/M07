@@ -135,7 +135,7 @@ class LogDataGeneratorView():
     Entre no shell do django: 
         python manage.py shell
     Execute:
-        from mpmg.services.views.log import *?
+        from mpmg.services.views.log import *
         LogDataGeneratorView().clear_logs() # caso queira deletar os logs existentes
         LogDataGeneratorView().generate('01/08/2020', '25/08/2020')
     '''
@@ -160,9 +160,6 @@ class LogDataGeneratorView():
             num_queries = random.randrange(MAX_QUERIES_PER_DAY)
             day_queries = random.sample(POSSIBLE_QUERIES, num_queries)
 
-            # probability of user click in that day
-            click_prob = 10 - random.randrange(4)
-
             # add some random weird queries (to make sure we dont get results)
             num_weird_queries = int(num_queries * random.random()) # the number is based on the number of normal queries
             num_words = random.randrange(2) + 1 # up to 3 words
@@ -178,7 +175,7 @@ class LogDataGeneratorView():
             random.shuffle(day_queries)
 
             
-            print(current_date, num_queries, click_prob)
+            print(current_date, num_queries)
 
             # execute queries
             for q in day_queries:
@@ -195,32 +192,22 @@ class LogDataGeneratorView():
 
                 try:
                     query_obj = Query(q,1,qid,sid,id_usuario)
+                    query_obj.data_hora = query_timestamp
                     total_docs, total_pages, documents, took = query_obj.execute()
                 except:
                     print('ERRO:', current_date, q)
                     continue
                 
-                # LogSearch().save(dict(
-                #     id_sessao = sid, 
-                #     id_consulta = qid,
-                #     id_usuario = id_usuario,
-                #     text_consulta = q,
-                #     algoritmo = 'BM25',
-                #     data_hora = query_timestamp,
-                #     tempo_resposta = took,
-                #     documentos = [ i.type+':'+i.id for i in sorted(documents, key = lambda x: x.rank_number) ],
-                #     pagina = 1,
-                #     resultados_por_pagina = 10,
-                #     tempo_resposta_total = time.time() - start
-                # ))
+
 
                 # result click
-                clicked = False
+                num_clicks = 0
                 if len(documents) > 0:
                     # clicked = random.choices([True, False], [click_prob, 1])
                     # clicked = clicked[0]
-                    clicked = random.choice([True, False])
-                    if clicked:
+                    # clicked = random.choice([True, False])
+                    num_clicks = random.choices([0,1,2,3,4], [5, 5, 1, 1, 1])
+                    for _ in range(num_clicks[0]):
                         clicked_doc = random.sample(documents, 1)
                         clicked_doc = clicked_doc[0]
 
@@ -233,7 +220,7 @@ class LogDataGeneratorView():
                             timestamp=(query_timestamp + random.randrange(60)*1000) # up to one minute to click in the result
                         ))
                 
-                print(qid, q, len(documents)==0, clicked)
+                print(qid, q, 'vazio:',len(documents)==0, 'clicks:', num_clicks)
             
             current_date = current_date + timedelta(days=1)
         print('Finished')
