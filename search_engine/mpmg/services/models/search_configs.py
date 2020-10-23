@@ -1,12 +1,16 @@
 from django.db import models
 
 class SearchConfigs(models.Model):
-    results_per_page = models.IntegerField(default=10, blank=False)
+    results_per_page = models.IntegerField(default=10, blank=False, primary_key=True)
     
     def save(self, *args, **kwargs):
-        if SearchConfigs.objects.count() > 0:
-            SearchConfigs.objects.all()[0].delete()
-        super(SearchConfigs, self).save(*args, **kwargs)
+        if SearchConfigs.objects.count() >= 1:
+            for obj in SearchConfigs.objects.all():
+                obj.delete()
+        
+        if SearchConfigs.objects.count() == 0:
+            super(SearchConfigs, self).save(*args, **kwargs)
+        
 
     @classmethod
     def get_results_per_page(cls):

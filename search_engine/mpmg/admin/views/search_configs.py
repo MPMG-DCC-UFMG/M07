@@ -4,7 +4,7 @@ from django.urls import reverse
 from mpmg.admin.forms import AddWeightedSearchFieldForm, EditWeightedSearchFieldForm, AddSearchableIndexForm, EditSearchableIndexForm, SearchConfigsForm
 from mpmg.services.models import WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
 
-#typo
+
 class SearchConfigsView(admin.AdminSite): 
     def __init__(self):
         super(SearchConfigsView, self).__init__()
