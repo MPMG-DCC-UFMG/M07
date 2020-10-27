@@ -33,8 +33,11 @@ class Metrics:
             
             if len(click_log) > 0:
                 click_log['dia'] = click_log['timestamp'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
+            else:
+                click_log = pd.DataFrame(columns=LogSearchClick().index_fields+['dia'])
+
         else:
-            click_log = pd.DataFrame.from_dict({})
+            click_log = pd.DataFrame(columns=LogSearchClick().index_fields+['dia'])
 
         return query_log, click_log, sugestion_log
     

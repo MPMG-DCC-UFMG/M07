@@ -169,3 +169,9 @@ class ElasticModel(dict):
             })
         info = sorted(info, key=lambda item: item['index_name'])
         return info
+    
+
+    @staticmethod
+    def get_cluster_info():
+        response = ElasticModel.elastic.es.cluster.stats()
+        return response

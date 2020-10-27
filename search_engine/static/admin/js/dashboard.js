@@ -1,4 +1,32 @@
+var isTabActive = true;
+
+window.onfocus = function(){ 
+    isTabActive = true; 
+}; 
+
+window.onblur = function(){ 
+    isTabActive = false; 
+};
+
+function get_cluster_info(){
+    // console.log(!document.hidden)
+    if(!document.hidden){ //(isTabActive) { // só faz se a janela estiver ativa
+        var ajax = $.get(SERVICES_URL+'monitoring/cluster')
+            ajax.done(function(response){
+                $('#cpu_percent').html(response['cpu_percent']+'%');
+                var mem_percent = ((response['jvm_heap_used'] / response['jvm_heap_size']) * 100).toFixed(2);
+                $('#mem_percent').html(mem_percent+'%');
+            });
+    }
+}
+
+var grafico_uso_processador;
+var grafico_uso_memoria;
+
 $(function(){
+
+    //solicita informação sobre o cluster a cada 2s
+    setInterval(get_cluster_info, 2000);
 
     var qtdes_ctx = $("#grafico-pizza-qtdes-indices").get(0).getContext("2d");
     var qtdes_config = {

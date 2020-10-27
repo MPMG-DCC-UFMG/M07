@@ -1,11 +1,12 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.contrib import admin
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.conf import settings
-from mpmg.services.models.elastic_model import ElasticModel
+from mpmg.services.models import ElasticModel, SearchableIndicesConfigs
 from mpmg.services.metrics import Metrics
 
 class DashboardView(admin.AdminSite):
@@ -33,6 +34,20 @@ class DashboardView(admin.AdminSite):
 
         # informação sobre os índices
         indices_info = ElasticModel.get_indices_info()
+
+        # total de registros (considerando apenas os índices principais)
+        total_records = 0
+        searchable_indices = SearchableIndicesConfigs.get_searchable_indices(groups=['regular'])
+        for item in indices_info:
+            if item['index_name'] in searchable_indices:
+                total_records += int(item['num_documents'])
+        
+
+        cluster_info = ElasticModel.get_cluster_info()
+        store_size = round(cluster_info['indices']['store']['size_in_bytes'] /1024 /1024 /1024, 2)
+        allocated_processors = cluster_info['nodes']['os']['allocated_processors']
+        jvm_heap_size = int(cluster_info['nodes']['jvm']['mem']['heap_max_in_bytes'] /1024 /1024 /1024)
+
 
         # dados para o gráfico de pizza com a qtde de documentos por índice
         searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
@@ -186,9 +201,14 @@ class DashboardView(admin.AdminSite):
 
         context = dict(
             self.each_context(request), # admin variables
+            services_url= settings.SERVICES_URL,
+            allocated_processors= allocated_processors,
+            jvm_heap_size= jvm_heap_size,
             start_date= start_date.strftime('%d/%m/%Y'),
             end_date= end_date.strftime('%d/%m/%Y'),
+            total_records= total_records,
             total_queries= total_queries,
+            store_size= store_size,
             avg_query_time= avg_query_time,
             total_no_clicks= total_no_clicks,
             total_no_results= total_no_results,

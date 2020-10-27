@@ -14,6 +14,9 @@ var time_to_first_click_per_day = {{ time_to_first_click_per_day|safe }};
 var avg_click_position_per_day = {{ avg_click_position_per_day|safe }};
 var avg_clicks_per_query_per_day = {{ avg_clicks_per_query_per_day|safe }};
 var avg_session_duration_per_day = {{ avg_session_duration_per_day|safe }};
+
+SERVICES_URL = "{{ services_url }}";
+
 </script>
 {% endblock %}
 {% block content %}
@@ -67,7 +70,7 @@ var avg_session_duration_per_day = {{ avg_session_duration_per_day|safe }};
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel">
-            {% include "./_dash_indices.html" with indices_info=indices_info %}
+            {% include "./_dash_indices.html" with store_size=store_size indices_info=indices_info total_records=total_records %}
         </div>
         <div class="tab-pane fade" id="profile" role="tabpanel">
             {% include "./_dash_queries.html" with total_queries=total_queries porc_total_no_clicks=porc_total_no_clicks total_no_clicks=total_no_clicks porc_total_no_results=porc_total_no_results total_no_results=total_no_results avg_query_time=avg_query_time %}

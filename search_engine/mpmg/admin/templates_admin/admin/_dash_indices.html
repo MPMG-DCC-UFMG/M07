@@ -6,7 +6,7 @@
                 <div class="col-lg-3 col-md-6">
                     <div class="d-flex">
                     <div class="wrapper">
-                        <h3 class="mb-0 font-weight-semibold">00</h3>
+                        <h3 class="mb-0 font-weight-semibold">{{ store_size }}</h3>
                         <h5 class="mb-0 font-weight-medium text-primary">Gigabytes</h5>
                         <p class="mb-0 text-muted">no cluster</p>
                     </div>
@@ -19,7 +19,7 @@
                 <div class="col-lg-3 col-md-6 mt-md-0 mt-4">
                     <div class="d-flex">
                     <div class="wrapper">
-                        <h3 class="mb-0 font-weight-semibold">1000</h3>
+                        <h3 class="mb-0 font-weight-semibold">{{ total_records }}</h3>
                         <h5 class="mb-0 font-weight-medium text-primary">Registros</h5>
                         <p class="mb-0 text-muted">excluindo os logs</p>
                     </div>
@@ -32,9 +32,9 @@
                 <div class="col-lg-3 col-md-6 mt-md-0 mt-4">
                     <div class="d-flex">
                     <div class="wrapper">
-                        <h3 class="mb-0 font-weight-semibold">10%</h3>
+                        <h3 class="mb-0 font-weight-semibold" id="cpu_percent">0%</h3>
                         <h5 class="mb-0 font-weight-medium text-primary">de processamento</h5>
-                        <p class="mb-0 text-muted">CPU de x núcleos</p>
+                        <p class="mb-0 text-muted">CPU de {{ allocated_processors }} núcleos</p>
                     </div>
                     <div class="wrapper my-auto ml-auto ml-lg-4">
                         <div class="totals-icon cpu-usage"><i class="fas fa-microchip"></i></div>
@@ -45,9 +45,9 @@
                 <div class="col-lg-3 col-md-6 mt-md-0 mt-4">
                     <div class="d-flex">
                     <div class="wrapper">
-                        <h3 class="mb-0 font-weight-semibold">5%</h3>
+                        <h3 class="mb-0 font-weight-semibold" id="mem_percent">0%</h3>
                         <h5 class="mb-0 font-weight-medium text-primary">de memória</h5>
-                        <p class="mb-0 text-muted">32GB no total</p>
+                        <p class="mb-0 text-muted">{{ jvm_heap_size }}GB no heap</p>
                     </div>
                     <div class="wrapper my-auto ml-auto ml-lg-4">
                         <div class="totals-icon mem-usage"><i class="fas fa-memory"></i></div>

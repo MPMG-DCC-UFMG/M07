@@ -2,7 +2,21 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from mpmg.services.models import ElasticModel
 from ..metrics import Metrics
+
+
+class ClusterStatsView(APIView):
+    # permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        cluster_info = ElasticModel.get_cluster_info()
+        response = {}
+        response['cpu_percent'] = cluster_info['nodes']['process']['cpu']['percent']
+        response['jvm_heap_size'] = cluster_info['nodes']['jvm']['mem']['heap_max_in_bytes']
+        response['jvm_heap_used'] = cluster_info['nodes']['jvm']['mem']['heap_used_in_bytes']
+        return Response(response)
+
 
 
 class MetricsView(APIView):
