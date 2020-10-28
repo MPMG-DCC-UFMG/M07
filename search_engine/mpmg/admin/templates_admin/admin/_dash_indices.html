@@ -64,6 +64,25 @@
 <div class="row">
     <div class="col-md-6 grid-margin stretch-card">
         <div class="card">
+            <div class="card-body"  style="height: 240px;">
+                <h4 class="card-title">Uso do Processador</h4>
+                <canvas id="grafico-uso-processador"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+          <div class="card-body" style="height: 240px;">
+              <h4 class="card-title">Consumo do Heap JVM</h4>
+              <canvas id="grafico-uso-memoria"></canvas>
+          </div>
+      </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
             <div class="card-body">
                 <h4 class="card-title">Informações sobre os Índices</h4>
                 <table id="indices-status" class="table table-striped">
@@ -94,7 +113,7 @@
     <div class="col-md-6 grid-margin stretch-card">
       <div class="card">
           <div class="card-body">
-              <h4 class="card-title">Proporção dos Dados</h4>
+              <h4 class="card-title">Proporção de Dados Indexados</h4>
               <canvas id="grafico-pizza-qtdes-indices"></canvas>
           </div>
       </div>

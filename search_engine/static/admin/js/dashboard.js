@@ -16,6 +16,14 @@ function get_cluster_info(){
                 $('#cpu_percent').html(response['cpu_percent']+'%');
                 var mem_percent = ((response['jvm_heap_used'] / response['jvm_heap_size']) * 100).toFixed(2);
                 $('#mem_percent').html(mem_percent+'%');
+
+                //atualiza os gráficos
+                grafico_uso_processador.data['datasets'][0]["data"].shift();
+                grafico_uso_processador.data['datasets'][0]["data"].push(response['cpu_percent']);
+                grafico_uso_memoria.data['datasets'][0]["data"].shift();
+                grafico_uso_memoria.data['datasets'][0]["data"].push(mem_percent);
+                grafico_uso_processador.update();
+                grafico_uso_memoria.update();
             });
     }
 }
@@ -24,6 +32,90 @@ var grafico_uso_processador;
 var grafico_uso_memoria;
 
 $(function(){
+    var uso_processador_ctx = $("#grafico-uso-processador").get(0).getContext("2d");
+    var uso_processador_config = {
+        type: 'line',
+        data: {
+            datasets: [
+                {label: 'Processador',
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                borderColor: '#f4a261',},
+            ],
+            labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: false,
+            elements: {
+                point: {
+                    radius: 0,
+                    backgroundColor: "#000"
+                },
+                line: {
+                    tension: 0
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 100
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        display: false
+                    }
+                }]
+            },
+        }
+    }
+    grafico_uso_processador = new Chart(uso_processador_ctx, uso_processador_config);
+
+
+    var uso_memoria_ctx = $("#grafico-uso-memoria").get(0).getContext("2d");
+    var uso_memoria_config = {
+        type: 'line',
+        data: {
+            datasets: [
+                {label: 'Memória',
+                data: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                borderColor: '#2a9d8f',},
+            ],
+            labels: [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            legend: false,
+            elements: {
+                point: {
+                    radius: 0,
+                    backgroundColor: "#000"
+                },
+                line: {
+                    tension: 0
+                }
+            },
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        max: 100
+                    }
+                }],
+                xAxes: [{
+                    ticks: {
+                        display: false
+                    }
+                }]
+            },
+        },
+    }
+    grafico_uso_memoria = new Chart(uso_memoria_ctx, uso_memoria_config);
+
+
 
     //solicita informação sobre o cluster a cada 2s
     setInterval(get_cluster_info, 2000);
