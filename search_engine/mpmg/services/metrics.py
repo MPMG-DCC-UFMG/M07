@@ -33,6 +33,7 @@ class Metrics:
             
             if len(click_log) > 0:
                 click_log['dia'] = click_log['timestamp'].apply(lambda v: datetime.fromtimestamp(v/1000).date().strftime('%d/%m'))
+                click_log['posicao'] = pd.to_numeric(click_log['posicao']) 
             else:
                 click_log = pd.DataFrame(columns=LogSearchClick().index_fields+['dia'])
 
@@ -71,6 +72,8 @@ class Metrics:
 
     def avg_click_position(self):
         #media da posição dos clicks
+        df = pd.DataFrame(self.click_log['posicao'].astype(int))
+        print()
         response = {
             "avg_click_position": self.click_log['posicao'].astype(int).mean() if len(self.click_log) > 0 else [],
             "avg_click_position_per_day": self.click_log.groupby(by='dia').mean()['posicao'].to_dict() if len(self.click_log) > 0 else []
