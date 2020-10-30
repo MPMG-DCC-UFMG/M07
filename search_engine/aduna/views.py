@@ -83,8 +83,8 @@ def search(request):
             'end_date': datetime.strptime(response_content['end_date'], '%Y-%m-%d') if response_content['end_date'] != None else None,
             'instances': response_content['instances'],
             'doc_types': response_content['doc_types'],
-            'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2'],
-            'filter_doc_types': ['Diario', 'Processo']
+            'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2','Obras TCE'],#TODO:Automatizar
+            'filter_doc_types': ['Diario', 'Processo', 'Licitacao']#TODO:Automatizar
         }
         
         return render(request, 'aduna/search.html', context)

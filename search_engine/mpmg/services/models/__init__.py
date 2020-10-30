@@ -4,6 +4,7 @@ from .log_search_click import LogSearchClick
 from .log_sugestoes import LogSugestoes
 from .diario import Diario
 from .processo import Processo
+from .licitacao import Licitacao
 from .diario_entidade import DiarioEntidade
 from .document import Document
 from .config import Config

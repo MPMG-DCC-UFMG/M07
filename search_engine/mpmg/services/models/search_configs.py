@@ -28,6 +28,7 @@ class SearchableIndicesConfigs(models.Model):
     MODELS = (
         ('Diario', 'Diario'),
         ('Processo', 'Processo'),
+        ('Licitacao', 'Licitacao')
     )
 
     index = models.CharField(max_length=50, blank=False, primary_key=True)

@@ -50,7 +50,7 @@ class DashboardView(admin.AdminSite):
 
 
         # dados para o gráfico de pizza com a qtde de documentos por índice
-        searchable_indices = list(settings.SEARCHABLE_INDICES.keys())
+        searchable_indices = list(SearchableIndicesConfigs.get_indices_list())
         colors = ['#ffcd56', # amarelo
                   '#6ac472', # verde
                   '#ff9f40', # laranja

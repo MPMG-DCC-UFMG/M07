@@ -3,7 +3,8 @@ import hashlib
 
 from django.conf import settings
 from .elastic import Elastic
-from mpmg.services.models import LogSearch, Document, WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
+from mpmg.services.models import LogSearch, Document
+from mpmg.services.models import WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
 
 #Classe funciona como uma especie de interface para usar o Models/Document
 class Query:

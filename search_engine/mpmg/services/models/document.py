@@ -1,6 +1,7 @@
 from mpmg.services.elastic import Elastic
 from mpmg.services.models.processo import Processo
 from mpmg.services.models.diario import Diario
+from mpmg.services.models.licitacao import Licitacao
 from mpmg.services.models.diario_entidade import DiarioEntidade
 from mpmg.services.models.search_configs import SearchableIndicesConfigs
 from django.conf import settings
@@ -20,45 +21,45 @@ class Document:
 
     def __init__(self, searchable_indices=None):
         self.elastic = Elastic()
-        self.results_per_page = 10
+        # self.results_per_page = 10
         
-        if searchable_indices == None:
-            searchable_indices = {}
-            for k, v in settings.SEARCHABLE_INDICES.items(): # converte a string para classe
-                searchable_indices[k] = eval(v)
-        else:
-            for k, v in searchable_indices.items(): # converte a string para classe
-                searchable_indices[k] = eval(v)
-        self.searchable_indices = searchable_indices
-        self.index_names = list(self.searchable_indices.keys())
+        # if searchable_indices == None:
+        #     searchable_indices = {}
+        #     for k, v in settings.SEARCHABLE_INDICES.items(): # converte a string para classe
+        #         searchable_indices[k] = eval(v)
+        # else:
+        #     for k, v in searchable_indices.items(): # converte a string para classe
+        #         searchable_indices[k] = eval(v)
+        # self.searchable_indices = searchable_indices
+        # self.index_names = list(self.searchable_indices.keys())
 
     
 
-    def search(self, query, page_number):
-        start = self.results_per_page * (page_number - 1)
-        end = start + self.results_per_page
+    # def search(self, query, page_number):
+    #     start = self.results_per_page * (page_number - 1)
+    #     end = start + self.results_per_page
         
-        elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=self.index_names) \
-                .source(['fonte', 'titulo', 'conteudo']) \
-                .query('query_string', query=query, phrase_slop='2', default_field='conteudo')[start:end] \
-                .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False, type="unified")
+    #     elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=self.index_names) \
+    #             .source(['fonte', 'titulo', 'conteudo']) \
+    #             .query('query_string', query=query, phrase_slop='2', default_field='conteudo')[start:end] \
+    #             .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False, type="unified")
 
-        response = elastic_request.execute()
-        total_docs = response.hits.total.value
-        total_pages = (total_docs // self.results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
-        documents = []
+    #     response = elastic_request.execute()
+    #     total_docs = response.hits.total.value
+    #     total_pages = (total_docs // self.results_per_page) + 1 # Total retrieved documents per page + 1 page for rest of division
+    #     documents = []
 
-        for i, item in enumerate(response):
-            dict_data = item.to_dict()
-            dict_data['id'] = item.meta.id
-            dict_data['description'] = item.meta.highlight.conteudo[0]
-            dict_data['rank_number'] = self.results_per_page * (page_number-1) + (i+1)
-            dict_data['type'] = item.meta.index
+    #     for i, item in enumerate(response):
+    #         dict_data = item.to_dict()
+    #         dict_data['id'] = item.meta.id
+    #         dict_data['description'] = item.meta.highlight.conteudo[0]
+    #         dict_data['rank_number'] = self.results_per_page * (page_number-1) + (i+1)
+    #         dict_data['type'] = item.meta.index
 
-            result_class = self.searchable_indices[item.meta.index]
-            documents.append(result_class(**dict_data))
+    #         result_class = self.searchable_indices[item.meta.index]
+    #         documents.append(result_class(**dict_data))
         
-        return total_docs, total_pages, documents, response.took
+    #     return total_docs, total_pages, documents, response.took
 
         
     def custum_search(self, indices, must_queries, filter_queries, page_number, results_per_page):
