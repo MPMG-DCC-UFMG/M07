@@ -46,10 +46,7 @@ class Elastic:
 
     def set_cur_algo(self, **kwargs):
         algo = kwargs.get('algorithm')
-        
-        group = 'regular'
-        if kwargs.get('compare') == 'replica':
-            group = 'replica'
+        group = kwargs.get('compare')
         
         for index in SearchableIndicesConfigs.get_indices_list(group=group):
             
