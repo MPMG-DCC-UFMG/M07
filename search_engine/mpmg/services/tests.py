@@ -30,52 +30,52 @@ def get_auth_token(client):
     return response.json()['token']
 
 
-class SearchTests(TestCase):
+# class SearchTests(TestCase):
 
-    def setUp(self):
-        # Every test needs a client.
-        self.client = Client()
-        user = User.objects.create(username='testuser')
-        user.set_password('12345')
-        user.save()
+#     def setUp(self):
+#         # Every test needs a client.
+#         self.client = Client()
+#         user = User.objects.create(username='testuser')
+#         user.set_password('12345')
+#         user.save()
 
-    def test_query_request_logout(self):
-        # GET request enquanto logged out.
-        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': '123456789'})
+#     def test_query_request_logout(self):
+#         # GET request enquanto logged out.
+#         response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': '123456789'})
         
-        # Checa por response 401 Unauthorized.
-        self.assertEqual(response.status_code, 401)
+#         # Checa por response 401 Unauthorized.
+#         self.assertEqual(response.status_code, 401)
 
 
-    def test_query_request_login(self):
-        # GET request enquanto logged in.
-        auth_token = get_auth_token(self.client)
-        response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': '123456789'}, 
-                                    HTTP_AUTHORIZATION='Token '+auth_token)
+#     def test_query_request_login(self):
+#         # GET request enquanto logged in.
+#         auth_token = get_auth_token(self.client)
+#         response = self.client.get(reverse('mpmg.services:search'), {'query': 'maria', 'page': 1, 'sid': '123456789'}, 
+#                                     HTTP_AUTHORIZATION='Token '+auth_token)
         
-        # Checa por response 200 OK.
-        self.assertEqual(response.status_code, 200)
+#         # Checa por response 200 OK.
+#         self.assertEqual(response.status_code, 200)
         
-        # Response to JSON
-        response = response.json()
+#         # Response to JSON
+#         response = response.json()
 
-        # Checa pela resposta de autenticado.
-        self.assertIsNotNone(response['query'])
+#         # Checa pela resposta de autenticado.
+#         self.assertIsNotNone(response['query'])
 
-    def test_invalid_query(self):
-        # GET request enquanto logged in.
-        auth_token = get_auth_token(self.client)
-        response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': '123456789'},
-                                    HTTP_AUTHORIZATION='Token '+auth_token)
+#     def test_invalid_query(self):
+#         # GET request enquanto logged in.
+#         auth_token = get_auth_token(self.client)
+#         response = self.client.get(reverse('mpmg.services:search'), {'query': '', 'page': 1, 'sid': '123456789'},
+#                                     HTTP_AUTHORIZATION='Token '+auth_token)
 
-        # Checa por response 400 Bad Request.
-        self.assertEqual(response.status_code, 400)
+#         # Checa por response 400 Bad Request.
+#         self.assertEqual(response.status_code, 400)
 
-        # Response to JSON
-        response = response.json()
+#         # Response to JSON
+#         response = response.json()
 
-        # Checa que a mensagem de erro é 'invalid_query'.
-        self.assertEqual(response['error_type'], 'invalid_query')
+#         # Checa que a mensagem de erro é 'invalid_query'.
+#         self.assertEqual(response['error_type'], 'invalid_query')
 
     
 class DocumentTests(TestCase):
@@ -258,20 +258,20 @@ class LogTests(TestCase):
         # Checa por response 401 Unauthorized.
         self.assertEqual(response.status_code, 401)
 
-    def test_get_log_search_result_login(self):
-        # GET request enquanto logged in.
-        auth_token = get_auth_token(self.client)
-        response = self.client.get(reverse('mpmg.services:log_search'), {'end_date': self.current_time},
-                                    HTTP_AUTHORIZATION='Token '+auth_token)
+    # def test_get_log_search_result_login(self):
+    #     # GET request enquanto logged in.
+    #     auth_token = get_auth_token(self.client)
+    #     response = self.client.get(reverse('mpmg.services:log_search'), {'end_date': self.current_time},
+    #                                 HTTP_AUTHORIZATION='Token '+auth_token)
 
-        # Checa por response 200 OK.
-        self.assertEqual(response.status_code, 200)
+    #     # Checa por response 200 OK.
+    #     self.assertEqual(response.status_code, 200)
 
-        # Response to JSON
-        response = response.json()
+    #     # Response to JSON
+    #     response = response.json()
         
-        # Checa por resultado não vazio
-        self.assertIsNotNone(response['data'])
+    #     # Checa por resultado não vazio
+    #     self.assertIsNotNone(response['data'])
 
     def test_get_log_search_result_start_end_dates(self):
         # GET request enquanto logged in.
