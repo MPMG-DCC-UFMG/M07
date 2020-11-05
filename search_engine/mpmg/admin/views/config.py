@@ -11,8 +11,8 @@ class ConfigView(admin.AdminSite):
         super(ConfigView, self).__init__()
         self.es = Elastic()
 
-    def view_config(self, request):
-        sim_settings = self.es.get_cur_algo(group='regular') #TODO: acertar isso para obter da interface
+    def get_default_options(self, group='regular'):
+        sim_settings = self.es.get_cur_algo(group=group) #TODO: acertar isso para obter da interface
         current_num_repl = self.es.get_cur_replicas()
         max_result_window = self.es.get_max_result_window()
         algo = sim_settings['type']
@@ -52,21 +52,35 @@ class ConfigView(admin.AdminSite):
         elif algo == 'LMJelinek':
             initial['lambda_jelinek'] = sim_settings['lambda']
 
+        return initial
 
-        form = ConfigForm(initial=initial)
+    def view_config(self, request):
+        initial_regular = self.get_default_options(group='regular')
+        initial_replica = self.get_default_options(group='replica')
+
+        form_regular = ConfigForm(initial=initial_regular, prefix='regular')
+        form_replica = ConfigForm(initial=initial_replica, prefix='replica')
 
         context = dict(
             self.each_context(request), # Include common variables for rendering the admin template.
-            form = form,
+            form_regular = form_regular,
+            form_replica = form_replica,
         )
         
         return render(request, 'admin/config.html', context)
 
     def view_save_config(self, request):
-        # algo = request.POST['algorithm']
-        num_repl = request.POST['num_repl']
-        max_result_window = request.POST['max_result_window']
-        params_dict = request.POST.dict()
+        # Remove prefix (regular/replica) from the request 
+        params_dict = {}
+        for k, v in request.POST.dict().items():
+            if (k.find('regular') != -1 or k.find('replica') != -1):
+                params_dict[k.split('-')[1]] = v
+            else:
+                params_dict[k] = v
+
+        num_repl = params_dict['num_repl']
+        max_result_window = params_dict['max_result_window']
+        
         self.es.set_cur_algo(**params_dict)
         self.es.set_cur_replicas(num_repl)
         self.es.set_max_result_window(max_result_window)

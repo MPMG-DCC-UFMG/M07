@@ -202,7 +202,6 @@ def search_comparison(request):
                 id_pos[result['id']].append('<br>')    
             id_pos[result['id']].append('{}: {}ª posição'.format(response_content['algorithm_repl'], result['rank_number']))
 
-        print(id_pos)
         id_pos = dict(id_pos)
         for k, v in id_pos.items():
             id_pos[k] = ''.join(v)
