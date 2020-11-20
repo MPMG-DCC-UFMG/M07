@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.conf import settings
 from mpmg.services.models import LogSearch, Document
+from mpmg.services.models import SearchConfigs
 from ..elastic import Elastic
 from ..features_extractor import FeaturesExtractor
 from ..ranking.tf_idf import TF_IDF
@@ -80,8 +81,8 @@ class CompareView(APIView):
         user_id = request.user.id
 
         self.regular_query = Query(raw_query, page, qid, sid, user_id, instances, 
-                doc_types, start_date, end_date)
+                doc_types, start_date, end_date, use_entities=SearchConfigs.get_use_entities_in_search())
 
         self.replica_query = Query(raw_query, page, qid, sid, user_id, instances, 
-                doc_types, start_date, end_date, group='replica') #TODO: Modificar o doc_types para incluir os indices do outro alg
+                doc_types, start_date, end_date, group='replica', use_entities=SearchConfigs.get_use_entities_in_search()) #TODO: Modificar o doc_types para incluir os indices do outro alg
         
