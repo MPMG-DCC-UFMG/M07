@@ -7,6 +7,7 @@ urlpatterns = [
     path('logout', views.TokenLogout.as_view(), name='logout'),
     path('search', views.SearchView.as_view(), name='search'),
     path('search_comparison', views.CompareView.as_view(), name='search_comparison'),
+    path('search_comparison_entity', views.CompareViewEntity.as_view(), name='search_comparison_entity'),
     path('document', views.DocumentView.as_view(), name='document'),
     path('query_suggestion', views.QuerySuggestionView.as_view(), name='query_suggestion'),
     path('log_search', views.LogSearchView.as_view(), name='log_search'),

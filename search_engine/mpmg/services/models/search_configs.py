@@ -1,8 +1,10 @@
 from django.db import models
 
 class SearchConfigs(models.Model):
-    results_per_page = models.IntegerField(default=10, blank=False, primary_key=True)
-    
+    results_per_page = models.IntegerField(default=10, blank=False)
+    use_entities_in_search = models.BooleanField(default=True, blank=False)
+
+
     def save(self, *args, **kwargs):
         if SearchConfigs.objects.count() >= 1:
             for obj in SearchConfigs.objects.all():
@@ -11,13 +13,19 @@ class SearchConfigs(models.Model):
         if SearchConfigs.objects.count() == 0:
             super(SearchConfigs, self).save(*args, **kwargs)
         
-
     @classmethod
     def get_results_per_page(cls):
         if SearchConfigs.objects.count() == 0:
-            return None
+            return 10
         else:
             return cls.objects.all()[0].results_per_page
+    
+    @classmethod
+    def get_use_entities_in_search(cls):
+        if SearchConfigs.objects.count() == 0:
+            return True
+        else:
+            return cls.objects.all()[0].use_entities_in_search
 
 class SearchableIndicesConfigs(models.Model):
     GROUPS = (
@@ -26,10 +34,25 @@ class SearchableIndicesConfigs(models.Model):
     )
 
     MODELS = (
-        ('Diario', 'Diario'),
-        ('Processo', 'Processo'),
-        ('Licitacao', 'Licitacao')
+        ('Diario',         'Diario'),
+        ('Processo',       'Processo'),
+        ('Licitacao',      'Licitacao'),
+        ('DiarioEntidade', 'DiarioEntidade')
     )
+
+    entity_to_field_map = {
+        'PESSOA': 'entidade_pessoa',
+        'ORGANIZACAO': 'entidade_organizacao',
+        'LOCAL': 'entidade_local', 
+        'TEMPO': 'entidade_tempo', 
+        'LEGISLACAO': 'entidade_legislacao',
+        'JURISPRUDENCIA': 'entidade_jurisprudencia',
+        'CPF':'entidade_cpf', 
+        'CNPJ':'entidade_cnpj',
+        'CEP':'entidade_cep',
+        'MUNICIPIO':'entidade_municipio',
+        'NUM_LICIT_OU_MODALID':'entidade_processo_licitacao'
+    }
 
     index = models.CharField(max_length=50, blank=False, primary_key=True)
     index_model = models.CharField(max_length=50, blank=False, choices=MODELS)

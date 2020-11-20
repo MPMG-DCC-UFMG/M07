@@ -62,14 +62,14 @@ class Document:
     #     return total_docs, total_pages, documents, response.took
 
         
-    def custum_search(self, indices, must_queries, filter_queries, page_number, results_per_page):
+    def custum_search(self, indices, must_queries, should_queries, filter_queries, page_number, results_per_page):
         
         start = results_per_page * (page_number - 1)
         end = start + results_per_page
-
+        # print('indices: ', indices)
         elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=indices) \
                         .source(['fonte', 'titulo', 'conteudo']) \
-                        .query("bool", must = must_queries, filter = filter_queries)[start:end] \
+                        .query("bool", must = must_queries, should = should_queries, filter = filter_queries)[start:end] \
                         .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False, type="unified")                        
         
         response = elastic_request.execute()

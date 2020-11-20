@@ -8,10 +8,12 @@ class SearchConfigsForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['results_per_page'].label = 'Resultados por pagina'
+        self.fields['use_entities_in_search'].label = 'Usar entidades na busca'
         
     class Meta:  
         model = SearchConfigs  
-        fields = ['results_per_page']
+        fields = ['results_per_page', 
+                  'use_entities_in_search']
 
 class AddWeightedSearchFieldForm(ModelForm):
     def __init__(self, *args, **kwargs):
