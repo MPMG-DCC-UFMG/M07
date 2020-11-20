@@ -1,5 +1,7 @@
 import time
 import hashlib
+import subprocess
+import json
 
 from django.conf import settings
 from .elastic import Elastic
@@ -7,9 +9,10 @@ from mpmg.services.models import LogSearch, Document
 from mpmg.services.models import WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
 
 #Classe funciona como uma especie de interface para usar o Models/Document
-class Query:
+class Query: #TODO: Refatorar essa classe
     def __init__(self, raw_query, page, qid, sid, user_id, instances=[], 
-                doc_types=[], start_date=None, end_date=None, group='regular'):
+                 doc_types=[], start_date=None, end_date=None, group='regular', use_entities = True):
+
         self.start_time = time.time()
         self.raw_query = raw_query
         self.page = page
@@ -33,14 +36,38 @@ class Query:
         self.data_hora = int(time.time()*1000)
         self.query = ' '.join([w for w in self.raw_query.split() if len(w) > 1])
         self.group = group
+        self.use_entities = use_entities
         
         self.algo_configs = Elastic().get_cur_algo(group=self.group)
         self.results_per_page =  SearchConfigs.get_results_per_page()
 
-        self.weighted_fields =  WeightedSearchFieldsConfigs.get_weigted_search_fields()
         self._generate_query_id()
 
+        self.query_entities, entities_fields = self._get_entities_in_query() #TODO: encapsular mais essas funçoes e tirar resposabilidade do init
+        self.weighted_fields =  self._get_weighted_fields(entities_fields)
         self.indices = self._get_search_indices()
+    
+    def _get_entities_in_query(self): #TODO: Qual a melhor forma de incluir esse serviço
+        if self.use_entities:
+            ner_args = ['java', '-cp', 'mp-ufmg-ner.jar:lib/*', 'Pipeline', '-str'] + [self.query]
+            ner_dir = '/home/luiznery/Documents/mpmg/data/M02/'
+            out, err = subprocess.Popen(ner_args, stdout=subprocess.PIPE, cwd=ner_dir).communicate()
+            ner_data = json.loads(out.decode('utf-8'))
+
+            entities = {}
+            for line in ner_data['entities']:
+                field = SearchableIndicesConfigs.entity_to_field_map[line['label']]
+                if field not in entities:
+                    entities[field] = set()    
+                entities[field].add(line['entity'])
+            
+            for field in entities:
+                entities[field] = list(entities[field])
+            
+            entities_fields = list(entities.keys())
+            return entities, entities_fields
+        else:
+            return {}, []
 
     def _generate_query_id(self):
         if not self.qid:
@@ -48,10 +75,13 @@ class Query:
             pre_qid.update(bytes(str(self.data_hora) + str(self.user_id) + self.query + self.sid, encoding='utf-8'))
             self.qid = pre_qid.hexdigest()
 
-    # def _get_weighted_fields(self):
-    #     self.weighted_fields = []
-    #     for field in settings.WEIGHTED_FIELDS:
-    #         self.weighted_fields.append( field+"^"+str(settings.WEIGHTED_FIELDS[field]) )
+    def _get_weighted_fields(self, entities_fields):
+        weighted_fields = WeightedSearchFieldsConfigs.get_weigted_search_fields()
+        for field in weighted_fields:
+            if field.split('^')[0] in entities_fields:
+                entities_fields.remove(field.split('^')[0])
+        weighted_fields = weighted_fields+entities_fields
+        return weighted_fields
 
     def is_valid(self):
         query_len = len(''.join(self.query.split()))
@@ -63,6 +93,19 @@ class Query:
     def _get_must_queries(self):
         must_queries = [Elastic().dsl.Q('query_string', query=self.query, fields=self.weighted_fields)]
         return must_queries
+
+    def _get_should_queries(self):
+        # print("using entities: ", self.use_entities)
+        if self.use_entities:
+            should_queries = []
+            for field in self.query_entities:
+                for entity in self.query_entities[field]:
+                    q = Elastic().dsl.Q({'match': { field: entity}})
+                    should_queries.append(q)
+            # print(should_queries)
+            return(should_queries)
+        else:
+            return []
 
 
     def _get_filters_queries(self):
@@ -84,25 +127,26 @@ class Query:
     def execute(self):
         must_queries = self._get_must_queries()
         filter_queries = self._get_filters_queries()
+        should_queries = self._get_should_queries()
+        # print(should_queries)
         
         self.total_docs, self.total_pages, self.documents, self.response_time  = Document().custum_search( self.indices,
-            must_queries, filter_queries, self.page, self.results_per_page)
-    
+            must_queries, should_queries, filter_queries, self.page, self.results_per_page)
+
         self._log()
 
         return self.total_docs, self.total_pages, self.documents, self.response_time 
 
     def _get_search_indices(self):
+        # print('len de doc_types: ', len(self.doc_types))
         if len(self.doc_types) > 0:
             indices = SearchableIndicesConfigs.get_searchable_indices(models=self.doc_types, groups=[self.group])
-            # print(indices)
             return indices
         else:
             indices = SearchableIndicesConfigs.get_searchable_indices(groups=[self.group])
-            # print(indices)
             return indices
 
-    def _log(self):
+    def _log(self): #TODO: Adicionar parametros de entidades nos logs
         data = dict(
             id_sessao = self.sid,
             id_consulta = self.qid,

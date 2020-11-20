@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.conf import settings
 from mpmg.services.models import LogSearch, Document
+from mpmg.services.models import SearchConfigs
 from ..elastic import Elastic
 from ..features_extractor import FeaturesExtractor
 from ..ranking.tf_idf import TF_IDF
@@ -26,7 +27,7 @@ class SearchView(APIView):
 
             # valida o tamanho da consulta
         if not self.query.is_valid():
-            print("query invalida")
+            # print("query invalida")
             data = {'error_type': 'invalid_query'}
             return Response(data, status=status.HTTP_400_BAD_REQUEST)
             
@@ -74,7 +75,7 @@ class SearchView(APIView):
         user_id = request.user.id
 
         self.query = Query(raw_query, page, qid, sid, user_id, instances, 
-                doc_types, start_date, end_date)
+                doc_types, start_date, end_date, use_entities=SearchConfigs.get_use_entities_in_search())
 
 
 

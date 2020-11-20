@@ -237,3 +237,93 @@ def search_comparison(request):
         }
         
         return render(request, 'aduna/search_comparison.html', context)
+
+
+def search_comparison_entity(request):
+    if request.GET.get('invalid_query', False) or not request.session.get('auth_token'):
+        return redirect('/aduna/login')
+    
+    headers = {'Authorization': 'Token '+request.session.get('auth_token')}
+
+    sid = request.session.session_key
+    query = request.GET.get('query', 'comparação de busca com entidade')
+    qid = request.GET.get('qid', '')
+    page = int(request.GET.get('page', 1))
+    instances = request.GET.getlist('instance', [])
+    doc_types = request.GET.getlist('doc_type', [])
+    start_date = request.GET.get('start_date', None)
+    if start_date == "":
+        start_date = None
+    end_date = request.GET.get('end_date', None)
+    if end_date == "":
+        end_date = None
+    
+    params = {
+        'query': query, 
+        'page': page, 
+        'sid': sid, 
+        'qid': qid, 
+        'instances': instances, 
+        'doc_types': doc_types,
+        'start_date': start_date,
+        'end_date': end_date
+    }
+    service_response = requests.get(settings.SERVICES_URL+'search_comparison_entity', params, headers=headers)
+    response_content = service_response.json()
+
+    if service_response.status_code == 500:
+        messages.add_message(request, messages.ERROR, response_content['error_message'], extra_tags='danger')
+        return redirect('/aduna/erro')
+
+    elif service_response.status_code == 401:
+        request.session['auth_token'] = None
+        request.session['user_info'] = None
+        return redirect('/aduna/login')
+
+    else:
+        # Verificação dos ids de resposta
+        id_pos = defaultdict(list)
+        for result in response_content['documents_entity']:
+            id_pos[result['id']].append('Com entidades: {}ª posição'.format(result['rank_number']))
+        for result in response_content['documents']:
+            if id_pos[result['id']]:
+                id_pos[result['id']].append('<br>')    
+            id_pos[result['id']].append('Sem entidades: {}ª posição'.format(result['rank_number']))
+
+        print(id_pos)
+        id_pos = dict(id_pos)
+        for k, v in id_pos.items():
+            id_pos[k] = ''.join(v)
+
+        context = {
+            'auth_token': request.session.get('auth_token'),
+            'user_name': request.session.get('user_info')['first_name'],
+            'services_url': settings.SERVICES_URL,
+            'query': query,
+            'page': page,
+            'sid': sid,
+            'time': response_content['time'],
+            'qid': response_content['qid'],
+            'total_docs': response_content['total_docs'],
+            'results_per_page': range(response_content['results_per_page']),
+            'documents': response_content['documents'],
+            'total_pages': response_content['total_pages'],
+            'results_pagination_bar': range(min(9, response_content['total_pages'])), # Typically show 9 pages. Odd number used so we can center the current one and show 4 in each side. Show less if not enough pages
+            'start_date': datetime.strptime(response_content['start_date'], '%Y-%m-%d') if response_content['start_date'] != None else None,
+            'end_date': datetime.strptime(response_content['end_date'], '%Y-%m-%d') if response_content['end_date'] != None else None,
+            'instances': response_content['instances'],
+            'doc_types': response_content['doc_types'],
+            'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2','Obras TCE'],#TODO:Automatizar
+            'filter_doc_types': ['Diario', 'Processo', 'Licitacao'],#TODO:Automatizar
+            'total_docs_entity': response_content['total_docs_entity'],
+            'total_pages_entity': response_content['total_pages_entity'],
+            'documents_entity': response_content['documents_entity'],
+            'response_time': response_content['response_time'],
+            'response_time_entity': response_content['response_time_entity'],
+            'algorithm': response_content['algorithm'],
+            'entities': response_content['entities'],
+            'id_pos': id_pos, # Converte de volta pra dict, pois o Django Template Language não lê defaultdict
+        }
+        print(response_content['entities'])
+        
+        return render(request, 'aduna/search_comparison_entity.html', context)

@@ -16,13 +16,14 @@ class SearchConfigsView(admin.AdminSite):
         if request.method == "POST":  
             form_search_configs =  SearchConfigsForm(request.POST)
             if form_search_configs.is_valid():  
-                try:  
-                    form_search_configs.save()  
-                    return redirect(reverse('admin:search_configs'))
-                except:  
-                    pass  
-        
-        form_search_configs =  SearchConfigsForm(initial={'results_per_page': SearchConfigs().get_results_per_page() })
+                form_search_configs.save()  
+                return redirect(reverse('admin:search_configs'))
+                
+        initial = {
+            'results_per_page': SearchConfigs().get_results_per_page(),
+            'use_entities_in_search': SearchConfigs().get_use_entities_in_search(),
+        }
+        form_search_configs =  SearchConfigsForm(initial=initial)
         context = {
             'weighted_search_fields':weighted_search_fields,
             'searchable_indices': searchable_indices,
