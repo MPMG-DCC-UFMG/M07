@@ -225,11 +225,7 @@ def search_comparison(request):
             'instances': response_content['instances'],
             'doc_types': response_content['doc_types'],
             'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2','Obras TCE'],#TODO:Automatizar
-<<<<<<< HEAD
-            'filter_doc_types': ['Diario', 'Processo', 'Licitacao'],#TODO:Automatizar
-=======
             'filter_doc_types': ['Diario', 'Processo', 'Licitacao'], #TODO:Automatizar
->>>>>>> d864c43a393487961212d3dccf5e4b88f60de608
             'total_docs_repl': response_content['total_docs_repl'],
             'total_pages_repl': response_content['total_pages_repl'],
             'documents_repl': response_content['documents_repl'],
