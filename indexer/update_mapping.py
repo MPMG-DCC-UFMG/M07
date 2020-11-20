@@ -6,8 +6,16 @@ import indexer
 
 from elasticsearch import Elasticsearch
 
+def clone_index(es, index, target):
+    try:
+        es.indices.put_settings({"index.blocks.write": 'true'}, index=index)
+        es.indices.clone(index, target)
+        es.indices.put_settings({"index.blocks.write": None}, index=index)
+    except:
+        print('Não foi possível clonar o índice {}.'.format(index))
+
+
 def main(args):
-    
     force_reindexation = []
     update_settings = []
 
@@ -30,9 +38,12 @@ def main(args):
     updated_mappings = json.load(open(mappings_path))
     local_indices = [index for index in updated_mappings.keys() if es.indices.exists(index)]
     local_mappings = es.indices.get_mapping(local_indices)
+
+    replica_indices = dict([(index, 0) for index in updated_mappings.keys() if 'conteudo' in updated_mappings[index]['mappings']['properties'].keys()])
     
     csv_indexer = indexer.Indexer(elastic_address = elastic_address)
     for index in updated_mappings.keys():
+        
         print("Checking " + index + "...")
         
         index_folder = "indices/"+index
@@ -56,6 +67,14 @@ def main(args):
             else:
                 print("Indexing " + str(len(files_to_index)) + " files in " + index)
                 csv_indexer.parallel_indexer(files_to_index, index, thread_count=4) # insere documentos
+            # Verifica se é necessário (re)criar uma replica para esse índice
+            if index in replica_indices.keys():
+                replica = index + '-replica'
+                if es.indices.exists(replica):
+                    print("Deleting replica of index: " + index)
+                    es.indices.delete(replica)
+                print("Cloning replica of index: " + index)
+                clone_index(es, index, replica)
         
         if index in update_settings:
             if index in settings:
