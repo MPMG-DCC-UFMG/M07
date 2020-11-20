@@ -102,7 +102,7 @@ class Query: #TODO: Refatorar essa classe
                 for entity in self.query_entities[field]:
                     q = Elastic().dsl.Q({'match': { field: entity}})
                     should_queries.append(q)
-            print(should_queries)
+            # print(should_queries)
             return(should_queries)
         else:
             return []
@@ -128,7 +128,7 @@ class Query: #TODO: Refatorar essa classe
         must_queries = self._get_must_queries()
         filter_queries = self._get_filters_queries()
         should_queries = self._get_should_queries()
-        print(should_queries)
+        # print(should_queries)
         
         self.total_docs, self.total_pages, self.documents, self.response_time  = Document().custum_search( self.indices,
             must_queries, should_queries, filter_queries, self.page, self.results_per_page)

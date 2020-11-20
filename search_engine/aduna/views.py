@@ -283,9 +283,9 @@ def search_comparison_entity(request):
     else:
         # Verificação dos ids de resposta
         id_pos = defaultdict(list)
-        for result in response_content['documents']:
-            id_pos[result['id']].append('Com entidades: {}ª posição'.format(result['rank_number']))
         for result in response_content['documents_entity']:
+            id_pos[result['id']].append('Com entidades: {}ª posição'.format(result['rank_number']))
+        for result in response_content['documents']:
             if id_pos[result['id']]:
                 id_pos[result['id']].append('<br>')    
             id_pos[result['id']].append('Sem entidades: {}ª posição'.format(result['rank_number']))
