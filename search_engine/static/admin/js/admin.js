@@ -138,9 +138,11 @@ $(function(){
 	});
 });
 	
-function get_algo_options(){
-	var selected_algo = $('#id_algorithm').val().toLowerCase();
-	$( "#id_algorithm" ).children('option').each(function( index ) {
+function get_algo_options(prefix){
+	console.log(prefix);
+	console.log('#' + prefix + '-algorithm');
+	var selected_algo = $('#' + prefix + '-algorithm').val().toLowerCase();
+	$( '#' + prefix + '-algorithm' ).children('option').each(function( index ) {
 		var algo = $( this ).val().toLowerCase();
 		var elements_by_class = $('.' + algo);
 		$.each(elements_by_class, function() {
@@ -149,10 +151,10 @@ function get_algo_options(){
 				$('#' + cur_id).show();
 				$('#' + cur_id)[0].disabled = false;
 				$( "label[for='" + cur_id + "']").show();
-				if (($('#id_normalization_' + algo).val()) == 'no') {
-					$('#id_normalization_parameter_' + algo)[0].disabled = true;
-					$('#id_normalization_parameter_' + algo).hide();
-					$("label[for='id_normalization_parameter_" + algo + "']").hide();
+				if (($('#' + prefix + '-normalization_' + algo).val()) == 'no') {
+					$('#' + prefix + '-normalization_parameter_' + algo)[0].disabled = true;
+					$('#' + prefix + '-normalization_parameter_' + algo).hide();
+					$("label[for='" + prefix + "-normalization_parameter_" + algo + "']").hide();
 				}
 			}
 			else { // Esconder opções
@@ -166,9 +168,31 @@ function get_algo_options(){
 };
 
 $(function(){
-	get_algo_options();
-  
-	$('#id_algorithm, #id_normalization_ib, #id_normalization_dfr').change(function(){
-		get_algo_options();
+	$('[id$=-algorithm], [id$=-normalization_ib], [id$=-normalization_dfr]').change(function(event){
+		var prefix = event.target.id.split('-')[0]
+		console.log(prefix)
+		get_algo_options(prefix);
+	});
+});
+
+$(document).ready(function() {
+	$("#regular_btn").click(function(event) {
+	  $("#regular_form").toggle();
+	  if($("#replica_form").is(":visible")){
+		$("#replica_form").toggle();	
+	  }
+	  var prefix = event.target.id.split('_')[0];
+	  get_algo_options('id_' + prefix);
+	});
+});
+
+$(document).ready(function() {
+	$("#replica_btn").click(function(event) {
+	  $("#replica_form").toggle();
+	  if($("#regular_form").is(":visible")){
+	    $("#regular_form").toggle();	
+	  }
+	  var prefix = event.target.id.split('_')[0]
+	  get_algo_options('id_' + prefix);
 	});
 });

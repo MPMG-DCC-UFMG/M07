@@ -38,22 +38,10 @@
             </ul>
             </div>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-            <i class="menu-icon typcn typcn-shopping-bag"></i>
-            <span class="menu-title">Rankings</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">
-            <i class="menu-icon typcn typcn-th-large-outline"></i>
-            <span class="menu-title">Métricas</span>
-            </a>
-        </li>
         <li class="nav-item {% if request.resolver_match.view_name == 'admin:config' %}active{%endif%}">
             <a class="nav-link" href="{% url 'admin:config' %}">
             <i class="menu-icon typcn typcn-th-large-outline"></i>
-            <span class="menu-title" >Configurações</span>
+            <span class="menu-title" >Configurações do Cluster</span>
             </a>
         </li>
         <li class="nav-item {% if request.resolver_match.view_name == 'admin:search_configs' %}active{%endif%}">

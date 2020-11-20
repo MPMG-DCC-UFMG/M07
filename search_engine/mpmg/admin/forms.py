@@ -58,7 +58,7 @@ class ConfigForm(ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['algorithm'].label = 'Algoritmo'
         self.fields['num_repl'].label = 'Replicas por índice'
-        self.fields['compare'].label = 'Conjunto de índices'
+        # self.fields['compare'].label = 'Conjunto de índices'
         
         # BM25
         self.fields['b'].widget.attrs.update({'class': 'bm25'})
@@ -100,8 +100,8 @@ class ConfigForm(ModelForm):
     class Meta:
         model = Config
         # fields = '__all__'
-        fields = ['compare',
-                  'num_repl',
+        # fields = ['compare',
+        fields = ['num_repl',
                   'max_result_window',
                   'algorithm', 
                   'k1', 

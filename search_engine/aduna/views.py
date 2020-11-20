@@ -202,8 +202,7 @@ def search_comparison(request):
                 id_pos[result['id']].append('<br>')    
             id_pos[result['id']].append('{}: {}ª posição'.format(response_content['algorithm_repl'], result['rank_number']))
 
-        print(id_pos)
-        id_pos = dict(id_pos)
+        id_pos = dict(id_pos) # Converte de volta pra dict, pois o Django Template Language não lê defaultdict
         for k, v in id_pos.items():
             id_pos[k] = ''.join(v)
 
@@ -226,7 +225,11 @@ def search_comparison(request):
             'instances': response_content['instances'],
             'doc_types': response_content['doc_types'],
             'filter_instances': ['Belo Horizonte', 'Uberlândia', 'São Lourenço', 'Minas Gerais', 'Ipatinga', 'Associação Mineira de Municípios', 'Governador Valadares', 'Uberaba', 'Araguari', 'Poços de Caldas', 'Varginha', 'Tribunal Regional Federal da 2ª Região - TRF2','Obras TCE'],#TODO:Automatizar
+<<<<<<< HEAD
             'filter_doc_types': ['Diario', 'Processo', 'Licitacao'],#TODO:Automatizar
+=======
+            'filter_doc_types': ['Diario', 'Processo', 'Licitacao'], #TODO:Automatizar
+>>>>>>> d864c43a393487961212d3dccf5e4b88f60de608
             'total_docs_repl': response_content['total_docs_repl'],
             'total_pages_repl': response_content['total_pages_repl'],
             'documents_repl': response_content['documents_repl'],
@@ -234,7 +237,7 @@ def search_comparison(request):
             'response_time_repl': response_content['response_time_repl'],
             'algorithm_base': response_content['algorithm_base'],
             'algorithm_repl': response_content['algorithm_repl'],
-            'id_pos': id_pos, # Converte de volta pra dict, pois o Django Template Language não lê defaultdict
+            'id_pos': id_pos,
         }
         
         return render(request, 'aduna/search_comparison.html', context)
