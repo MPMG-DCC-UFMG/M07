@@ -1,10 +1,9 @@
 import time
 import hashlib
-import subprocess
-import json
 
 from django.conf import settings
 from .elastic import Elastic
+from .ner import NER
 from mpmg.services.models import LogSearch, Document
 from mpmg.services.models import WeightedSearchFieldsConfigs, SearchableIndicesConfigs, SearchConfigs
 
@@ -44,26 +43,13 @@ class Query: #TODO: Refatorar essa classe
         self._generate_query_id()
 
         self.query_entities, entities_fields = self._get_entities_in_query() #TODO: encapsular mais essas funçoes e tirar resposabilidade do init
+        # print(self.query_entities)
         self.weighted_fields =  self._get_weighted_fields(entities_fields)
         self.indices = self._get_search_indices()
     
     def _get_entities_in_query(self): #TODO: Qual a melhor forma de incluir esse serviço
         if self.use_entities:
-            ner_args = ['java', '-cp', 'mp-ufmg-ner.jar:lib/*', 'Pipeline', '-str'] + [self.query]
-            ner_dir = '/home/luiznery/Documents/mpmg/data/M02/'
-            out, err = subprocess.Popen(ner_args, stdout=subprocess.PIPE, cwd=ner_dir).communicate()
-            ner_data = json.loads(out.decode('utf-8'))
-
-            entities = {}
-            for line in ner_data['entities']:
-                field = SearchableIndicesConfigs.entity_to_field_map[line['label']]
-                if field not in entities:
-                    entities[field] = set()    
-                entities[field].add(line['entity'])
-            
-            for field in entities:
-                entities[field] = list(entities[field])
-            
+            entities = NER().execute(self.raw_query)
             entities_fields = list(entities.keys())
             return entities, entities_fields
         else:

@@ -38,3 +38,6 @@ search_engine/env/
 
 # VS Code
 .vscode
+
+#NER stuff:
+NER/M02/models/lener_model.ser.gz
