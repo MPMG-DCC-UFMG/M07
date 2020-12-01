@@ -191,7 +191,7 @@ class LogDataGeneratorView():
                 qid = qid.hexdigest()
 
                 try:
-                    query_obj = Query(q,1,qid,sid,id_usuario)
+                    query_obj = Query(q,1,qid,sid,id_usuario, use_entities=False)
                     query_obj.data_hora = query_timestamp
                     total_docs, total_pages, documents, took = query_obj.execute()
                 except:
