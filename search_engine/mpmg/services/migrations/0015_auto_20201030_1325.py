@@ -17,8 +17,8 @@ def insert_configs_data(apps, schema_editor):
         WeightedSearchFieldsConfigs = apps.get_model('services', 'WeightedSearchFieldsConfigs')
         for row in WeightedSearchFieldsConfigs.objects.all():
             row.delete()
-        WeightedSearchFieldsConfigs(field='conteudo', field_name='Titulo',   weight=1, searchable=True ).save()
-        WeightedSearchFieldsConfigs(field='titulo',   field_name='Conteudo', weight=1, searchable=False).save()
+        WeightedSearchFieldsConfigs(field='titulo',   field_name='Titulo',   weight=1, searchable=True ).save()
+        WeightedSearchFieldsConfigs(field='conteudo', field_name='Conteudo', weight=1, searchable=False).save()
 
 class Migration(migrations.Migration):
     
