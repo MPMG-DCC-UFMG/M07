@@ -19,14 +19,12 @@ class AddWeightedSearchFieldForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['field'].label = 'Campo'
-        self.fields['field_name'].label = 'Descrição do campo'
         self.fields['weight'].label = 'Peso'
         self.fields['searchable'].label = 'Buscavel'
 
     class Meta:  
         model = WeightedSearchFieldsConfigs  
         fields = ['field',
-                  'field_name',
                   'weight',
                   'searchable']  
 
