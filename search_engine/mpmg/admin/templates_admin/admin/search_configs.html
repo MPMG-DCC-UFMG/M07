@@ -41,7 +41,6 @@
                     <table class="table table-striped table-bordered table-sm">  
                         <thead class="thead-dark">  
                         <tr>  
-                            <th>Descrição</th>  
                             <th>Campo</th>  
                             <th>Peso</th>  
                             <th>Buscavel</th>  
@@ -51,10 +50,10 @@
                         <tbody>  
                     {% for campo in weighted_search_fields %}  
                         <tr>  
-                            <td>{{ campo.field_name }}</td>  
                             <td>{{ campo.field }}</td>  
                             <td>{{ campo.weight }}</td>  
-                            <td>{{ campo.searchable }}</td>  
+                            <td>{% if campo.searchable %}Sim{% else %}Não{%endif%}</td>  
+                            
                             <td>  
                                 <a href="/admin/update_weighted_search_field/{{ campo.field }}"><span class="glyphicon glyphicon-pencil" >Editar</span></a>  
                                 
@@ -93,7 +92,7 @@
                         <tr>  
                             <td>{{ index.index }}</td>  
                             <td>{{ index.index_model }}</td>  
-                            <td>{{ index.searchable }}</td>  
+                            <td>{% if index.searchable %}Sim{% else %}Não{%endif%}</td>  
                             <td>{{ index.group }}</td>  
                             <td>  
                                 <a href="/admin/update_searchable_indice/{{ index.index }}"><span class="glyphicon glyphicon-pencil" >Editar</span></a>  
