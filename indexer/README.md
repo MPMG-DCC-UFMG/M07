@@ -7,24 +7,20 @@ O nome das colunas do csv deve bater com o nome dos campos do índice no qual se
 Existem duas formas de se indexar os dados, simple e parallel, que usam respectivamente os métodos helpers.bulk e helpers.parallel_bulk do elasticsearch client.<br>
 <br>
 Para indexar um csv usar o script ```python elastic_indexer.py```, que conta com os seguintes argumentos:
-```
-  -strategy
-  -index
-  -f
-  -d
-  -t
-```
 <br>
-```-strategy``` deve-se escolher entre uma das estratégias apresentadas: ```simple``` ou ```parallel```;<br> 
-```-index``` deve-se dar o nome do índice no qual se deseja indexar os dados;<br> 
-```-f```, opcional, deve-se dar uma lista de nomes de arquivos csv que se deseja indexar;<br> 
-```-d```, opcional, deve-se passar uma lista de nomes de diretorios, nos quais existam somente arquivos csvs que se deseja indexar;<br> 
-```-t``` define o número de Threadpools a se usar quando se escolhe a estratégia ```parallel```, o defaut é 4.<br><br> 
+<bold>-strategy</bold> deve-se escolher entre uma das estratégias apresentadas: <bold>simple</bold> ou <bold>parallel</bold>;<br> 
+<bold>-index</bold> deve-se dar o nome do índice no qual se deseja indexar os dados;<br> 
+<bold>-f</bold> opcional, deve-se dar uma lista de nomes de arquivos csv que se deseja indexar;<br> 
+<bold>-d</bold> opcional, deve-se passar uma lista de nomes de diretorios, nos quais existam somente arquivos csvs que se deseja indexar;<br> 
+<bold>-t</bold> opcional, define o número de Threadpools a se usar quando se escolhe a estratégia <bold>parallel</bold>, o defaut é 4;<br>
+<bold>-elastic_address</bold> opcional, define o endereço usado para acessar o elasticsearch, o defaut é 'localhost:9200', formato: IP:PORT;<br><br> 
 
 ## update_mapping
 Ao rodar ```python update_mapping.py```, para cada índice no arquivo mappings.json, o script verifica se o existe alguma diferença entre esse índice e o índice do elasticsearch. Em caso positivo, o índice existente no elastic é apagado. Caso o índice tenha sido apagado ou ele não exista no elasticsearch, é criado um novo índice com o mapping atualizado e os csvs nas respectivas pastas de cada índice. Caso nenhum arquivo exista na pasta, nada é feito.<br>
 Nota: As pastas de cada índice devem estar nomeadas com o nome do índice e dentro de uma pasta indexer/indices, note que ao rodar o programa sem existir nenhuma dessas pastas, ele automaticamente ira criá-las da forma especificada.<br>
 Quando um indice é criado, os settings presentes no arquivo additional_settings.json são inseridos.<br>
-Caso deseje forçar a reindexação de um índice, use o argumento ```-force_reindexation```, que deve vir seguido de uma lista de índices que se deseja reindexar. <br>
-Caso deseje forçar a atualização dos settings, use o argumento ```-update_settings```, que deve ser seguido de uma lista de índices que se deseja atualizar os settings.
+Caso deseje forçar a reindexação de um índice, use o argumento <bold>-force_reindexation</bold>, que deve vir seguido de uma lista de índices que se deseja reindexar. <br>
+Caso deseje forçar a atualização dos settings, use o argumento <bold>-update_settings</bold>, que deve ser seguido de uma lista de índices que se deseja atualizar os settings.<br>
+O argumento <bold>-mappings_path</bold> permite ao usuario especificar qual arquivo contendo os mappings dos indices será usado. Defaut é mappings.json.<br>
+O argumento <bold>-elastic_address</bold> permite especificar o endereço do elasticsearch. Formato: IP:PORT. Defaut é 'localhost:9200.
 

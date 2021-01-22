@@ -7,7 +7,7 @@ parser.add_argument("-index", help="Index", required=True)
 parser.add_argument("-f", nargs='+', help="List of csv files to index")
 parser.add_argument("-d", nargs='+', help="List of directories which all files will be indexed")
 parser.add_argument("-t", help="Threadpool size to use for the bulk requests")
-parser.add_argument("-elastic_address", default="localhost:9200", help="Elasticsearch address. Format: <ip>:<port>")#TODO: Add this arg in the docs
+parser.add_argument("-elastic_address", default="localhost:9200", help="Elasticsearch address. Format: <ip>:<port>")
 args = vars(parser.parse_args()) 
 
 index = args["index"]

@@ -36,11 +36,10 @@ class SearchableIndicesConfigs(models.Model):
     MODELS = (
         ('Diario',         'Diario'),
         ('Processo',       'Processo'),
-        ('Licitacao',      'Licitacao'),
-        ('DiarioEntidade', 'DiarioEntidade')
+        ('Licitacao',      'Licitacao')
     )
 
-    entity_to_field_map = {
+    entity_to_field_map = { #TODO: Colocar isso em um banco de dados
         'PESSOA': 'entidade_pessoa',
         'ORGANIZACAO': 'entidade_organizacao',
         'LOCAL': 'entidade_local', 
@@ -81,7 +80,6 @@ class SearchableIndicesConfigs(models.Model):
 
 class WeightedSearchFieldsConfigs(models.Model):
     field = models.CharField(max_length=50, blank=False, primary_key=True)
-    field_name = models.CharField(max_length=50, blank=False)
     weight = models.IntegerField(default=1, blank=False)
     searchable = models.BooleanField(default=True, blank=False)
 

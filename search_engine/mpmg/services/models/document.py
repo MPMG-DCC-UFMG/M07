@@ -2,7 +2,6 @@ from mpmg.services.elastic import Elastic
 from mpmg.services.models.processo import Processo
 from mpmg.services.models.diario import Diario
 from mpmg.services.models.licitacao import Licitacao
-from mpmg.services.models.diario_entidade import DiarioEntidade
 from mpmg.services.models.search_configs import SearchableIndicesConfigs
 from django.conf import settings
 
