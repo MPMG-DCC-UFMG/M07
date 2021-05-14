@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from mpmg.services.models import Diario, Processo
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -65,8 +65,8 @@ ROOT_URLCONF = 'mpmg.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        # 'DIRS': [os.path.join(BASE_DIR, 'templates_admin')],
+        # 'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'mpmg/admin/templates_admin')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -132,7 +132,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # run the command "python manage.py collectstatic" to copy all static files to this folder
-STATIC_ROOT = '/home/rafael/UFMG/MPMG/M07/search_engine/assets/'
+STATIC_ROOT = '/home/user/M05/search_engine/assets/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
@@ -141,7 +141,7 @@ STATICFILES_DIRS = [
 # Configure Elasticsearch server
 ELASTICSEARCH_DSL = {
     'default': {
-        'hosts': 'elasticsearch:9200'
+        'hosts': 'localhost:9200'
     },
 }
 
