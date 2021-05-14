@@ -24,3 +24,34 @@ Caso deseje forçar a atualização dos settings, use o argumento <bold>-update_
 O argumento <bold>-mappings_path</bold> permite ao usuario especificar qual arquivo contendo os mappings dos indices será usado. Defaut é mappings.json.<br>
 O argumento <bold>-elastic_address</bold> permite especificar o endereço do elasticsearch. Formato: IP:PORT. Defaut é 'localhost:9200.
 
+
+## Exemplo:
+
+### Indexandos os CSVs
+
+A pasta indices-sample possui uma amostra dos dados para serem indexados. São 100 diários oficiais de BH, 1000 licitações de obras e 2000 processos do TRF.<br>
+Com o elasticsearch em execução, rode:
+
+python elastic_indexer.py -strategy simple -index diarios -d indices-sample/diarios <br>
+python elastic_indexer.py -strategy simple -index processos -d indices-sample/processos <br>
+python elastic_indexer.py -strategy simple -index licitacoes -d indices-sample/licitacoes <br>
+
+
+### Criando os índices de réplica:
+
+Depois faça clones dos índices (pra isso vc deve seta-los para read-only antes):
+
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":true}}'  http://localhost:9200/diarios/_settings <br>
+curl -XPOST http://localhost:9200/diarios/_clone/diarios-replica <br>
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":false}}'  http://localhost:9200/diarios/_settings <br>
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":false}}'  http://localhost:9200/diarios-replica/_settings <br>
+
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":true}}'  http://localhost:9200/processos/_settings <br>
+curl -XPOST http://localhost:9200/processos/_clone/processos-replica <br>
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":false}}'  http://localhost:9200/processos/_settings <br>
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":false}}'  http://localhost:9200/processos-replica/_settings <br>
+
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":true}}'  http://localhost:9200/licitacoes/_settings <br>
+curl -XPOST http://localhost:9200/licitacoes/_clone/licitacoes-replica <br>
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":false}}'  http://localhost:9200/licitacoes/_settings <br>
+curl -XPUT -H "Content-Type: application/json" -d '{"index":{"blocks.read_only":false}}'  http://localhost:9200/licitacoes-replica/_settings <br>
