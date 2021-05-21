@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from mpmg.services.models import LogSearch, LogSearchClick, LogSugestoes, Document
+from ..docstring_schema import AutoDocstringSchema
 
 
 class LogSearchView(APIView):
@@ -67,8 +68,45 @@ class LogSearchView(APIView):
 
 
 class LogSearchClickView(APIView):
-    permission_classes = (IsAuthenticated,)
+    '''
+    post:
+      description: Grava no log o documento do ranking clicado pelo usuário.
+      security:
+        - tokenAuth: []
+      parameters:
+        - name: item_id
+          description: ID do documento clicado
+          required: true
+        - name: qid
+          description: ID da consulta executada (É sempre retornado pelo método search)
+          required: true
+        - name: rank_number
+          description: Posição do documento clicado na lista de documentos retornados
+          required: true
+          schema:
+            type: integer
+        - name: item_type
+          description: Tipo do documento clicado
+          required: true
+          schema:
+            type: string
+            enum:
+              - diarios
+              - processos
+              - licitacoes
+        - name: page
+          description: Número da página onde estava o documento
+          required: true
+          schema:
+            type: integer
+            minimum: 1
 
+    '''
+
+    permission_classes = (IsAuthenticated,)
+    schema = AutoDocstringSchema()
+
+    '''
     def get(self, request):
         id_consultas = request.GET.getlist('id_consultas', None)  # list of id_consulta
         log_list = LogSearchClick.get_list_filtered(id_consultas=id_consultas)
@@ -76,11 +114,9 @@ class LogSearchClickView(APIView):
             "data": log_list
         }
         return Response(response)
+    '''
 
     def post(self, request):
-        '''
-        Grava no log o item do ranking clicado pelo usuário.
-        '''
         response = LogSearchClick().save(dict(
             id_documento=request.POST['item_id'],
             id_consulta=request.POST['qid'],
@@ -106,7 +142,24 @@ class LogQuerySuggestionView(APIView):
 
 
 class LogQuerySuggestionClickView(APIView):
+    '''
+    post:
+      description: Grava no log a sugestão de consulta clicada pelo usuário
+      security:
+        - tokenAuth: []
+      parameters:
+        - name: suggestion
+          description: Texto da sugestão clicada
+          required: true
+        - name: rank_number
+          description: Posição da sugestão clicada na lista de sugestões
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+    '''
     permission_classes = (IsAuthenticated,)
+    schema = AutoDocstringSchema()
 
     def post(self, request):
         timestamp = int(time.time() * 1000)

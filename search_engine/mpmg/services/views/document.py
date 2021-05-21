@@ -4,9 +4,33 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from mpmg.services.models import *
 from mpmg.services.models import SearchableIndicesConfigs
+from ..docstring_schema import AutoDocstringSchema
+
 
 class DocumentView(APIView):
+    '''
+    get:
+      description: Busca o conteúdo completo de um documento específico.
+      security:
+        - tokenAuth: []
+      parameters:
+        - name: doc_id
+          in: query
+          description: ID do documento
+          required: true
+        - name: doc_type
+          in: query
+          description: Tipo do documento
+          schema:
+            type: string
+            enum:
+              - diarios
+              - processos
+              - licitacoes
+    '''
+
     permission_classes = (IsAuthenticated,)
+    schema = AutoDocstringSchema()
 
     def get(self, request):
         doc_type = request.GET['doc_type']

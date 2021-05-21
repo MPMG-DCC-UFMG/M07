@@ -8,6 +8,7 @@ from ..metrics import Metrics
 
 class ClusterStatsView(APIView):
     # permission_classes = (IsAuthenticated,)
+    schema = None
 
     def get(self, request):
         cluster_info = ElasticModel.get_cluster_info()

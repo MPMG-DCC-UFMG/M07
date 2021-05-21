@@ -5,9 +5,24 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from mpmg.services.models import LogSearch
 from rest_framework import status
+from ..docstring_schema import AutoDocstringSchema
+
 
 class QuerySuggestionView(APIView):
+    '''
+    get:
+      description: Retorna uma lista de sugestões de consultas baseadas na consulta fornecida
+      security:
+        - tokenAuth: []
+      parameters:
+        - name: query
+          in: query
+          description: Texto da consulta
+          required: true
+    '''
+
     permission_classes = (IsAuthenticated,)
+    schema = AutoDocstringSchema()
 
     def get(self, request):
         query = request.GET.get('query', None)
