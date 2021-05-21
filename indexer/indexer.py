@@ -3,9 +3,13 @@ import ctypes
 import os
 import time
 import json
+from random import random
 
+import nltk
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+from nltk import tokenize
+nltk.download('punkt')
 
 from os import listdir
 from os.path import isfile, join
@@ -20,9 +24,19 @@ def list_files(path):
     return [path+f for f in listdir(path) if isfile(join(path, f))]
 
 
+def get_sentences(text):
+    tokens = text.replace("\n", "").replace("\r", "").split()
+    text = " ".join(tokens)
+    return tokenize.sent_tokenize(text)
+
+
+def get_dense_vector(text):
+    return [random() for i in range(768)]
+
+
 class Indexer:
-    
-    def __init__(self, elastic_address = 'localhost:9200'):
+
+    def __init__(self, elastic_address='localhost:9200'):
 
         self.ELASTIC_ADDRESS = elastic_address
         self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=120, max_retries=3, retry_on_timeout=True)
@@ -36,25 +50,28 @@ class Indexer:
         file = open(file_path, encoding=encoding)
         table = csv.DictReader(file)
         columns = table.fieldnames.copy()
-        
+
         for line in table:
             line = dict(line)
             doc = {}
             for field in columns:
                 if line[field] == '':
                     continue
-                
+
                 field_name = field
                 field_type = None
                 if len(field.split(":")) > 1:
                     field_name = field.split(":")[0]
                     field_type = field.split(":")[-1]
-                
+
                 if field_type == "list":
                     doc[field_name] = eval(line[field])
                 else:
                     doc[field_name] = line[field]
-            
+
+            sentences = get_sentences(line['conteudo'])
+            doc["sentences_vectors"] = [get_dense_vector(sent) for sent in sentences]
+
             yield {
                 "_index": index,
                 "_source": doc
@@ -84,7 +101,7 @@ class Indexer:
         Note that the queue_size is the same as thread_count
         """
         start = time.time()
-        
+
         error = False
         for csv_file in files_to_index:
             try:
@@ -97,7 +114,7 @@ class Indexer:
             except:
                 error = True
                 print("Detected error while indexing: " + csv_file)
-        
+
         if not error:
             print("All files indexed with no error.")
             end = time.time()

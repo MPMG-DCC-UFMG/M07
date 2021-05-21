@@ -12,6 +12,15 @@
                         }
                     }
                 },
+                "sentences_vectors": {
+                    "type": "nested",
+                    "properties": {
+                      "vector": {
+                        "type": "dense_vector",
+                        "dims": 768
+                      }
+                    }
+                },
                 "data": {
                     "type": "date"
                 }, 
@@ -188,6 +197,15 @@
                         }
                     }
                 },
+                "sentences_vectors": {
+                    "type": "nested",
+                    "properties": {
+                      "vector": {
+                        "type": "dense_vector",
+                        "dims": 768
+                      }
+                    }
+                },
                 "conteudo": {
                     "type": "text",
                     "term_vector" : "with_positions_offsets",
@@ -267,6 +285,15 @@
                             "type": "keyword",
                             "ignore_above": 256
                         }
+                    }
+                },
+                "sentences_vectors": {
+                    "type": "nested",
+                    "properties": {
+                      "vector": {
+                        "type": "dense_vector",
+                        "dims": 768
+                      }
                     }
                 },
                 "tipo_documento":{
