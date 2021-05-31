@@ -22,8 +22,6 @@ class SearchView(APIView):
     '''
     get:
       description: Realiza uma busca por documentos não estruturados
-      security:
-        - tokenAuth: []
       parameters:
         - name: query
           in: query
@@ -82,7 +80,7 @@ class SearchView(APIView):
           description: Requisição não autorizada caso não seja fornecido um token válido
     '''
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
     
     def get(self, request):

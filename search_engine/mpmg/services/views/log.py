@@ -71,8 +71,6 @@ class LogSearchClickView(APIView):
     '''
     post:
       description: Grava no log o documento do ranking clicado pelo usuário.
-      security:
-        - tokenAuth: []
       parameters:
         - name: item_id
           description: ID do documento clicado
@@ -103,7 +101,7 @@ class LogSearchClickView(APIView):
 
     '''
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
 
     '''
@@ -145,8 +143,6 @@ class LogQuerySuggestionClickView(APIView):
     '''
     post:
       description: Grava no log a sugestão de consulta clicada pelo usuário
-      security:
-        - tokenAuth: []
       parameters:
         - name: suggestion
           description: Texto da sugestão clicada
@@ -158,7 +154,7 @@ class LogQuerySuggestionClickView(APIView):
             type: integer
             minimum: 1
     '''
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
 
     def post(self, request):

@@ -11,8 +11,6 @@ class DocumentView(APIView):
     '''
     get:
       description: Busca o conteúdo completo de um documento específico.
-      security:
-        - tokenAuth: []
       parameters:
         - name: doc_id
           in: query
@@ -29,7 +27,7 @@ class DocumentView(APIView):
               - licitacoes
     '''
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
 
     def get(self, request):
