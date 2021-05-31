@@ -8,6 +8,8 @@ from random import random
 import nltk
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
+from sentence_transformers import SentenceTransformer, models
+from torch import nn
 from nltk import tokenize
 nltk.download('punkt')
 
@@ -30,8 +32,17 @@ def get_sentences(text):
     return tokenize.sent_tokenize(text)
 
 
-def get_dense_vector(text):
-    return [random() for i in range(768)]
+def get_dense_vector(model, text_list):
+    vectors = model.encode(text_list)
+    vectors = [vec.tolist() for vec in vectors]
+    return vectors
+
+
+def get_sentence_model():
+    word_embedding_model = models.Transformer("neuralmind/bert-base-portuguese-cased", max_seq_length=500)
+    pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
+
+    return SentenceTransformer(modules=[word_embedding_model, pooling_model])
 
 
 class Indexer:
@@ -40,6 +51,7 @@ class Indexer:
 
         self.ELASTIC_ADDRESS = elastic_address
         self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=120, max_retries=3, retry_on_timeout=True)
+        self.sentence_model = get_sentence_model()
 
         csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
@@ -70,7 +82,7 @@ class Indexer:
                     doc[field_name] = line[field]
 
             sentences = get_sentences(line['conteudo'])
-            doc["sentences_vectors"] = [get_dense_vector(sent) for sent in sentences]
+            doc["sentences_vectors"] = get_dense_vector(self.sentence_model, sentences)
 
             yield {
                 "_index": index,
