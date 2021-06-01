@@ -16,6 +16,8 @@ class DocumentView(APIView):
           in: query
           description: ID do documento
           required: true
+          schema:
+            type: string
         - name: doc_type
           in: query
           description: Tipo do documento

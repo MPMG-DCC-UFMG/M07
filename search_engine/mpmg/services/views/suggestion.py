@@ -17,6 +17,8 @@ class QuerySuggestionView(APIView):
           in: query
           description: Texto da consulta
           required: true
+          schema:
+            type: string
     '''
 
     # permission_classes = (IsAuthenticated,)
