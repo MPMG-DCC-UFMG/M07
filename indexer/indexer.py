@@ -4,6 +4,7 @@ import os
 import time
 import json
 from random import random
+import datetime
 
 import nltk
 from elasticsearch import Elasticsearch
@@ -66,6 +67,11 @@ class Indexer:
 
                 if field_type == "list":
                     doc[field_name] = eval(line[field])
+                elif field_name == 'data':
+                    if line[field] != '':
+                        element = datetime.datetime.strptime(line[field],"%d-%m-%Y")
+                        timestamp = datetime.datetime.timestamp(element)
+                        doc[field_name] = timestamp
                 else:
                     doc[field_name] = line[field]
 
