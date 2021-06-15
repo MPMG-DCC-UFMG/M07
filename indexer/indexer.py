@@ -41,8 +41,8 @@ def get_dense_vector(model, text_list):
     return vectors
 
 
-def get_sentence_model():
-    word_embedding_model = models.Transformer("neuralmind/bert-base-portuguese-cased", max_seq_length=500)
+def get_sentence_model(model_path="neuralmind/bert-base-portuguese-cased"):
+    word_embedding_model = models.Transformer(model_path, max_seq_length=500)
     pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
 
     return SentenceTransformer(modules=[word_embedding_model, pooling_model])
@@ -50,11 +50,13 @@ def get_sentence_model():
 
 class Indexer:
 
-    def __init__(self, elastic_address='localhost:9200'):
+    def __init__(self, elastic_address='localhost:9200', model_path="neuralmind/bert-base-portuguese-cased"):
 
         self.ELASTIC_ADDRESS = elastic_address
         self.es = Elasticsearch([self.ELASTIC_ADDRESS], timeout=120, max_retries=3, retry_on_timeout=True)
-        self.sentence_model = get_sentence_model()
+        self.model_path = model_path
+        if self.model_path != "None":
+            self.sentence_model = get_sentence_model(self.model_path)
 
         csv.field_size_limit(int(ctypes.c_ulong(-1).value // 2))
 
@@ -95,8 +97,9 @@ class Indexer:
                 else:
                     doc[field_name] = line[field]
 
-            sentences = get_sentences(line['conteudo'])
-            doc["sentences_vectors"] = [{"vector": vector} for vector in get_dense_vector(self.sentence_model, sentences)]
+            if self.model_path != "None":
+                sentences = get_sentences(line['conteudo'])
+                doc["sentences_vectors"] = [{"vector": vector} for vector in get_dense_vector(self.sentence_model, sentences)]
 
             yield {
                 "_index": index,
