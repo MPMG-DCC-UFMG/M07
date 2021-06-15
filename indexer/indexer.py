@@ -3,6 +3,7 @@ import ctypes
 import os
 import time
 import json
+from copy import deepcopy
 from random import random
 import datetime
 
@@ -63,9 +64,14 @@ class Indexer:
         """
         file = open(file_path, encoding=encoding)
         table = csv.DictReader(file)
+
+        file_count = open(file_path, encoding=encoding)
+        table_count = csv.DictReader(file_count)
+
         columns = table.fieldnames.copy()
 
-        lines_num = sum(1 for line in open(file_path, encoding=encoding))
+        rows = list(table_count)
+        lines_num = len(rows)
         for line in tqdm(table, total=lines_num):
             line = dict(line)
             doc = {}
@@ -90,7 +96,7 @@ class Indexer:
                     doc[field_name] = line[field]
 
             sentences = get_sentences(line['conteudo'])
-            doc["sentences_vectors"] = [{"vector": get_dense_vector(sent)} for sent in sentences]
+            doc["sentences_vectors"] = [{"vector": vector} for vector in get_dense_vector(self.sentence_model, sentences)]
 
             yield {
                 "_index": index,
