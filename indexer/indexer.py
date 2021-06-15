@@ -35,6 +35,14 @@ def get_dense_vector(text):
     return [random() for i in range(768)]
 
 
+def parse_date(text):
+    for fmt in ('%Y-%m-%d', "%d-%m-%Y"):
+        try:
+            return datetime.datetime.strptime(text, fmt)
+        except ValueError:
+            pass
+    raise ValueError('no valid date format found')
+
 class Indexer:
 
     def __init__(self, elastic_address='localhost:9200'):
@@ -69,7 +77,7 @@ class Indexer:
                     doc[field_name] = eval(line[field])
                 elif field_name == 'data':
                     if line[field] != '':
-                        element = datetime.datetime.strptime(line[field],"%d-%m-%Y")
+                        element = parse_date(line[field])
                         timestamp = datetime.datetime.timestamp(element)
                         doc[field_name] = timestamp
                 else:
