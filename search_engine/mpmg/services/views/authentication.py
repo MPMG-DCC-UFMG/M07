@@ -45,7 +45,7 @@ class CustomAuthToken(ObtainAuthToken):
           description: Usuário não autorizado
     '''
 
-    schema = AutoDocstringSchema()
+    schema = None #AutoDocstringSchema()
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})
@@ -78,7 +78,7 @@ class TokenLogout(APIView):
         - tokenAuth: []
     '''
     permission_classes = (IsAuthenticated,)
-    schema = AutoDocstringSchema()
+    schema = None
 
     def post(self, request):
         try:

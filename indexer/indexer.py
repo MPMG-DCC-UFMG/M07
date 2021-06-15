@@ -4,6 +4,7 @@ import os
 import time
 import json
 from random import random
+import datetime
 
 import nltk
 from elasticsearch import Elasticsearch
@@ -78,11 +79,16 @@ class Indexer:
 
                 if field_type == "list":
                     doc[field_name] = eval(line[field])
+                elif field_name == 'data':
+                    if line[field] != '':
+                        element = datetime.datetime.strptime(line[field],"%d-%m-%Y")
+                        timestamp = datetime.datetime.timestamp(element)
+                        doc[field_name] = timestamp
                 else:
                     doc[field_name] = line[field]
 
             sentences = get_sentences(line['conteudo'])
-            doc["sentences_vectors"] = get_dense_vector(self.sentence_model, sentences)
+            doc["sentences_vectors"] = [{"vector": get_dense_vector(sent)} for sent in sentences]
 
             yield {
                 "_index": index,

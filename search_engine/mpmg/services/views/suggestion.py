@@ -12,16 +12,16 @@ class QuerySuggestionView(APIView):
     '''
     get:
       description: Retorna uma lista de sugestões de consultas baseadas na consulta fornecida
-      security:
-        - tokenAuth: []
       parameters:
         - name: query
           in: query
           description: Texto da consulta
           required: true
+          schema:
+            type: string
     '''
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
 
     def get(self, request):

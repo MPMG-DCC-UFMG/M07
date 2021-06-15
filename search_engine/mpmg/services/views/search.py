@@ -22,13 +22,13 @@ class SearchView(APIView):
     '''
     get:
       description: Realiza uma busca por documentos não estruturados
-      security:
-        - tokenAuth: []
       parameters:
         - name: query
           in: query
           description: texto da consulta
           required: true
+          schema:
+            type: string
         - name: page
           in: query
           description: Página do resultado de busca
@@ -41,10 +41,14 @@ class SearchView(APIView):
           in: query
           description: ID da sessão do usuário na aplicação
           required: true
+          schema:
+            type: string
         - name: qid
           in: query
           description: ID da consulta. Quando _page=1_ passe vazio e este método irá cria-lo. \
                        Quando _page>1_ passe o qid retornado na primeira chamada.
+          schema:
+            type: string
         - name: instances
           in: query
           description: Filtro com uma lista de nomes de cidades às quais o documento deve pertencer
@@ -66,9 +70,13 @@ class SearchView(APIView):
         - name: start_date
           in: query
           description: Filtra documentos cuja data de publicação seja igual ou posterior à data informada. Data no formato YYYY-MM-DD
+          schema:
+            type: string
         - name: end_date
           in: query
           description: Filtra documentos cuja data de publicação seja anterior à data informada. Data no formato YYYY-MM-DD
+          schema:
+            type: string
 
       responses:
         '200':
@@ -82,7 +90,7 @@ class SearchView(APIView):
           description: Requisição não autorizada caso não seja fornecido um token válido
     '''
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
     
     def get(self, request):

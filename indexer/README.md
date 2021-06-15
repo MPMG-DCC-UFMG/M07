@@ -27,6 +27,18 @@ O argumento <bold>-elastic_address</bold> permite especificar o endereço do ela
 
 ## Exemplo:
 
+### Criando os índices
+
+Para criar o "esqueleto" de todos os índices, execute:
+
+python create_mappings.py
+
+O comando acima irá criar apenas os índices que ainda não existem no elasticsearch. Caso queira criar todos os índices do arquivo de mappings, execute:
+
+python create_mappings.py -force_creation
+
+Isto irá apagar o índice atual (juntamente com seus dados) e criará de novo.
+
 ### Indexandos os CSVs
 
 A pasta indices-sample possui uma amostra dos dados para serem indexados. São 100 diários oficiais de BH, 1000 licitações de obras e 2000 processos do TRF.<br>

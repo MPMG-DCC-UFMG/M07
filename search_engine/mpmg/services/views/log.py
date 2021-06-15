@@ -71,39 +71,42 @@ class LogSearchClickView(APIView):
     '''
     post:
       description: Grava no log o documento do ranking clicado pelo usuário.
-      security:
-        - tokenAuth: []
-      parameters:
-        - name: item_id
-          description: ID do documento clicado
-          required: true
-        - name: qid
-          description: ID da consulta executada (É sempre retornado pelo método search)
-          required: true
-        - name: rank_number
-          description: Posição do documento clicado na lista de documentos retornados
-          required: true
-          schema:
-            type: integer
-        - name: item_type
-          description: Tipo do documento clicado
-          required: true
-          schema:
-            type: string
-            enum:
-              - diarios
-              - processos
-              - licitacoes
-        - name: page
-          description: Número da página onde estava o documento
-          required: true
-          schema:
-            type: integer
-            minimum: 1
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                item_id:
+                  description: ID do documento clicado
+                  type: string
+                qid:
+                  description: ID da consulta executada (É sempre retornado pelo método search)
+                  type: string
+                rank_number:
+                  description: Posição do documento clicado na lista de documentos retornados
+                  type: integer
+                item_type:
+                  description: Tipo do documento clicado
+                  type: string
+                  enum:
+                  - diarios
+                  - processos
+                  - licitacoes
+                page:
+                  description: Número da página onde estava o documento
+                  type: integer
+                  minimum: 1
+              required:
+                - item_id
+                - qid
+                - rank_number
+                - item_type
+                - page
 
     '''
 
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
 
     '''
@@ -145,20 +148,24 @@ class LogQuerySuggestionClickView(APIView):
     '''
     post:
       description: Grava no log a sugestão de consulta clicada pelo usuário
-      security:
-        - tokenAuth: []
-      parameters:
-        - name: suggestion
-          description: Texto da sugestão clicada
-          required: true
-        - name: rank_number
-          description: Posição da sugestão clicada na lista de sugestões
-          required: true
-          schema:
-            type: integer
-            minimum: 1
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                suggestion:
+                  description: Texto da sugestão clicada
+                  type: string
+                rank_number:
+                  description: Posição da sugestão clicada na lista de sugestões
+                  type: integer
+                  minimum: 1
+              required:
+                - suggestion
+                - rank_number
     '''
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
 
     def post(self, request):
