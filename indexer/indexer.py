@@ -7,6 +7,7 @@ from random import random
 import datetime
 
 import nltk
+from tqdm import tqdm
 from elasticsearch import Elasticsearch
 from elasticsearch import helpers
 from sentence_transformers import SentenceTransformer, models
@@ -64,7 +65,8 @@ class Indexer:
         table = csv.DictReader(file)
         columns = table.fieldnames.copy()
 
-        for line in table:
+        lines_num = sum(1 for line in open(file_path, encoding=encoding))
+        for line in tqdm(table, total=lines_num):
             line = dict(line)
             doc = {}
             for field in columns:
