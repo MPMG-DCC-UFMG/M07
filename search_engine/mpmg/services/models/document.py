@@ -67,7 +67,7 @@ class Document:
         end = start + results_per_page
         # print('indices: ', indices)
         elastic_request = self.elastic.dsl.Search(using=self.elastic.es, index=indices) \
-                        .source(['fonte', 'titulo', 'conteudo']) \
+                        .source(['fonte', 'titulo', 'conteudo', 'sentences_vectors']) \
                         .query("bool", must = must_queries, should = should_queries, filter = filter_queries)[start:end] \
                         .highlight('conteudo', fragment_size=500, pre_tags='<strong>', post_tags='</strong>', require_field_match=False, type="unified")                        
         
@@ -82,7 +82,8 @@ class Document:
             dict_data['description'] = item.meta.highlight.conteudo[0]
             dict_data['rank_number'] = results_per_page * (page_number-1) + (i+1)
             dict_data['type'] = item.meta.index
-            
+            dict_data['score'] =  item.meta.score
+
             index_model_class_name = SearchableIndicesConfigs.get_index_model_class_name(item.meta.index)
             result_class = eval(index_model_class_name)
             documents.append(result_class(**dict_data))

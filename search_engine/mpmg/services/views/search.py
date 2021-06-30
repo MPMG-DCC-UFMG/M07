@@ -10,6 +10,7 @@ from django.conf import settings
 from mpmg.services.models import LogSearch, Document
 from mpmg.services.models import SearchConfigs
 from ..elastic import Elastic
+from ..reranker import Reranker
 from ..features_extractor import FeaturesExtractor
 from ..ranking.tf_idf import TF_IDF
 from ..features_extractor import TermVectorsFeaturesExtractor
@@ -92,6 +93,7 @@ class SearchView(APIView):
 
     # permission_classes = (IsAuthenticated,)
     schema = AutoDocstringSchema()
+    reranker = Reranker()
     
     def get(self, request):
         start = time.time() # Medindo wall-clock time da requisição completa
@@ -99,6 +101,8 @@ class SearchView(APIView):
         # try:
         self.elastic = Elastic()
         self._generate_query(request)
+
+        # é melhor ficar em outro lugar senao tenho de ficar reconstruido isso toda hora
 
             # valida o tamanho da consulta
         if not self.query.is_valid():
@@ -108,6 +112,9 @@ class SearchView(APIView):
             
         # Busca os documentos no elastic
         total_docs, total_pages, documents, response_time = self.query.execute()
+
+        # reranking goes here
+        documents = self.reranker.rerank(request.GET['query'], documents)
 
         end = time.time()
         wall_time = end - start
